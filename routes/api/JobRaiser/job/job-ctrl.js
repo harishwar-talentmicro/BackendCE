@@ -1648,7 +1648,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
 
 
                                     var query = 'CALL wm_get_requiremnetTeam_mail( ' + inputParams.join(',') + ')';
-                                    console.log("jejdnvoodsnoivnojasndovn", query);
+                                    console.log("query", query);
                                     req.db.query(query, function (err, result) {
                                         console.log(result)
                                         if (result && result[0] && result[0][0]) {
@@ -1675,12 +1675,28 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                 var jobtitle = result[0][i].jobtitle;
                                                 var shortSignature = result[0][i].shortSignature;
                                                 var displayName = result[0][i].displayName;
+                                                var tags = result[0][i].tags ? JSON.parse(result[0][i].tags) : [];
+
+                                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                    // 
+                                                    if ((result[0][i][tags.requirement[tagIndex].tagName] && result[0][i][tags.requirement[tagIndex].tagName] != null && result[0][i][tags.requirement[tagIndex].tagName] != 'null' && result[0][i][tags.requirement[tagIndex].tagName] != '') || result[0][i][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                        bodydata = replaceAll(bodydata, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
+
+                                                        subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
+
+                                                        // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
+
+                                                    }
+                                                }
+
+
 
                                                 if (bodydata != "") {
                                                     bodydata = bodydata.replace("[FullName]", (firstname + ' ' + lastname));
                                                     bodydata = bodydata.replace("[FirstName]", firstname);
-                                                    bodydata = bodydata.replace("[Code]", jobcode);
-                                                    bodydata = bodydata.replace("[Title]", jobtitle);
+                                                    // bodydata = bodydata.replace("[Code]", jobcode);
+                                                    // bodydata = bodydata.replace("[Title]", jobtitle);
                                                     bodydata = bodydata.replace("[displayName]", displayName);
                                                     bodydata = bodydata.replace("[shortSignature]", shortSignature);
                                                 }

@@ -3409,14 +3409,14 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                                 response.message = "Mail and SMS sent successfully";
                                                                 response.data = {
                                                                     transactions: transactions[0] ? transactions[0] : [],
-                                                                    reqAppList: result[4] ? result[4] : []
+                                                                    reqAppList: result[5] ? result[5] : []
                                                                 }
                                                             }
                                                             else {
                                                                 response.message = "Mail sent successfully";
                                                                 response.data = {
                                                                     transactions: transactions[0] ? transactions[0] : [],
-                                                                    reqAppList: result[4] ? result[4] : []
+                                                                    reqAppList: result[5] ? result[5] : []
                                                                 }
                                                             }
                                                         }
@@ -3426,14 +3426,14 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                                 response.message = "SMS sent successfully. Mail subject is empty, mail cannot be sent";
                                                                 response.data = {
                                                                     transactions: transactions[0] ? transactions[0] : [],
-                                                                    reqAppList: result[4] ? result[4] : []
+                                                                    reqAppList: result[5] ? result[5] : []
                                                                 }
                                                             }
                                                             else {
                                                                 response.message = "Mail subject is fields empty and SMS flag is not enabled, Mail and SMS cannot be sent";
                                                                 response.data = {
                                                                     transactions: transactions[0] ? transactions[0] : [],
-                                                                    reqAppList: result[4] ? result[4] : []
+                                                                    reqAppList: result[5] ? result[5] : []
                                                                 }
                                                             }
                                                         }
@@ -3441,7 +3441,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                             response.message = "Mail subject field is empty, SMS flag is not enabled . Mail and SMS cannot be sent";
                                                             response.data = {
                                                                 transactions: transactions[0] ? transactions[0] : [],
-                                                                reqAppList: result[4] ? result[4] : []
+                                                                reqAppList: result[5] ? result[5] : []
                                                             }
                                                         }
                                                     }
@@ -3451,14 +3451,14 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                             response.message = "Mail sent successfully";
                                                             response.data = {
                                                                 transactions: transactions[0] ? transactions[0] : [],
-                                                                reqAppList: result[4] ? result[4] : []
+                                                                reqAppList: result[5] ? result[5] : []
                                                             }
                                                         }
                                                         else if (subject == '') {
                                                             response.message = "Mail subject is empty, mail cannot be sent";
                                                             response.data = {
                                                                 transactions: transactions[0] ? transactions[0] : [],
-                                                                reqAppList: result[4] ? result[4] : []
+                                                                reqAppList: result[5] ? result[5] : []
                                                             }
                                                         }
                                                     }
@@ -3467,21 +3467,21 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                             response.message = "SMS sent successfully";
                                                             response.data = {
                                                                 transactions: transactions[0] ? transactions[0] : [],
-                                                                reqAppList: result[4] ? result[4] : []
+                                                                reqAppList: result[5] ? result[5] : []
                                                             }
                                                         }
                                                         else if (smsMsg == '' && smsFlag) {
                                                             response.message = "SMS field is empty, SMS cannot be sent";
                                                             response.data = {
                                                                 transactions: transactions[0] ? transactions[0] : [],
-                                                                reqAppList: result[4] ? result[4] : []
+                                                                reqAppList: result[5] ? result[5] : []
                                                             }
                                                         }
                                                         else {
                                                             response.message = "SMS flag is not enabled, SMS cannot be sent";
                                                             response.data = {
                                                                 transactions: transactions[0] ? transactions[0] : [],
-                                                                reqAppList: result[4] ? result[4] : []
+                                                                reqAppList: result[5] ? result[5] : []
                                                             }
                                                         }
                                                     }
@@ -8907,6 +8907,14 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                     if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
 
                                         smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                    }
+                                }
+
+                                for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+
+                                    if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+
+                                        smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
                                     }
                                 }
 
