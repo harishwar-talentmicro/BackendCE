@@ -1677,16 +1677,18 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                 var displayName = result[0][i].displayName;
                                                 var tags = result[0][i].tags ? JSON.parse(result[0][i].tags) : [];
 
-                                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                                    // 
-                                                    if ((result[0][i][tags.requirement[tagIndex].tagName] && result[0][i][tags.requirement[tagIndex].tagName] != null && result[0][i][tags.requirement[tagIndex].tagName] != 'null' && result[0][i][tags.requirement[tagIndex].tagName] != '') || result[0][i][tags.requirement[tagIndex].tagName] >= 0) {
+                                                if (tags && tags.length){
+                                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                        // 
+                                                        if ((result[0][i][tags.requirement[tagIndex].tagName] && result[0][i][tags.requirement[tagIndex].tagName] != null && result[0][i][tags.requirement[tagIndex].tagName] != 'null' && result[0][i][tags.requirement[tagIndex].tagName] != '') || result[0][i][tags.requirement[tagIndex].tagName] >= 0) {
 
-                                                        bodydata = replaceAll(bodydata, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
+                                                            bodydata = replaceAll(bodydata, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
 
-                                                        subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
+                                                            subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
 
-                                                        // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
+                                                            // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
 
+                                                        }
                                                     }
                                                 }
 
@@ -1695,8 +1697,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                 if (bodydata != "") {
                                                     bodydata = bodydata.replace("[FullName]", (firstname + ' ' + lastname));
                                                     bodydata = bodydata.replace("[FirstName]", firstname);
-                                                    // bodydata = bodydata.replace("[Code]", jobcode);
-                                                    // bodydata = bodydata.replace("[Title]", jobtitle);
+                                                    bodydata = bodydata.replace("[Code]", jobcode);
+                                                    bodydata = bodydata.replace("[Title]", jobtitle);
                                                     bodydata = bodydata.replace("[displayName]", displayName);
                                                     bodydata = bodydata.replace("[shortSignature]", shortSignature);
                                                 }
