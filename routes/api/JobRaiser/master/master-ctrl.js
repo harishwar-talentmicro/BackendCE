@@ -86,8 +86,8 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                             portalList: result[11] ? result[11] : [],
                             reasons: result[12] ? result[12] : [],
                             teamMembers: result[14] ? result[14] : [],
-                            industry : result[15] ? result[15] : [],
-                            functionalAreas : result[16] ? result[16] : []
+                            industry: result[15] ? result[15] : [],
+                            functionalAreas: result[16] ? result[16] : []
 
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -581,7 +581,7 @@ masterCtrl.getbranchList = function (req, res, next) {
                             branch_contacts: results[3] ? results[3] : []
                         };
 
-                        if (req.query.isWeb==1) {
+                        if (req.query.isWeb == 1) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
                                 response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -602,7 +602,7 @@ masterCtrl.getbranchList = function (req, res, next) {
                             wBranchList: [],
                             branch_contacts: []
                         };
-                        if (req.query.isWeb==1) {
+                        if (req.query.isWeb == 1) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
                                 response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -1491,134 +1491,135 @@ masterCtrl.getRequirementView = function (req, res, next) {
                 if (req.query.isWeb) {
                     if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                         var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+
+
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                                req.query.status = (req.query.status) ? req.query.status : 0;
+                                req.query.type = (req.query.type) ? req.query.type : 0;
+
+                                var inputs = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.query.status),
+                                    req.st.db.escape(req.query.heMasterId),
+                                    req.st.db.escape(req.query.type),
+                                    req.st.db.escape(req.query.startPage || 0),
+                                    req.st.db.escape(req.query.limit || 0),
+                                    req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                                    req.st.db.escape(req.query.search || ""),
+                                    req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
+                                    req.st.db.escape(req.query.isWeb || 0),
+                                    req.st.db.escape(req.body.departmentTitle || ""),
+                                    req.st.db.escape(req.body.branchName || ""),
+                                    req.st.db.escape(req.body.jobCode || ""),
+                                    req.st.db.escape(req.body.jobTitle || ""),
+                                    req.st.db.escape(req.body.positions || 0),
+                                    req.st.db.escape(req.body.positionsFilled || 0),
+                                    req.st.db.escape(req.body.requirementTeam || ""),
+                                    req.st.db.escape(req.body.notes || ""),
+                                    req.st.db.escape(req.body.offeredCTC || 0),
+                                    req.st.db.escape(req.body.joiningDate || null),
+                                    req.st.db.escape(req.body.jobType || 0),
+                                    req.st.db.escape(req.body.creatorName || ""),
+                                    req.st.db.escape(req.body.createdDate || null)
+                                ];
+
+                                var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, results) {
+                                    console.log(err);
+
+                                    if (!err && results && (results[0] || results[1])) {
+                                        response.status = true;
+                                        response.message = " Requirement View loaded sucessfully";
+                                        response.error = null;
+                                        var output = [];
+                                        for (var i = 0; i < results[0].length; i++) {
+                                            results[0][i].branchList = results[0][i].branchList && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                                                results[0][i].contactList = results[0][i].contactList && JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                                results[0][i].stageDetail = results[0][i].stageDetail && JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                                results[0][i].followUpNotes = results[0][i].followUpNotes && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
+                                        }
+
+                                        for (var i = 0; i < results[3].length; i++) {
+                                            results[3][i].status = results[3] && results[3][i] && JSON.parse(results[3][i].status) ? JSON.parse(results[3][i].status) : [];
+                                        }
+
+                                        response.data = {
+                                            requirementView: results[0] ? results[0] : [],
+                                            requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
+                                            stageList: results[3] && results[3][0] ? results[3] : []
+                                        };
+
+                                        if (req.query.isWeb == 0) {
+                                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            // zlib.gzip(buf, function (_, result) {
+                                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                            //});
+                                        }
+                                        else {
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+                                        }
+
+                                    }
+                                    else if (!err) {
+                                        response.status = true;
+                                        response.message = " Requirement View is empty";
+                                        response.error = null;
+                                        response.data = {
+                                            requirementView: [],
+                                            stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
+
+                                        };
+                                        if (req.query.isWeb == 0) {
+                                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            // zlib.gzip(buf, function (_, result) {
+                                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                            // });
+                                        }
+                                        else {
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+                                        }
+
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Error while loading Requirement View";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+
+                                });
+                            }
+
+                        });
                     }
                     else {
                         response.message = "Session expired.! Please re-login";
                         res.status(401).json(response);
                         return;
                     }
-
-                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
-
-                        if (!validationFlag) {
-                            response.error = error;
-                            response.message = 'Please check the errors';
-                            res.status(400).json(response);
-                            console.log(response);
-                        }
-                        else {
-                            req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                            req.query.status = (req.query.status) ? req.query.status : 0;
-                            req.query.type = (req.query.type) ? req.query.type : 0;
-
-                            var inputs = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.query.status),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.query.type),
-                                req.st.db.escape(req.query.startPage || 0),
-                                req.st.db.escape(req.query.limit || 0),
-                                req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
-                                req.st.db.escape(req.query.search || ""),
-                                req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
-                                req.st.db.escape(req.query.isWeb || 0),
-                                req.st.db.escape(req.body.departmentTitle || ""),
-                                req.st.db.escape(req.body.branchName || ""),
-                                req.st.db.escape(req.body.jobCode || ""),
-                                req.st.db.escape(req.body.jobTitle || ""),
-                                req.st.db.escape(req.body.positions || 0),
-                                req.st.db.escape(req.body.positionsFilled || 0),
-                                req.st.db.escape(req.body.requirementTeam || ""),
-                                req.st.db.escape(req.body.notes || ""),
-                                req.st.db.escape(req.body.offeredCTC || 0),
-                                req.st.db.escape(req.body.joiningDate || null),
-                                req.st.db.escape(req.body.jobType || 0),
-                                req.st.db.escape(req.body.creatorName || ""),
-                                req.st.db.escape(req.body.createdDate || null)
-                            ];
-
-                            var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, results) {
-                                console.log(err);
-
-                                if (!err && results && (results[0] || results[1])) {
-                                    response.status = true;
-                                    response.message = " Requirement View loaded sucessfully";
-                                    response.error = null;
-                                    var output = [];
-                                    for (var i = 0; i < results[0].length; i++) {
-                                        results[0][i].branchList = results[0][i].branchList && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
-                                            results[0][i].contactList = results[0][i].contactList && JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                            results[0][i].stageDetail = results[0][i].stageDetail && JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
-                                            results[0][i].followUpNotes = results[0][i].followUpNotes && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
-                                    }
-
-                                    for (var i = 0; i < results[3].length; i++) {
-                                        results[3][i].status = results[3] && results[3][i] && JSON.parse(results[3][i].status) ? JSON.parse(results[3][i].status) : [];
-                                    }
-
-                                    response.data = {
-                                        requirementView: results[0] ? results[0] : [],
-                                        requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
-                                        stageList: results[3] && results[3][0] ? results[3] : []
-                                    };
-
-                                    if (req.query.isWeb == 0) {
-                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        // zlib.gzip(buf, function (_, result) {
-                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                        //});
-                                    }
-                                    else {
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                            res.status(200).json(response);
-                                        });
-                                    }
-
-                                }
-                                else if (!err) {
-                                    response.status = true;
-                                    response.message = " Requirement View is empty";
-                                    response.error = null;
-                                    response.data = {
-                                        requirementView: [],
-                                        stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
-
-                                    };
-                                    if (req.query.isWeb == 0) {
-                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        // zlib.gzip(buf, function (_, result) {
-                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                        // });
-                                    }
-                                    else {
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                            res.status(200).json(response);
-                                        });
-                                    }
-
-                                }
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while loading Requirement View";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                }
-
-                            });
-                        }
-
-                    });
                 }
                 else {
                     if (!validationFlag) {
@@ -1683,7 +1684,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                     requirementView: results[0] ? results[0] : [],
                                     requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
                                     stageList: results[3] && results[3][0] ? results[3] : []
-                            };
+                                };
 
                                 if (req.query.isWeb == 0) {
                                     // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1776,83 +1777,83 @@ masterCtrl.getClientView = function (req, res, next) {
                 var decryptBuf = '';
                 if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                            req.query.type = (req.query.type) ? req.query.type : 3;
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(DBSecretKey),
+                                req.st.db.escape(req.query.type),
+                                req.st.db.escape(req.query.startPage || 0),
+                                req.st.db.escape(req.query.limit || 0),
+                                req.st.db.escape(req.query.search || ""),
+                                req.st.db.escape(req.body.clientName || ""),
+                                req.st.db.escape(req.body.notes || ""),
+                                req.st.db.escape(req.body.status || ""),
+                                req.st.db.escape(req.body.followUpNotes || ""),
+                                req.st.db.escape(req.body.createdUserName || ""),
+                                req.st.db.escape(req.body.createdDate || null),
+                                req.st.db.escape(JSON.stringify(req.body.clientStatusId || []))
+                            ];
+
+                            var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+
+                                if (!err && results && results[0]) {
+                                    response.status = true;
+                                    response.message = " Client View loaded sucessfully";
+                                    response.error = null;
+                                    for (var i = 0; i < results[0].length; i++) {
+                                        results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
+                                            results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
+                                        results[0][i].branchList = results[0][i] && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [];
+                                        results[0][i].followUpNotes = results[0][i] && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : [];
+
+                                    }
+                                    response.data = {
+                                        clientView: results[0] ? results[0] : [],
+                                        clientCount: results[1] && results[1][0] && results[1][0].clientCount ? results[1][0].clientCount : 0
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while loading client View";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+
+                            });
+                        }
+
+                    });
+
                 }
                 else {
                     response.message = "Session expired.! Please re-login";
                     res.status(401).json(response);
                     return;
                 }
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                        req.query.type = (req.query.type) ? req.query.type : 3;
-
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(req.query.type),
-                            req.st.db.escape(req.query.startPage || 0),
-                            req.st.db.escape(req.query.limit || 0),
-                            req.st.db.escape(req.query.search || ""),
-                            req.st.db.escape(req.body.clientName || ""),
-                            req.st.db.escape(req.body.notes || ""),
-                            req.st.db.escape(req.body.status || ""),
-                            req.st.db.escape(req.body.followUpNotes || ""),
-                            req.st.db.escape(req.body.createdUserName || ""),
-                            req.st.db.escape(req.body.createdDate || null),
-                            req.st.db.escape(JSON.stringify(req.body.clientStatusId || []))
-                        ];
-
-                        var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            console.log(err);
-
-                            if (!err && results && results[0]) {
-                                response.status = true;
-                                response.message = " Client View loaded sucessfully";
-                                response.error = null;
-                                for (var i = 0; i < results[0].length; i++) {
-                                    results[0][i].stageDetail = results[0][i].stageDetail ? JSON.parse(results[0][i].stageDetail) : [],
-                                        results[0][i].clientContacts = results[0][i] && JSON.parse(results[0][i].clientContacts) ? JSON.parse(results[0][i].clientContacts) : [];
-                                    results[0][i].branchList = results[0][i] && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [];
-                                    results[0][i].followUpNotes = results[0][i] && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : [];
-
-                                }
-                                response.data = {
-                                    clientView: results[0] ? results[0] : [],
-                                    clientCount: results[1] && results[1][0] && results[1][0].clientCount ? results[1][0].clientCount : 0
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
-
-                            else {
-                                response.status = false;
-                                response.message = "Error while loading client View";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-
-                        });
-                    }
-
-                });
-
-
 
             }
             else {
@@ -2641,17 +2642,17 @@ masterCtrl.saveUserManager = function (req, res, next) {
                                 results[1][0].jobTitle = (results[1][0].jobTitle && JSON.parse(results[1][0].jobTitle).jobTitleId) ? JSON.parse(results[1][0].jobTitle) : {};
 
                                 results[1][0].userType = (results[1][0].userType && JSON.parse(results[1][0].userType).userTypeId) ? JSON.parse(results[1][0].userType) : {};
-    
+
                                 results[1][0].transferredTo = (results[1][0].transferredTo && JSON.parse(results[1][0].transferredTo).transferredToUserId) ? JSON.parse(results[1][0].transferredTo) : {};
-    
+
                                 results[1][0].reportingTo = results[1][0].reportingTo ? JSON.parse(results[1][0].reportingTo) : [];
-    
+
                                 results[1][0].accessRights = (results[1][0].accessRights && JSON.parse(results[1][0].accessRights).templateId) ? JSON.parse(results[1][0].accessRights) : {};
-    
+
                                 results[1][0].department = (results[1][0].department && JSON.parse(results[1][0].department).departmentId) ? JSON.parse(results[1][0].department) : {};
-    
+
                                 results[1][0].branch = (results[1][0].branch && JSON.parse(results[1][0].branch).branchId) ? JSON.parse(results[1][0].branch) : {};
-    
+
                                 results[1][0].grade = (results[1][0].grade && JSON.parse(results[1][0].grade).gradeId) ? JSON.parse(results[1][0].grade) : {};
 
                                 response.data = {
@@ -3075,7 +3076,7 @@ masterCtrl.jobCodeGenerationMobile = function (req, res, next) {
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         // zlib.gzip(buf, function (_, result) {
                         //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
+                        res.status(200).json(response);
                         // });
                     }
 
