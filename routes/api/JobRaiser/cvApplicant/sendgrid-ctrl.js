@@ -4559,7 +4559,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                         zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                             try {
                                 req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
+                                console.log("req.body",JSON.stringify(req.body));
                                 var mailBody = req.body.mailBody ? req.body.mailBody : '';
                                 var subject = req.body.subject && req.body.subject != '' ? req.body.subject : '(no subject)';
                                 var smsMsg = req.body.smsMsg ? req.body.smsMsg : '';
@@ -5051,6 +5051,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
 
                 }
                 catch (ex) {
+                    console.log(ex);
                     error_logger.error = ex;
                     logger(req, error_logger);
                     res.status(500).json(error_response);

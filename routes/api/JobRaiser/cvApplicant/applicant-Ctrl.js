@@ -723,6 +723,23 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                         result[46][0].teamUsers = (result[46] && result[46][0] && result[46][0].teamUsers) ? JSON.parse(result[46][0].teamUsers) : []
                                     }
 
+                                    var applicant = {};
+                                    if (result[65] && result[65].length)
+                                        for (var x = 0; x < result[65].length; x++) {
+                                            applicant[result[65][x].fieldName] = result[65][x].fieldLength;
+                                        }
+
+                                    var requirement = {};
+                                    if (result[65] && result[66].length)
+                                        for (var x = 0; x < result[66].length; x++) {
+                                            requirement[result[66][x].fieldName] = result[66][x].fieldLength;
+                                        }
+                                    var client = {};
+                                    if (result[65] && result[67].length)
+                                        for (var x = 0; x < result[67].length; x++) {
+                                            client[result[67][x].fieldName] = result[67][x].fieldLength;
+                                        }
+
 
                                     response.data = {
                                         jobType: result[0] ? result[0] : [],
@@ -792,8 +809,13 @@ applicantCtrl.getApplicantMasterData = function (req, res, next) {
                                         salutation: result[60] && result[60][0] ? result[60] : [],
                                         clientBirthdayList: result[61] && result[61][0] ? result[61] : [],
                                         customRangeList: result[62] && result[62][0] ? result[62] : [],
-                                        backUpMaster : result[63] && result[63][0] ? result[63] : [],
-                                        configDetails : result[64] && result[64][0] ? result[64][0] : {}
+                                        backUpMaster: result[63] && result[63][0] ? result[63] : [],
+                                        configDetails: result[64] && result[64][0] ? result[64][0] : {},
+                                        fieldValidationData: {
+                                            applicant: applicant,
+                                            requirement: requirement,
+                                            client: client
+                                        }
                                     };
 
                                     if (req.query.isWeb == 0) {
@@ -1506,7 +1528,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                                                 response.message = "Requirement positions have been filled";
                                                 response.error = null;
                                                 response.data = statusResult[1][0] ? statusResult[1][0] : {},
-                                                response.data.reqAppList = statusResult[3] && statusResult[3][0] ? statusResult[3] : []
+                                                    response.data.reqAppList = statusResult[3] && statusResult[3][0] ? statusResult[3] : []
                                                 response.data.postionFilledRequirements = statusResult[0] ? statusResult[0] : []
 
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3519,7 +3541,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                                             interviewMailerTemplate: (result[7] && result[7][0]) ? JSON.parse(result[7][0].formDataJson) : [],
                                             branchAddress: (result[8] && result[8][0]) ? result[8][0] : null,
                                             address: result[8][0] && result[8][0].address ? result[8][0].address : "",
-                                            clientContacts : result[9] && result[9][0] ?  result[9] : []
+                                            clientContacts: result[9] && result[9][0] ? result[9] : []
                                         };
 
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

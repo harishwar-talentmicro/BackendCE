@@ -274,7 +274,13 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.clientCVMaskEmail || 0),
                         req.st.db.escape(req.body.clientResumeLogoAttach || 0),
                         req.st.db.escape(req.body.homePageLogo || ""),
-                        req.st.db.escape(JSON.stringify(req.body.notifyClientBirthdayFor || {}))
+                        req.st.db.escape(JSON.stringify(req.body.notifyClientBirthdayFor || {})),
+                        req.st.db.escape(JSON.stringify(req.body.autoInterviewStageStatus || {})),
+                        req.st.db.escape(JSON.stringify(req.body.updateInterviewStageStatus || {})),
+                        req.st.db.escape(req.body.interviewMailerLimit || 0),
+                        req.st.db.escape(req.body.ccToClients || 0),
+                        req.st.db.escape(req.body.isTagEditFlag || 0),
+                        req.st.db.escape(JSON.stringify(req.body.tags || []))
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -287,7 +293,18 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                             response.message = "Requirement default saved successfully";
                             response.data = {
                                 defaultId: results[0],
-                                defaultData: (results[1] && results[1][0] && results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData) : {}
+                                defaultData: (results[1] && results[1][0] && results[1][0].defaultFormData) ? JSON.parse(results[1][0].defaultFormData) : {},
+                                tags: {
+                                    candidate: results[2] ? results[2] : [],
+                                    requirement: results[3] ? results[3] : [],
+                                    client: results[4] ? results[4] : [],
+                                    general: results[5] ? results[5] : [],
+                                    clientContact: results[6] ? results[6] : [],
+                                    interview: results[7] ? results[7] : [],
+                                    billing: results[8] ? results[8] : [],
+                                    billingTable: results[9] ? results[9] : [],
+                                    offer: results[10] ? results[10] : []
+                                }
                             };
                             if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
                                 // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1572,7 +1589,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.currentTimeStamp),
                                 req.st.db.escape(JSON.stringify(functionalAreas)),
                                 req.st.db.escape(req.body.postJobCareerPortal || 0),
-                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {}))
+                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
+                                req.st.db.escape(req.body.statusNotes || "")
                             ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1982,7 +2000,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.currentTimeStamp),
                                 req.st.db.escape(JSON.stringify(functionalAreas)),
                                 req.st.db.escape(req.body.postJobCareerPortal),
-                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {}))
+                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
+                                req.st.db.escape(req.body.statusNotes || "")
                             ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
