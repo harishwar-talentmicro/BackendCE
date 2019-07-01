@@ -4733,6 +4733,7 @@ sendgridCtrl.interviewMailerPreview = function (req, res, next) {
                                                                 }
                                                             }
                                                             resumeFileNameArray.push(tempFileName);
+                                                            applicantsReqAppId.push(result[0][applicantIndex].reqAppId);
 
                                                         }
                                                         for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
