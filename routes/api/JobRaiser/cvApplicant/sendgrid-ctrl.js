@@ -2504,6 +2504,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                             var smsMsg_array = [];
                             var resumeFileNameArray = [];
                             var resumeFileName = req.body.resumeFileName;
+                            var reqAppData = [];
 
                             var procQuery;
                             procQuery = 'CALL wm_paceSubmissionMailer( ' + inputs.join(',') + ')';
@@ -2588,7 +2589,7 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
 
                                             }
                                             resumeFileNameArray.push(tempFileName);
-
+                                            reqAppData.push(result[0][applicantIndex].reqAppId);
                                         }
                                         for (var tagIndex = 0; tagIndex < tags.clientContacts.length; tagIndex++) {
 
@@ -2729,7 +2730,9 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                         clientCVArray: clientCVArray,
                                         resumeFileName: resumeFileNameArray,
                                         trackerData: ws_data || "",
-                                        clientContactsData: clientContactsData
+                                        clientContactsData: clientContactsData,
+                                        applicantsReqAppId: reqAppData
+
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -2751,7 +2754,8 @@ sendgridCtrl.SubmissionMailerPreview = function (req, res, next) {
                                         clientCVArray: [],
                                         resumeFileName: [],
                                         trackerData: [],
-                                        clientContactsData: []
+                                        clientContactsData: [],
+                                        applicantsReqAppId : []
                                     };
                                     res.status(200).json(response);
                                 }
