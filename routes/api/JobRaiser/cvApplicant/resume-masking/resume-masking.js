@@ -4,9 +4,11 @@ var resumeMaskingCtrl = {};
 var path = require('path');
 var uuid = require('node-uuid');
 var request = require('request');
+var error = {};
 // var resume_masking = function (original_path, new_path, header, footer, required_data) {
 resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
 
+    console.log("guru");
     var response = {
         status: false,
         message: "Invalid token",
@@ -35,6 +37,7 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
     //     req.st.validateToken(req.query.token, function (err, tokenResult) {
     //         if ((!err) && tokenResult) {
 
+    console.log('Inside http api start');
 
     var inputs = [
         req.st.db.escape(req.query.token),
@@ -49,23 +52,24 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
         console.log(err);
         console.log(Result);
         if (!err && Result && Result[0] && Result[1] && Result[1][0] && Result[1][0].cvPath != "") {
-
-            var orgCVPath = Result[1][0].cvPath;
-            var clientCVHeader = Result[0][0].clientCVHeader;
-            var clientCVFooter = Result[0][0].clientCVFooter;
-            var clientCVMaskMobileNo = Result[0][0].clientCVMaskMobileNo;
-            var clientCVMaskEmail = Result[0][0].clientCVMaskEmail;
-            var logoFile = Result[0][0].logoFile;
-
-            var uniqueId = uuid.v4();
-
-            var uniqueId = uniqueId + "." + orgCVPath.split('.')[1];
-
-            if (logoFile != "") {
-                logoFile = 'https://storage.googleapis.com/ezeone/' + logoFile;
-            }
-
             try {
+
+                var orgCVPath = Result[1][0].cvPath;
+                var clientCVHeader = Result[0][0].clientCVHeader;
+                var clientCVFooter = Result[0][0].clientCVFooter;
+                var clientCVMaskMobileNo = Result[0][0].clientCVMaskMobileNo;
+                var clientCVMaskEmail = Result[0][0].clientCVMaskEmail;
+                var logoFile = Result[0][0].logoFile;
+
+                var uniqueId = uuid.v4();
+
+                var uniqueId = uniqueId + "." + orgCVPath.split('.')[1];
+
+                if (logoFile != "") {
+                    logoFile = 'https://storage.googleapis.com/ezeone/' + logoFile;
+                }
+
+                console.log(path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail);
 
                 var process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail]);
                 // fs.readFile(path.resolve(__dirname, "word.py"), function (err, res) {
@@ -97,6 +101,7 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
                             response.data = {
                                 clientCVPath: uniqueId
                             };
+                            console.log(response);
                             res.status(200).json(response);
 
                             // res.send(200)
@@ -144,7 +149,7 @@ resumeMaskingCtrl.resume_maskinghttps = function (req, res, next) {
 
     var response = {
         status: false,
-        message: "Invalid token",
+        message: "Invalid some error occurred",
         data: null,
         error: null
     };
@@ -166,6 +171,7 @@ resumeMaskingCtrl.resume_maskinghttps = function (req, res, next) {
     }
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
+            console.log(err, tokenResult);
             if ((!err) && tokenResult) {
 
 
@@ -173,7 +179,7 @@ resumeMaskingCtrl.resume_maskinghttps = function (req, res, next) {
                 var isWeb = req.query.isWeb;
                 var token = req.query.token;
 
-                var url = 'http://35.237.69.199/api/v1.1/WM/cv/resume-preparationhttp?heMasterId=' + heMasterId + '&isWeb=' + isWeb + '&token=' + token;
+                var url = 'http://23.236.49.140:1002/api/v1.1/WM/cv/talentmicro-resume-preparation?heMasterId=' + heMasterId + '&isWeb=' + isWeb;
                 console.log("http url", url);
 
                 try {

@@ -1,3 +1,4 @@
+from google.cloud import storage
 import re
 from docx import Document
 from docx.shared import Inches
@@ -17,9 +18,8 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.dirname(__file__)+"/cred.
 # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
 
 # [START storage_upload_file]
-from google.cloud import storage
 
-# print (sys.argv)
+print (sys.argv)
 
 try:
     def docx_replace_regex(doc_obj, regex, replace):
@@ -38,12 +38,12 @@ try:
                 for cell in row.cells:
                     docx_replace_regex(cell, regex, replace)
 
-
     regex1 = re.compile(r"(\+)*[ 0-9\-]{8,14}")
     replace1 = r""
     regex2 = re.compile(r"[a-zA-Z0-9\._]+@[a-zA-Z]+.[a-zA-Z]+")
     replace2 = r""
-    filename = sys.argv[1]+sys.argv[2]#"https://storage.googleapis.com/ezeone/6f8e5aaf-84dd-4ece-99c2-946cd469929f.docx"
+    # "https://storage.googleapis.com/ezeone/6f8e5aaf-84dd-4ece-99c2-946cd469929f.docx"
+    filename = sys.argv[1]+sys.argv[2]
     doc = Document(BytesIO(requests.get(filename).content))
     docx_replace_regex(doc, regex1, replace1)
     docx_replace_regex(doc, regex2, replace2)
@@ -55,28 +55,32 @@ try:
     first_paragraph = header.paragraphs[0]
     image_paragraph = first_paragraph.insert_paragraph_before()
     header_image = image_paragraph.add_run()
-    header_image.add_picture(BytesIO(requests.get(sys.argv[4]).content), width=Inches(1.5))
+    header_image.add_picture(
+        BytesIO(requests.get(sys.argv[4]).content), width=Inches(1.5))
     text_paragraph = first_paragraph.insert_paragraph_before()
     header_text = text_paragraph.add_run()
     header_text.add_text(sys.argv[5])
 
-    # paragraph.add_picture('download.png', width=Inches(1.25))
+   # paragraph.add_picture('download.png', width=Inches(1.25))
     try:
         storage_client = storage.Client()
         bucket = storage_client.get_bucket('ezeone')
-        blob = bucket.blob(sys.argv[3])#'6f8e5aaf-84dd-4ece-99c2-946cd469929f12345.docx')
-    except Exception as e: print(e)
+        # '6f8e5aaf-84dd-4ece-99c2-946cd469929f12345.docx')
+        blob = bucket.blob(sys.argv[3])
+        file_stream = BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+        blob.upload_from_file(file_stream)
+    except Exception as e:
+        print(e)
     # print("here")
     # with open(BytesIO(doc), "rb") as my_file:
     #     blob.upload_from_file(my_file)
-    file_stream = BytesIO()
-    doc.save(file_stream)
-    file_stream.seek(0)
-    blob.upload_from_file(file_stream)
 
-        # print('File {} uploaded to {}.'.format(
-        #     source_file_name,
-        #     destination_blob_name))
+       # print('File {} uploaded to {}.'.format(
+       #     source_file_name,
+       #     destination_blob_name))
     # [END storage_upload_file]
-except Exception as e: print(e)
+except Exception as e:
+    print(e)
 print ('done')
