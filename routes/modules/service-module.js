@@ -932,22 +932,28 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                     var readStream = fs.createReadStream(req.files.attachment.path);
 
                     uploadDocumentToCloud(aUrl, readStream, function (err) {
-                        if (!err) {
-                            responseMessage.status = true;
-                            responseMessage.message = 'attachment Uploaded successfully';
-                            responseMessage.data = {
-                                a_url: aUrl,
-                                a_fn: aFilename
-                            };
-                            console.log("responseMessage", responseMessage);
+                        try {
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.message = 'attachment Uploaded successfully';
+                                responseMessage.data = {
+                                    a_url: aUrl,
+                                    a_fn: aFilename
+                                };
+                                console.log("responseMessage", responseMessage);
 
-                            res.status(200).json(responseMessage);
-                            console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'attachment not upload';
-                            res.status(200).json(responseMessage);
-                            console.log('FnSaveServiceAttachment:attachment not upload');
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'attachment not upload';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveServiceAttachment:attachment not upload');
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                            responseMessage.message = 'Failed to upload';
+                            res.status(500).json(responseMessage);
                         }
                     });
                 } else {
@@ -957,15 +963,21 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                         attachment: fs.createReadStream(req.files.attachment.path),
                     };
                     request.post({ url: 'http://35.237.69.199/api/service_attachment_doc', formData: formData }, function (err, httpResponse, body) {
-                        if (err) {
-                            return console.error('upload failed:', err);
-                        }
-                        else {
-                            console.log('Response message convert:', body);
-                            responseMessage.message = "Converted to docx";
-                            // responseMessage.data = body.data;
+                        try {
+                            if (err) {
+                                return console.error('upload failed:', err);
+                            }
+                            else {
+                                console.log('Response message convert:', body);
+                                responseMessage.message = "Converted to docx";
+                                // responseMessage.data = body.data;
 
-                            res.status(200).json(JSON.parse(body));
+                                res.status(200).json(JSON.parse(body));
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                            responseMessage.message = 'Failed to upload';
+                            res.status(500).json(responseMessage);
                         }
                     });
 
@@ -1048,22 +1060,28 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                     var readStream = fs.createReadStream(req.files.attachment.path);
 
                     uploadDocumentToCloud(aUrl, readStream, function (err) {
-                        if (!err) {
-                            responseMessage.status = true;
-                            responseMessage.message = 'attachment Uploaded successfully';
-                            responseMessage.data = {
-                                a_url: aUrl,
-                                a_fn: aFilename
-                            };
-                            console.log("responseMessage", responseMessage);
+                        try {
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.message = 'attachment Uploaded successfully';
+                                responseMessage.data = {
+                                    a_url: aUrl,
+                                    a_fn: aFilename
+                                };
+                                console.log("responseMessage", responseMessage);
 
-                            res.status(200).json(responseMessage);
-                            console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
-                        }
-                        else {
-                            responseMessage.message = 'attachment not upload';
-                            res.status(200).json(responseMessage);
-                            console.log('FnSaveServiceAttachment:attachment not upload');
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'attachment not upload';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveServiceAttachment:attachment not upload');
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                            responseMessage.message = 'Failed to upload';
+                            res.status(500).json(responseMessage);
                         }
                     });
                 }
@@ -1080,43 +1098,55 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
 
                     // the finish event is emitted when all data has been flushed from the stream
                     writeStream.on('finish', () => {
-                        console.log('wrote all data to file');
-                        console.log(path.resolve(__dirname, 'doc2docx.py'));
-                        var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]);
-                        // process.stdout.on('data',function(data){
-                        //     console.log(data.toString());
-                        // })
-                        process.stdout.on('data', function (data) {
-                            console.log("Inside");
-                            if (data)
-                                console.log(data.toString());
-                            process.kill();
-                            setTimeout(function () {
-                                var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
+                        try {
+                            console.log('wrote all data to file');
+                            console.log(path.resolve(__dirname, 'doc2docx.py'));
+                            var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]);
+                            // process.stdout.on('data',function(data){
+                            //     console.log(data.toString());
+                            // })
+                            process.stdout.on('data', function (data) {
+                                console.log("Inside");
+                                if (data)
+                                    console.log(data.toString());
+                                process.kill();
+                                setTimeout(function () {
+                                    var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
 
-                                uploadDocumentToCloud(aUrl, readStream, function (err) {
-                                    if (!err) {
-                                        responseMessage.status = true;
-                                        responseMessage.message = 'attachment Uploaded successfully';
-                                        responseMessage.data = {
-                                            a_url: aUrl,
-                                            a_fn: aFilename,
-                                            message: 'docx'
-                                        };
-                                        console.log("responseMessage", responseMessage);
+                                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                        try {
+                                            if (!err) {
+                                                responseMessage.status = true;
+                                                responseMessage.message = 'attachment Uploaded successfully';
+                                                responseMessage.data = {
+                                                    a_url: aUrl,
+                                                    a_fn: aFilename,
+                                                    message: 'docx'
+                                                };
+                                                console.log("responseMessage", responseMessage);
 
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
-                                    }
-                                    else {
-                                        responseMessage.message = 'attachment not upload';
-                                        res.status(200).json(responseMessage);
-                                        console.log('FnSaveServiceAttachment:attachment not upload');
-                                    }
-                                });
-                            }, 1000);
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                            }
+                                            else {
+                                                responseMessage.message = 'attachment not upload';
+                                                res.status(200).json(responseMessage);
+                                                console.log('FnSaveServiceAttachment:attachment not upload');
+                                            }
+                                        } catch (ex) {
+                                            console.log(ex);
+                                            responseMessage.message = 'Failed to upload';
+                                            res.status(500).json(responseMessage);
+                                        }
+                                    });
+                                }, 1000);
 
-                        })
+                            })
+                        } catch (ex) {
+                            console.log(ex);
+                            responseMessage.message = 'Failed to upload';
+                            res.status(500).json(responseMessage);
+                        }
                     });
                 }
             }
