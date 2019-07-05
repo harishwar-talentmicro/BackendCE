@@ -1358,7 +1358,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                     zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                         req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
+                        console.log(req.body);
                         if (!req.body.heMasterId) {
                             error.heMasterId = 'Invalid tenant';
                             validationFlag *= false;
@@ -1618,6 +1618,49 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     }
 
                                     response.error = null;
+                                    for (i = 0; i < results[5].length; i++) {
+                                        if (typeof (results[5] && results[5][i] && results[5][i].cc) == 'string') {
+                                            results[5][i].cc = JSON.parse(results[5][i].cc);
+                                        }
+                                        if (typeof (results[5] && results[5][i] && results[5][i].bcc) == 'string') {
+                                            results[5][i].bcc = JSON.parse(results[5][i].bcc);
+                                        }
+
+                                        var firstname = results[5][i].firstname ? results[5][i].firstname : "";
+                                        var lastname = results[5][i].lastname ? results[5][i].lastname : "";
+                                        var jobcode = results[5][i].JobCode;
+                                        var jobtitle = results[5][i].JobTitle;
+                                        var shortSignature = results[5][i].shortSignature;
+                                        var displayName = results[5][i].displayName;
+
+                                        var tags = results[5][i].tags ? JSON.parse(results[5][i].tags) : [];
+
+                                        if (tags && tags.length) {
+                                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                // 
+                                                if ((results[5][i][tags.requirement[tagIndex].tagName] && results[5][i][tags.requirement[tagIndex].tagName] != null && results[5][i][tags.requirement[tagIndex].tagName] != 'null' && results[5][i][tags.requirement[tagIndex].tagName] != '') || results[5][i][tags.requirement[tagIndex].tagName] >= 0) {
+
+                                                    results[5][i].mailbody = replaceAll(results[5][i].mailbody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+
+                                                    results[5][i].subject = replaceAll(results[5][i].subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+
+                                                    // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+
+                                                }
+                                            }
+                                        }
+
+                                        if (results[5][i].mailbody != "") {
+                                            results[5][i].mailbody = results[5][i].mailbody.replace("[FullName]", (firstname + ' ' + lastname));
+                                            results[5][i].mailbody = results[5][i].mailbody.replace("[FirstName]", firstname);
+                                            results[5][i].mailbody = results[5][i].mailbody.replace("[Code]", jobcode);
+                                            results[5][i].mailbody = results[5][i].mailbody.replace("[Title]", jobtitle);
+                                            results[5][i].mailbody = results[5][i].mailbody.replace("[displayName]", displayName);
+                                            results[5][i].mailbody = results[5][i].mailbody.replace("[shortSignature]", shortSignature);
+                                        }
+                                    }
+
+
                                     response.data = {
                                         messageList: {
                                             messageId: results[0][0].messageId,
@@ -1643,7 +1686,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             requirementList: (results && results[2] && results[2][0]) ? results[2] : [],
                                             jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : [],
                                             requirementJobTitle: (results && results[4] && results[4][0]) ? results[4] : [],
-                                            requirementDetails: (results && results[6] && results[6][0]) ? results[6][0] : {}
+                                            requirementDetails: (results && results[6] && results[6][0]) ? results[6][0] : {},
+                                            requirementMailData: results && results[5] && results[5][0] ? results[5] : []
                                         }
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1652,113 +1696,6 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         res.status(200).json(response);
                                     });
 
-                                    var reqId = results[5][0].reqId ? results[5][0].reqId : 0;
-                                    var templateId = results[5][0].templateId ? results[5][0].templateId : 0;
-                                    var reqgroupId = 0;
-
-                                    var inputParams = [
-                                        req.st.db.escape(req.query.token),
-                                        req.st.db.escape(req.body.heMasterId),
-                                        req.st.db.escape(reqId),
-                                        req.st.db.escape(templateId),
-                                        req.st.db.escape(reqgroupId)
-                                    ]
-
-
-                                    var query = 'CALL wm_get_requiremnetTeam_mail( ' + inputParams.join(',') + ')';
-                                    console.log("query", query);
-                                    req.db.query(query, function (err, result) {
-                                        console.log(result)
-                                        if (result && result[0] && result[0][0]) {
-                                            for (i = 0; i < result[0].length; i++) {
-                                                // var cc=result[0][i].cc;
-                                                // var bcc=result[0][i].bcc;
-
-                                                if (typeof (result[0] && result[0][i] && result[0][i].cc) == 'json') {
-                                                    result[0][i].cc = JSON.stringify(result[0][i].cc);
-                                                }
-
-
-                                                if (typeof (result[0] && result[0][i] && result[0][i].bcc) == 'json') {
-                                                    result[0][i].bcc = JSON.stringify(result[0][i].bcc);
-                                                }
-
-                                                var emailId = result[0][i].emailId;
-                                                var fromEmailId = result[0][i].fromMailId;
-                                                var bodydata = result[0][i].mailbody ? result[0][i].mailbody : "";
-                                                var subject = result[0][i].subject;
-                                                var firstname = result[0][i].firstname ? result[0][i].firstname : "";
-                                                var lastname = result[0][i].lastname ? result[0][i].lastname : "";
-                                                var jobcode = result[0][i].jobcode;
-                                                var jobtitle = result[0][i].jobtitle;
-                                                var shortSignature = result[0][i].shortSignature;
-                                                var displayName = result[0][i].displayName;
-                                                var tags = result[0][i].tags ? JSON.parse(result[0][i].tags) : [];
-
-                                                if (tags && tags.length){
-                                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                                        // 
-                                                        if ((result[0][i][tags.requirement[tagIndex].tagName] && result[0][i][tags.requirement[tagIndex].tagName] != null && result[0][i][tags.requirement[tagIndex].tagName] != 'null' && result[0][i][tags.requirement[tagIndex].tagName] != '') || result[0][i][tags.requirement[tagIndex].tagName] >= 0) {
-
-                                                            bodydata = replaceAll(bodydata, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
-
-                                                            subject = replaceAll(subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
-
-                                                            // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][i][tags.requirement[tagIndex].tagName]);
-
-                                                        }
-                                                    }
-                                                }
-
-
-
-                                                if (bodydata != "") {
-                                                    bodydata = bodydata.replace("[FullName]", (firstname + ' ' + lastname));
-                                                    bodydata = bodydata.replace("[FirstName]", firstname);
-                                                    bodydata = bodydata.replace("[Code]", jobcode);
-                                                    bodydata = bodydata.replace("[Title]", jobtitle);
-                                                    bodydata = bodydata.replace("[displayName]", displayName);
-                                                    bodydata = bodydata.replace("[shortSignature]", shortSignature);
-                                                }
-                                                if (result[0][i].cc != "") {
-                                                    result[0][i].cc = result[0][i].cc.replace("[", "");
-                                                    result[0][i].cc = result[0][i].cc.replace("]", "");
-                                                    result[0][i].cc = result[0][i].cc.replace(/["]/g, "");
-                                                }
-                                                if (result[0][i].bcc != "") {
-                                                    result[0][i].bcc = result[0][i].bcc.replace("[", "");
-                                                    result[0][i].bcc = result[0][i].bcc.replace("]", "");
-                                                    result[0][i].bcc = result[0][i].bcc.replace(/["]/g, "");
-                                                }
-
-                                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                                var mailOptions = new sendgrid.Email();
-                                                mailOptions.from = fromEmailId,
-                                                    mailOptions.to = emailId,
-                                                    mailOptions.cc = result[0][i].cc,
-                                                    mailOptions.bcc = result[0][i].bcc,
-                                                    mailOptions.subject = result[0][i].subject,
-                                                    mailOptions.html = bodydata// html body
-
-                                                sendgrid.send(mailOptions, function (err, results) {
-                                                    if (err) {
-                                                        console.log("mail not sent", err);
-
-                                                    }
-                                                    else {
-                                                        console.log('Mail sent successfully');
-
-                                                    }
-                                                });
-
-                                            }
-
-                                        }
-                                    });
-
-
-
-                                    // res.status(200).json(response);
                                 }
                                 else {
                                     response.status = false;
