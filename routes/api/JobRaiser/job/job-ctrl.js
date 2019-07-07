@@ -1636,6 +1636,15 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         var tags = results[5][i].tags ? JSON.parse(results[5][i].tags) : {};
 
                                         if (tags && tags.requirement && tags.requirement.length) {
+
+                                            function escapeRegExp(string) {
+                                                return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                                            }
+                                            
+                                            function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
+                                                return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
+                                            }
+                                            
                                             for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
                                                 // 
                                                 if ((results[5][i][tags.requirement[tagIndex].tagName] && results[5][i][tags.requirement[tagIndex].tagName] != null && results[5][i][tags.requirement[tagIndex].tagName] != 'null' && results[5][i][tags.requirement[tagIndex].tagName] != '') || results[5][i][tags.requirement[tagIndex].tagName] >= 0) {
