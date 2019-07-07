@@ -19,1059 +19,1437 @@ var DBSecretKey = CONFIG.DB.secretKey;
 
 var gulfCtrl = {};
 var error = {};
+var logger = require('../error-logger/error-log.js');
 
 gulfCtrl.saveMedical = function (req, res, next) {
-    var response = {
+
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag = false;
-    }
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag = false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+    try {
 
-                    var currency = req.body.currency;
-                    if (typeof (currency) == "string") {
-                        currency = JSON.parse(currency);
-                    }
-                    if (!currency) {
-                        currency = {};
-                    }
-                    var scale = req.body.scale;
-                    if (typeof (scale) == "string") {
-                        scale = JSON.parse(scale);
-                    }
-                    if (!scale) {
-                        scale = {};
-                    }
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                    var gamcaMedicalCentre = req.body.gamcaMedicalCentre;
-                    if (typeof (gamcaMedicalCentre) == "string") {
-                        gamcaMedicalCentre = JSON.parse(gamcaMedicalCentre);
-                    }
-                    if (!gamcaMedicalCentre) {
-                        gamcaMedicalCentre = {};
-                    }
+        var error_logger = {
+            details: 'gulfCtrl.saveMedical'
+        }
 
-                    var cdnFilePath = req.body.cdnFilePath;
-                    if (typeof (cdnFilePath) == "string") {
-                        cdnFilePath = JSON.parse(cdnFilePath);
-                    }
-                    if (!cdnFilePath) {
-                        cdnFilePath = [];
-                    }
-
-                    var medicalNotes = req.body.medicalNotes;
-                    if (typeof (medicalNotes) == "string") {
-                        medicalNotes = JSON.parse(medicalNotes);
-                    }
-                    if (!medicalNotes) {
-                        medicalNotes = {};
-                    }
-
-                    if (!req.body.reqApp.length) {
-                        error.reqApp = 'Invalid reqApp';
-                        validationFlag = false;
-                    }
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                        req.body.medicalId = (req.body.medicalId) ? req.body.medicalId : 0;
-                        req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 1;
-                        req.body.scaleId = (req.body.scaleId) ? req.body.scaleId : 1;
-                        req.body.tokenNumber = (req.body.tokenNumber) ? req.body.tokenNumber : 0;
-                        // req.body.medicalNotes = (req.body.medicalNotes) ? req.body.medicalNotes : "";
-                        req.body.notes = (req.body.notes) ? req.body.notes : "";
-                        req.body.medicalStatus = (req.body.medicalStatus) ? req.body.medicalStatus : 0;
-                        req.body.medicalStage = (req.body.medicalStage) ? req.body.medicalStage : 0;
-                        req.body.isGamca = (req.body.isGamca) ? req.body.isGamca : 0;
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag = false;
+        }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag = false;
+        }
 
 
-                        var getStatus = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.medicalId || 0),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(req.body.reqApp)),
-                            req.st.db.escape(req.body.heDepartmentId || 0),
-                            req.st.db.escape(req.body.billTo || 0),
-                            req.st.db.escape(req.body.amount || 0),
-                            req.st.db.escape(JSON.stringify(currency || {})),
-                            req.st.db.escape(JSON.stringify(scale || {})),
-                            req.st.db.escape(req.body.receivedDate),
-                            req.st.db.escape(req.body.sentDate),
-                            req.st.db.escape(req.body.date),
-                            req.st.db.escape(req.body.tokenNumber || ""),
-                            req.st.db.escape(req.body.MOFANumber || ""),
-                            req.st.db.escape(req.body.medicalStatus),
-                            req.st.db.escape(JSON.stringify(medicalNotes || "")),
-                            req.st.db.escape(req.body.notes || ""),
-                            req.st.db.escape(req.body.reMedical || 0),
-                            req.st.db.escape(req.body.medicalStage || 0),
-                            req.st.db.escape(JSON.stringify(gamcaMedicalCentre || {})),
-                            req.st.db.escape(JSON.stringify(cdnFilePath || [])),
-                            req.st.db.escape(req.body.isGamca || 0),
-                            req.st.db.escape(JSON.stringify(req.body.clinic || {}))
-                        ];
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
 
-                        var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, Result) {
-                            console.log(err);
-                            if (!err && Result && Result[0][0]) {
-                                response.status = true;
-                                response.message = "Medical data saved successfully";
-                                response.error = null;
-                                response.data = {
-                                    medicalId: Result[0][0].medicalId,
-                                    reqAppList: (Result[1] && Result[1][0]) ? Result[1] : [],
-                                    transactionHistory: (Result[2] && Result[2][0]) ? Result[2] : [],
-                                    medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : []
-                                };
 
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
+                    if ((!err) && tokenResult) {
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving medical data";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                                var currency = req.body.currency;
+                                if (typeof (currency) == "string") {
+                                    currency = JSON.parse(currency);
+                                }
+                                if (!currency) {
+                                    currency = {};
+                                }
+                                var scale = req.body.scale;
+                                if (typeof (scale) == "string") {
+                                    scale = JSON.parse(scale);
+                                }
+                                if (!scale) {
+                                    scale = {};
+                                }
+
+                                var gamcaMedicalCentre = req.body.gamcaMedicalCentre;
+                                if (typeof (gamcaMedicalCentre) == "string") {
+                                    gamcaMedicalCentre = JSON.parse(gamcaMedicalCentre);
+                                }
+                                if (!gamcaMedicalCentre) {
+                                    gamcaMedicalCentre = {};
+                                }
+
+                                var cdnFilePath = req.body.cdnFilePath;
+                                if (typeof (cdnFilePath) == "string") {
+                                    cdnFilePath = JSON.parse(cdnFilePath);
+                                }
+                                if (!cdnFilePath) {
+                                    cdnFilePath = [];
+                                }
+
+                                var medicalNotes = req.body.medicalNotes;
+                                if (typeof (medicalNotes) == "string") {
+                                    medicalNotes = JSON.parse(medicalNotes);
+                                }
+                                if (!medicalNotes) {
+                                    medicalNotes = {};
+                                }
+
+                                if (!req.body.reqApp.length) {
+                                    error.reqApp = 'Invalid reqApp';
+                                    validationFlag = false;
+                                }
+
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                                    req.body.medicalId = (req.body.medicalId) ? req.body.medicalId : 0;
+                                    req.body.currencyId = (req.body.currencyId) ? req.body.currencyId : 1;
+                                    req.body.scaleId = (req.body.scaleId) ? req.body.scaleId : 1;
+                                    req.body.tokenNumber = (req.body.tokenNumber) ? req.body.tokenNumber : 0;
+                                    // req.body.medicalNotes = (req.body.medicalNotes) ? req.body.medicalNotes : "";
+                                    req.body.notes = (req.body.notes) ? req.body.notes : "";
+                                    req.body.medicalStatus = (req.body.medicalStatus) ? req.body.medicalStatus : 0;
+                                    req.body.medicalStage = (req.body.medicalStage) ? req.body.medicalStage : 0;
+                                    req.body.isGamca = (req.body.isGamca) ? req.body.isGamca : 0;
+
+
+                                    var getStatus = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.body.medicalId || 0),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(req.body.reqApp)),
+                                        req.st.db.escape(req.body.heDepartmentId || 0),
+                                        req.st.db.escape(req.body.billTo || 0),
+                                        req.st.db.escape(req.body.amount || 0),
+                                        req.st.db.escape(JSON.stringify(currency || {})),
+                                        req.st.db.escape(JSON.stringify(scale || {})),
+                                        req.st.db.escape(req.body.receivedDate),
+                                        req.st.db.escape(req.body.sentDate),
+                                        req.st.db.escape(req.body.date),
+                                        req.st.db.escape(req.body.tokenNumber || ""),
+                                        req.st.db.escape(req.body.MOFANumber || ""),
+                                        req.st.db.escape(req.body.medicalStatus),
+                                        req.st.db.escape(JSON.stringify(medicalNotes || "")),
+                                        req.st.db.escape(req.body.notes || ""),
+                                        req.st.db.escape(req.body.reMedical || 0),
+                                        req.st.db.escape(req.body.medicalStage || 0),
+                                        req.st.db.escape(JSON.stringify(gamcaMedicalCentre || {})),
+                                        req.st.db.escape(JSON.stringify(cdnFilePath || [])),
+                                        req.st.db.escape(req.body.isGamca || 0),
+                                        req.st.db.escape(JSON.stringify(req.body.clinic || {}))
+                                    ];
+
+                                    var procQuery = 'CALL wm_save_1010_medical( ' + getStatus.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, Result) {
+                                        try {
+
+                                            console.log(err);
+                                            if (!err && Result && Result[0][0]) {
+                                                response.status = true;
+                                                response.message = "Medical data saved successfully";
+                                                response.error = null;
+                                                response.data = {
+                                                    medicalId: Result[0][0].medicalId,
+                                                    reqAppList: (Result[1] && Result[1][0]) ? Result[1] : [],
+                                                    transactionHistory: (Result[2] && Result[2][0]) ? Result[2] : [],
+                                                    medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : []
+                                                };
+
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    try {
+
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    }
+                                                    catch (ex) {
+                                                        console.log(ex);
+                                                        error_logger.error = ex;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                });
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while saving medical data";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
+                            } catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+                    }
+                    else {
+                        res.status(401).json(response);
                     }
 
-                });
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                } catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
     }
-
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
 };
 
 
 
 gulfCtrl.getMedical = function (req, res, next) {
-    var response = {
-        status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
+    try {
+        var error_response = {
+            status: false,
+            message: "Some error occurred!",
+            error: null,
+            data: null
+        }
+        var error_logger = {
+            details: 'gulfCtrl.getMedical'
+        }
+        try {
+            var response = {
+                status: false,
+                message: "Invalid token",
+                data: null,
+                error: null
+            };
 
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag = false;
-    }
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag = false;
-    }
-    if (!req.query.reqApplicantId) {
-        error.reqApplicantId = 'Invalid reqApplicantId';
-        validationFlag = false;
-    }
+            var validationFlag = true;
+            if (!req.query.token) {
+                error.token = 'Invalid token';
+                validationFlag = false;
+            }
+            if (!req.query.heMasterId) {
+                error.heMasterId = 'Invalid company';
+                validationFlag = false;
+            }
+            if (!req.query.reqApplicantId) {
+                error.reqApplicantId = 'Invalid reqApplicantId';
+                validationFlag = false;
+            }
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
+            }
+            else {
+                req.st.validateToken(req.query.token, function (err, tokenResult) {
+                    try {
 
-
-                var getStatus = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.reqApplicantId)
-                ];
-
-                var procQuery = 'CALL wm_get_medical( ' + getStatus.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, Result) {
-                    console.log(err);
-                    if (!err && Result[0] || Result[1] || Result[2]) {
+                        if ((!err) && tokenResult) {
 
 
-                        if (Result[0][0]) {
-                            Result[0][0].currency = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].currency).currencyId) ? JSON.parse(Result[0][0].currency) : {};
+                            var getStatus = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.query.reqApplicantId)
+                            ];
 
-                            Result[0][0].scale = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].scale).scaleId) ? JSON.parse(Result[0][0].scale) : {};
+                            var procQuery = 'CALL wm_get_medical( ' + getStatus.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, Result) {
+                                try {
 
-                            Result[0][0].gamcaMedicalCentre = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].gamcaMedicalCentre).medicalCentreId) ? JSON.parse(Result[0][0].gamcaMedicalCentre) : {};
+                                    console.log(err);
+                                    if (!err && Result[0] || Result[1] || Result[2]) {
 
-                            Result[0][0].cdnFilePath = (Result[0] && Result[0][0] && Result[0] && Result[0][0].cdnFilePath) ? JSON.parse(Result[0][0].cdnFilePath) : [];
 
-                            Result[0][0].medicalNotes = (Result[0] && Result[0][0] && Result[0] && Result[0][0].medicalNotes) ? JSON.parse(Result[0][0].medicalNotes) : {};
+                                        if (Result[0][0]) {
+                                            Result[0][0].currency = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].currency).currencyId) ? JSON.parse(Result[0][0].currency) : {};
 
-                            Result[0][0].clinic = (Result[0] && Result[0][0] && Result[0] && Result[0][0].clinic) ? JSON.parse(Result[0][0].clinic) : {};
+                                            Result[0][0].scale = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].scale).scaleId) ? JSON.parse(Result[0][0].scale) : {};
 
+                                            Result[0][0].gamcaMedicalCentre = (Result[0] && Result[0][0] && JSON.parse(Result[0][0].gamcaMedicalCentre).medicalCentreId) ? JSON.parse(Result[0][0].gamcaMedicalCentre) : {};
+
+                                            Result[0][0].cdnFilePath = (Result[0] && Result[0][0] && Result[0] && Result[0][0].cdnFilePath) ? JSON.parse(Result[0][0].cdnFilePath) : [];
+
+                                            Result[0][0].medicalNotes = (Result[0] && Result[0][0] && Result[0] && Result[0][0].medicalNotes) ? JSON.parse(Result[0][0].medicalNotes) : {};
+
+                                            Result[0][0].clinic = (Result[0] && Result[0][0] && Result[0] && Result[0][0].clinic) ? JSON.parse(Result[0][0].clinic) : {};
+
+                                        }
+
+                                        for (var i = 0; i < Result[2].length; i++) {
+                                            Result[2][i].stateWiseList = (Result[2][i] && Result[2][i]) ? JSON.parse(Result[2][i].stateWiseList) : [];
+
+                                            for (var j = 0; j < Result[2][i].stateWiseList.length; j++) {
+                                                Result[2][i].stateWiseList[j].medicalCentreList = (Result[2][i].stateWiseList[j]) ? JSON.parse(Result[2][i].stateWiseList[j].medicalCentreList) : [];
+                                            }
+                                        }
+                                        response.status = true;
+                                        response.message = "Medical loaded successfully";
+                                        response.error = null;
+                                        response.data = {
+                                            medicalNotes: Result[1],
+                                            allMedicalCentreList: Result[2] ? Result[2] : [],
+                                            medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : [],
+                                            clinicList: Result[4] ? Result[4] : [],
+                                            medicalDetails: Result[0] && Result[0][0] ? Result[0][0] : {},
+                                            applicantName: Result[5] && Result[5][0] && Result[5][0].applicantName ? Result[5][0].applicantName : ""
+                                        };
+
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            try {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            }
+                                            catch (ex) {
+                                                console.log(ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    }
+
+                                    else if (!err) {
+                                        response.status = false;
+                                        response.message = "No results found";
+                                        response.error = null;
+                                        response.data = {
+                                            currentMedicalDetails: {},
+                                            medicalNotes: [],
+                                            allMedicalCentreList: [],
+                                            clinicList: []
+                                        };
+                                        res.status(200).json(response);
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Error while loading medical data";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                }
+                                catch (ex) {
+                                    console.log(ex);
+                                    error_logger.error = ex;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            });
                         }
-
-                        for (var i = 0; i < Result[2].length; i++) {
-                            Result[2][i].stateWiseList = (Result[2][i] && Result[2][i]) ? JSON.parse(Result[2][i].stateWiseList) : [];
-
-                            for (var j = 0; j < Result[2][i].stateWiseList.length; j++) {
-                                Result[2][i].stateWiseList[j].medicalCentreList = (Result[2][i].stateWiseList[j]) ? JSON.parse(Result[2][i].stateWiseList[j].medicalCentreList) : [];
-                            }
+                        else {
+                            res.status(401).json(response);
                         }
-                        response.status = true;
-                        response.message = "Medical loaded successfully";
-                        response.error = null;
-                        response.data = {
-                            medicalNotes: Result[1],
-                            allMedicalCentreList: Result[2] ? Result[2] : [],
-                            medicalHistory: Result[3] && Result[3][0] && Result[3][0].medicalHistory ? JSON.parse(Result[3][0].medicalHistory) : [],
-                            clinicList: Result[4] ? Result[4] : [],
-                            medicalDetails: Result[0] && Result[0][0] ? Result[0][0] : {},
-                            applicantName: Result[5] && Result[5][0] && Result[5][0].applicantName ? Result[5][0].applicantName : ""
-                        };
-
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
                     }
-
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {
-                            currentMedicalDetails: {},
-                            medicalNotes: [],
-                            allMedicalCentreList: [],
-                            clinicList: []
-                        };
-                        res.status(200).json(response);
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while loading medical data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                    catch (ex) {
+                        console.log(ex);
+                        error_logger.error = ex;
+                        logger(req, error_logger);
+                        res.status(500).json(error_response);
                     }
                 });
             }
-            else {
-                res.status(401).json(response);
-            }
-        });
+        }
+
+        catch (ex) {
+            console.log(ex);
+            error_logger.error = ex;
+            logger(req, error_logger);
+            res.status(500).json(error_response);
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 
 };
 
 
 gulfCtrl.saveDeparture = function (req, res, next) {
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
-
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'gulfCtrl.saveDeparture'
     }
+    try {
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the error';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    console.log(req.body.reqApp);
-                    if (req.body.reqApp && !req.body.reqApp.length) {
-                        error.reqApp = 'Invalid reqApp';
-                        validationFlag *= false;
-                    }
-
-                    var departureCurrency = req.body.departureCurrency;
-                    if (typeof (departureCurrency) == "string") {
-                        departureCurrency = JSON.parse(departureCurrency);
-                    }
-                    if (!departureCurrency) {
-                        departureCurrency = {};
-                    }
-                    var departureCurrencyScale = req.body.departureCurrencyScale;
-                    if (typeof (departureCurrencyScale) == "string") {
-                        departureCurrencyScale = JSON.parse(departureCurrencyScale);
-                    }
-                    if (!departureCurrencyScale) {
-                        departureCurrencyScale = {};
-                    }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid heMasterId';
+            validationFlag *= false;
+        }
 
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the error';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+
+                            req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                            console.log(req.body.reqApp);
+                            if (req.body.reqApp && !req.body.reqApp.length) {
+                                error.reqApp = 'Invalid reqApp';
+                                validationFlag *= false;
+                            }
+
+                            var departureCurrency = req.body.departureCurrency;
+                            if (typeof (departureCurrency) == "string") {
+                                departureCurrency = JSON.parse(departureCurrency);
+                            }
+                            if (!departureCurrency) {
+                                departureCurrency = {};
+                            }
+                            var departureCurrencyScale = req.body.departureCurrencyScale;
+                            if (typeof (departureCurrencyScale) == "string") {
+                                departureCurrencyScale = JSON.parse(departureCurrencyScale);
+                            }
+                            if (!departureCurrencyScale) {
+                                departureCurrencyScale = {};
+                            }
+
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+
+                                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                // req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
+                                req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
+                                req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
+                                req.body.statusId = req.body.statusId ? req.body.statusId : 0;
+                                req.body.applicantName = req.body.applicantName ? req.body.applicantName : '';
+                                req.body.joiningDate = req.body.joiningDate ? req.body.joiningDate : null;
+                                req.body.travelDateFrom = req.body.travelDateFrom ? req.body.travelDateFrom : null;
+                                req.body.travelDateTo = req.body.travelDateTo ? req.body.travelDateTo : null;
+                                req.body.airlines = req.body.airlines ? req.body.airlines : '';
+                                req.body.tickets = req.body.tickets ? req.body.tickets : '';
+                                req.body.pnrNumber = req.body.pnrNumber ? req.body.pnrNumber : '';
+                                req.body.airlineStatus = req.body.airlineStatus ? req.body.airlineStatus : 0;
+                                req.body.departureAmount = req.body.departureAmount ? req.body.departureAmount : 0.0;
+                                req.body.billTo = req.body.billTo ? req.body.billTo : 0;
+                                req.body.creditNoteNumber = req.body.creditNoteNumber ? req.body.creditNoteNumber : '';
+                                req.body.notes = req.body.notes ? req.body.notes : '';
+                                req.body.isClearanceGiven = req.body.isClearanceGiven ? req.body.isClearanceGiven : 0;
+                                req.body.spokeToCandidateToDepart = req.body.spokeToCandidateToDepart ? req.body.spokeToCandidateToDepart : 0;
+                                req.body.receivedCandidateArrivalInfo = req.body.receivedCandidateArrivalInfo ? req.body.receivedCandidateArrivalInfo : 0;
+
+                                var inputs = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.query.heMasterId),
+                                    req.st.db.escape(req.body.departureHistoryId || 0),
+                                    req.st.db.escape(JSON.stringify(req.body.reqApp)),
+                                    req.st.db.escape(req.body.requirementId),
+                                    req.st.db.escape(req.body.statusId),
+                                    req.st.db.escape(req.body.applicantName),
+                                    req.st.db.escape(req.body.joiningDate),
+                                    req.st.db.escape(req.body.travelDateFrom),
+                                    req.st.db.escape(req.body.travelDateTo),
+                                    req.st.db.escape(req.body.airlines),
+                                    req.st.db.escape(req.body.tickets),
+                                    req.st.db.escape(req.body.pnrNumber),
+                                    req.st.db.escape(req.body.airlineStatus),
+                                    req.st.db.escape(JSON.stringify(departureCurrency)),
+                                    req.st.db.escape(req.body.departureAmount),
+                                    req.st.db.escape(JSON.stringify(departureCurrencyScale)),
+                                    req.st.db.escape(req.body.creditNoteNumber),
+                                    req.st.db.escape(req.body.billTo),
+                                    req.st.db.escape(req.body.notes),
+                                    req.st.db.escape(req.body.isClearanceGiven),
+                                    req.st.db.escape(req.body.spokeToCandidateToDepart),
+                                    req.st.db.escape(req.body.receivedCandidateArrivalInfo),
+                                    req.st.db.escape(req.body.stageId),
+                                    req.st.db.escape(req.body.departureFrom),
+                                    req.st.db.escape(req.body.departureTo)
+
+                                ];
+                                var procQuery = 'CALL wm_save_paceDeparture( ' + inputs.join(',') + ')';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, results) {
+                                    try {
+                                        console.log(err);
+
+                                        if (!err && results && results[0][0]) {
+                                            response.status = true;
+                                            response.message = "Departure data saved sucessfully";
+                                            response.error = null;
+
+                                            for (var i = 0; i < results[0].length; i++) {
+                                                results[0][i].departureCurrency = results[0][i].departureCurrency ? JSON.parse(results[0][i].departureCurrency) : {};
+                                                results[0][i].departureCurrencyScale = results[0][i].departureCurrencyScale ? JSON.parse(results[0][i].departureCurrencyScale) : {};
+                                            }
+
+                                            response.data = {
+                                                // departureDetails: (results[0] && results[0][0]) ? results[0][0] : {},
+                                                departureHistory: results[0] && results[0][0] ? results[0] : [],
+                                                reqAppList: results[1] && results[1][0] ? results[1] : [],
+                                                transactionHistory: results[2] && results[2][0] ? results[2] : []
+                                            }
+
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                try {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                }
+                                                catch (ex) {
+                                                    console.log(ex);
+                                                    error_logger.error = ex;
+                                                    logger(req, error_logger);
+                                                    res.status(500).json(error_response);
+                                                }
+                                            });
+                                        }
+
+                                        else {
+                                            response.status = false;
+                                            response.message = "Error while saving departure data";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(500).json(response);
+                                        }
+                                    }
+                                    catch (ex) {
+                                        console.log(ex);
+                                        error_logger.error = ex;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+
+                                });
+                            }
+
+
+                        });
+
+
+
                     }
                     else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
 
-                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                        // req.query.apiKey = req.query.apiKey ? req.query.apiKey : 0;
-                        req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
-                        req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
-                        req.body.statusId = req.body.statusId ? req.body.statusId : 0;
-                        req.body.applicantName = req.body.applicantName ? req.body.applicantName : '';
-                        req.body.joiningDate = req.body.joiningDate ? req.body.joiningDate : null;
-                        req.body.travelDateFrom = req.body.travelDateFrom ? req.body.travelDateFrom : null;
-                        req.body.travelDateTo = req.body.travelDateTo ? req.body.travelDateTo : null;
-                        req.body.airlines = req.body.airlines ? req.body.airlines : '';
-                        req.body.tickets = req.body.tickets ? req.body.tickets : '';
-                        req.body.pnrNumber = req.body.pnrNumber ? req.body.pnrNumber : '';
-                        req.body.airlineStatus = req.body.airlineStatus ? req.body.airlineStatus : 0;
-                        req.body.departureAmount = req.body.departureAmount ? req.body.departureAmount : 0.0;
-                        req.body.billTo = req.body.billTo ? req.body.billTo : 0;
-                        req.body.creditNoteNumber = req.body.creditNoteNumber ? req.body.creditNoteNumber : '';
-                        req.body.notes = req.body.notes ? req.body.notes : '';
-                        req.body.isClearanceGiven = req.body.isClearanceGiven ? req.body.isClearanceGiven : 0;
-                        req.body.spokeToCandidateToDepart = req.body.spokeToCandidateToDepart ? req.body.spokeToCandidateToDepart : 0;
-                        req.body.receivedCandidateArrivalInfo = req.body.receivedCandidateArrivalInfo ? req.body.receivedCandidateArrivalInfo : 0;
+            });
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
+
+}
+
+gulfCtrl.getDeparture = function (req, res, next) {
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+    var error_logger = {
+        details: 'gulfCtrl.getDeparture'
+    }
+
+    try {
+
+
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
+        if (!req.query.reqApplicantId) {
+            error.reqApplicantId = 'Invalid reqApplicantId';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+
+                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.departureHistoryId || 0),
-                            req.st.db.escape(JSON.stringify(req.body.reqApp)),
-                            req.st.db.escape(req.body.requirementId),
-                            req.st.db.escape(req.body.statusId),
-                            req.st.db.escape(req.body.applicantName),
-                            req.st.db.escape(req.body.joiningDate),
-                            req.st.db.escape(req.body.travelDateFrom),
-                            req.st.db.escape(req.body.travelDateTo),
-                            req.st.db.escape(req.body.airlines),
-                            req.st.db.escape(req.body.tickets),
-                            req.st.db.escape(req.body.pnrNumber),
-                            req.st.db.escape(req.body.airlineStatus),
-                            req.st.db.escape(JSON.stringify(departureCurrency)),
-                            req.st.db.escape(req.body.departureAmount),
-                            req.st.db.escape(JSON.stringify(departureCurrencyScale)),
-                            req.st.db.escape(req.body.creditNoteNumber),
-                            req.st.db.escape(req.body.billTo),
-                            req.st.db.escape(req.body.notes),
-                            req.st.db.escape(req.body.isClearanceGiven),
-                            req.st.db.escape(req.body.spokeToCandidateToDepart),
-                            req.st.db.escape(req.body.receivedCandidateArrivalInfo),
-                            req.st.db.escape(req.body.stageId),
-                            req.st.db.escape(req.body.departureFrom),
-                            req.st.db.escape(req.body.departureTo)
-
+                            req.st.db.escape(req.query.reqApplicantId)
                         ];
-                        var procQuery = 'CALL wm_save_paceDeparture( ' + inputs.join(',') + ')';
+
+                        var procQuery = 'CALL wm_get_paceDeparture( ' + inputs.join(',') + ')';
                         console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            console.log(err);
+                        req.db.query(procQuery, function (err, result) {
+                            try {
+                                console.log(err);
 
-                            if (!err && results && results[0][0]) {
-                                response.status = true;
-                                response.message = "Departure data saved sucessfully";
-                                response.error = null;
+                                var isWeb = req.query.isWeb;
+                                if (!err && result) {
+                                    response.status = true;
+                                    response.message = "Departure data loaded successfully";
+                                    response.error = null;
 
-                                for (var i = 0; i < results[0].length; i++) {
-                                    results[0][i].departureCurrency = results[0][i].departureCurrency ? JSON.parse(results[0][i].departureCurrency) : {};
-                                    results[0][i].departureCurrencyScale = results[0][i].departureCurrencyScale ? JSON.parse(results[0][i].departureCurrencyScale) : {};
+                                    for (var i = 0; i < result[0].length; i++) {
+                                        result[0][i].departureCurrency = result[0][i].departureCurrency ? JSON.parse(result[0][i].departureCurrency) : {};
+                                        result[0][i].departureCurrencyScale = result[0][i].departureCurrencyScale ? JSON.parse(result[0][i].departureCurrencyScale) : {};
+                                    }
+
+                                    var departureDetails = {};
+                                    if (result[0] && result[0][0])
+                                        var departureDetails = result[0] && result[0][0] ? result[0][0] : {};
+                                    else
+                                        departureDetails.applicantName = result[1] && result[1][0] && result[1][0].applicantName ? result[1][0].applicantName : "";
+
+                                    response.data = {
+                                        departureDetails: departureDetails,
+                                        departureHistory: result[0] && result[0][0] ? result[0] : []
+                                    }
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        try {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
                                 }
-
-                                response.data = {
-                                    // departureDetails: (results[0] && results[0][0]) ? results[0][0] : {},
-                                    departureHistory: results[0] && results[0][0] ? results[0] : [],
-                                    reqAppList: results[1] && results[1][0] ? results[1] : [],
-                                    transactionHistory: results[2] && results[2][0] ? results[2] : []
-                                }
-
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                else if (!err) {
+                                    response.status = false;
+                                    response.message = "No results found";
+                                    response.error = null;
+                                    response.data = {};
                                     res.status(200).json(response);
-                                });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while getting departure data";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
                             }
-
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving departure data";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                            catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
-
                         });
-                    }
-
-                });
-
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-
-
-        });
-    }
-};
-
-gulfCtrl.getDeparture = function (req, res, next) {
-    var response = {
-        status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
-    }
-    if (!req.query.reqApplicantId) {
-        error.reqApplicantId = 'Invalid reqApplicantId';
-        validationFlag *= false;
-    }
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.reqApplicantId)
-                ];
-
-                var procQuery = 'CALL wm_get_paceDeparture( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-
-                    var isWeb = req.query.isWeb;
-                    if (!err && result) {
-                        response.status = true;
-                        response.message = "Departure data loaded successfully";
-                        response.error = null;
-
-                        for (var i = 0; i < result[0].length; i++) {
-                            result[0][i].departureCurrency = result[0][i].departureCurrency ? JSON.parse(result[0][i].departureCurrency) : {};
-                            result[0][i].departureCurrencyScale = result[0][i].departureCurrencyScale ? JSON.parse(result[0][i].departureCurrencyScale) : {};
-                        }
-
-                        var departureDetails = {};
-                        if (result[0] && result[0][0])
-                            var departureDetails = result[0] && result[0][0] ? result[0][0] : {};
-                        else
-                            departureDetails.applicantName = result[1] && result[1][0] && result[1][0].applicantName ? result[1][0].applicantName : "";
-
-                        response.data = {
-                            departureDetails: departureDetails,
-                            departureHistory: result[0] && result[0][0] ? result[0] : []
-                        }
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-                    }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {};
-                        res.status(200).json(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while getting departure data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        res.status(401).json(response);
                     }
-                });
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 gulfCtrl.saveVisa = function (req, res, next) {
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+    var error_logger = {
+        details: 'gulfCtrl.saveVisa'
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
-    }
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the error';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid heMasterId';
+            validationFlag *= false;
+        }
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the error';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                    if (!req.body.reqApp || !req.body.reqApp.length) {
-                        error.reqApp = 'Invalid reqApplicantId';
-                        validationFlag *= false;
-                    }
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var visaCurrency = req.body.visaCurrency;
-                    if (typeof (visaCurrency) == "string") {
-                        visaCurrency = JSON.parse(visaCurrency);
-                    }
-                    if (!visaCurrency) {
-                        visaCurrency = {};
-                    }
-                    var visaScale = req.body.visaScale;
-                    if (typeof (visaScale) == "string") {
-                        visaScale = JSON.parse(visaScale);
-                    }
-                    if (!visaScale) {
-                        visaScale = {};
-                    }
-                    var country = req.body.country;
-                    if (typeof (country) == "string") {
-                        country = JSON.parse(country);
-                    }
-                    if (!country) {
-                        country = {};
-                    }
-
-                    var cdnFilePath = req.body.cdnFilePath;
-                    if (typeof (cdnFilePath) == "string") {
-                        cdnFilePath = JSON.parse(cdnFilePath);
-                    }
-                    if (!cdnFilePath) {
-                        cdnFilePath = {};
-                    }
-
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                        req.body.applicantName = req.body.applicantName ? req.body.applicantName : '';
-                        req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
-                        req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
-                        req.body.visaStatus = req.body.visaStatus ? req.body.visaStatus : 0;
-                        req.body.visaNumber = req.body.visaNumber ? req.body.visaNumber : '';
-                        req.body.dateOfIssue = req.body.dateOfIssue ? req.body.dateOfIssue : null;
-                        req.body.dateOfExpiry = req.body.dateOfExpiry ? req.body.dateOfExpiry : null;
-                        req.body.visaType = req.body.visaType ? req.body.visaType : '';
-                        req.body.visaDateOfIssue = req.body.visaDateOfIssue ? req.body.visaDateOfIssue : null;
-                        req.body.visaDateOfExpiry = req.body.visaDateOfExpiry ? req.body.visaDateOfExpiry : null;
-                        req.body.authority = req.body.authority ? req.body.authority : '';
-                        req.body.notes = req.body.notes ? req.body.notes : '';
-                        req.body.visaSponsor = req.body.visaSponsor ? req.body.visaSponsor : '';
-                        req.body.travelStatus = req.body.travelStatus ? req.body.travelStatus : 0;
-                        req.body.pickUpDatetime = req.body.pickUpDatetime ? req.body.pickUpDatetime : null;
-                        req.body.pickUpFrom = req.body.pickUpFrom ? req.body.pickUpFrom : '';
-                        req.body.dropTo = req.body.dropTo ? req.body.dropTo : '';
-                        req.body.airlines = req.body.airlines ? req.body.airlines : '';
-                        req.body.ticketNumber = req.body.ticketNumber ? req.body.ticketNumber : '';
-                        req.body.insuranceReferenceNumber = req.body.insuranceReferenceNumber ? req.body.insuranceReferenceNumber : '';
-                        req.body.validityFrom = req.body.validityFrom ? req.body.validityFrom : null;
-                        req.body.validityTo = req.body.validityTo ? req.body.validityTo : null;
-                        req.body.coverageDetails = req.body.coverageDetails ? req.body.coverageDetails : '';
-                        req.body.billTo = req.body.billTo ? req.body.billTo : 0;
-                        req.body.visaAmount = req.body.visaAmount ? req.body.visaAmount : 0.0;
-                        req.body.passportNumber = req.body.passportNumber ? req.body.passportNumber : '';
-                        req.body.stageId = req.body.stageId ? req.body.stageId : 0;
-                        req.body.statusId = req.body.statusId ? req.body.statusId : 0;
-                        req.body.ecr = req.body.ecr ? req.body.ecr : 0;
-
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(req.body.reqApp)),
-                            req.st.db.escape(req.body.requirementId),
-                            req.st.db.escape(req.body.applicantName),
-                            req.st.db.escape(req.body.passportNumber),
-                            req.st.db.escape(req.body.visaNumber),
-                            req.st.db.escape(req.body.visaStatus),
-                            req.st.db.escape(req.body.dateOfIssue),
-                            req.st.db.escape(req.body.dateOfExpiry),
-                            req.st.db.escape(req.body.visaType),
-                            req.st.db.escape(JSON.stringify(country)),
-                            req.st.db.escape(req.body.visaDateOfIssue),
-                            req.st.db.escape(req.body.visaDateOfExpiry),
-                            req.st.db.escape(req.body.authority),
-                            req.st.db.escape(req.body.notes),
-                            req.st.db.escape(req.body.visaSponsor),
-                            req.st.db.escape(req.body.travelStatus),
-                            req.st.db.escape(req.body.pickUpDatetime),
-                            req.st.db.escape(req.body.pickUpFrom),
-                            req.st.db.escape(req.body.dropTo),
-                            req.st.db.escape(req.body.airlines),
-                            req.st.db.escape(req.body.ticketNumber),
-                            req.st.db.escape(req.body.insuranceReferenceNumber),
-                            req.st.db.escape(req.body.validityFrom),
-                            req.st.db.escape(req.body.validityTo),
-                            req.st.db.escape(req.body.coverageDetails),
-                            req.st.db.escape(req.body.billTo),
-                            req.st.db.escape(JSON.stringify(visaCurrency)),
-                            req.st.db.escape(JSON.stringify(visaScale)),
-                            req.st.db.escape(req.body.visaAmount),
-                            req.st.db.escape(req.body.stageId),
-                            req.st.db.escape(req.body.statusId),
-                            req.st.db.escape(req.body.ecr),
-                            req.st.db.escape(JSON.stringify(cdnFilePath)),
-                            req.st.db.escape(req.body.visaCategory || "")
-                        ];
-                        var procQuery = 'CALL wm_save_paceVisa( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-
-                            if (!err && result && result[0][0]) {
-                                response.status = true;
-                                response.message = "Visa data saved sucessfully";
-                                response.error = null;
-                                result[0][0].visaCurrency = result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency) : {};
-                                result[0][0].country = result[0][0].country ? JSON.parse(result[0][0].country) : {};
-                                result[0][0].visaScale = result[0][0].visaScale ? JSON.parse(result[0][0].visaScale) : {};
-                                result[0][0].cdnFilePath = result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath) : {};
-
-                                response.data = {
-                                    visaDetails: (result[0] && result[0][0]) ? result[0][0] : {},
-                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
-                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : [],
-                                    visaHistory: result[3] && result[3][0] && result[3][0].visaHistory ? JSON.parse(result[3][0].visaHistory) : []
+                                if (!req.body.reqApp || !req.body.reqApp.length) {
+                                    error.reqApp = 'Invalid reqApplicantId';
+                                    validationFlag *= false;
                                 }
 
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
+                                var visaCurrency = req.body.visaCurrency;
+                                if (typeof (visaCurrency) == "string") {
+                                    visaCurrency = JSON.parse(visaCurrency);
+                                }
+                                if (!visaCurrency) {
+                                    visaCurrency = {};
+                                }
+                                var visaScale = req.body.visaScale;
+                                if (typeof (visaScale) == "string") {
+                                    visaScale = JSON.parse(visaScale);
+                                }
+                                if (!visaScale) {
+                                    visaScale = {};
+                                }
+                                var country = req.body.country;
+                                if (typeof (country) == "string") {
+                                    country = JSON.parse(country);
+                                }
+                                if (!country) {
+                                    country = {};
+                                }
 
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving visa data";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                                var cdnFilePath = req.body.cdnFilePath;
+                                if (typeof (cdnFilePath) == "string") {
+                                    cdnFilePath = JSON.parse(cdnFilePath);
+                                }
+                                if (!cdnFilePath) {
+                                    cdnFilePath = {};
+                                }
+
+
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                    req.body.applicantName = req.body.applicantName ? req.body.applicantName : '';
+                                    req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
+                                    req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
+                                    req.body.visaStatus = req.body.visaStatus ? req.body.visaStatus : 0;
+                                    req.body.visaNumber = req.body.visaNumber ? req.body.visaNumber : '';
+                                    req.body.dateOfIssue = req.body.dateOfIssue ? req.body.dateOfIssue : null;
+                                    req.body.dateOfExpiry = req.body.dateOfExpiry ? req.body.dateOfExpiry : null;
+                                    req.body.visaType = req.body.visaType ? req.body.visaType : '';
+                                    req.body.visaDateOfIssue = req.body.visaDateOfIssue ? req.body.visaDateOfIssue : null;
+                                    req.body.visaDateOfExpiry = req.body.visaDateOfExpiry ? req.body.visaDateOfExpiry : null;
+                                    req.body.authority = req.body.authority ? req.body.authority : '';
+                                    req.body.notes = req.body.notes ? req.body.notes : '';
+                                    req.body.visaSponsor = req.body.visaSponsor ? req.body.visaSponsor : '';
+                                    req.body.travelStatus = req.body.travelStatus ? req.body.travelStatus : 0;
+                                    req.body.pickUpDatetime = req.body.pickUpDatetime ? req.body.pickUpDatetime : null;
+                                    req.body.pickUpFrom = req.body.pickUpFrom ? req.body.pickUpFrom : '';
+                                    req.body.dropTo = req.body.dropTo ? req.body.dropTo : '';
+                                    req.body.airlines = req.body.airlines ? req.body.airlines : '';
+                                    req.body.ticketNumber = req.body.ticketNumber ? req.body.ticketNumber : '';
+                                    req.body.insuranceReferenceNumber = req.body.insuranceReferenceNumber ? req.body.insuranceReferenceNumber : '';
+                                    req.body.validityFrom = req.body.validityFrom ? req.body.validityFrom : null;
+                                    req.body.validityTo = req.body.validityTo ? req.body.validityTo : null;
+                                    req.body.coverageDetails = req.body.coverageDetails ? req.body.coverageDetails : '';
+                                    req.body.billTo = req.body.billTo ? req.body.billTo : 0;
+                                    req.body.visaAmount = req.body.visaAmount ? req.body.visaAmount : 0.0;
+                                    req.body.passportNumber = req.body.passportNumber ? req.body.passportNumber : '';
+                                    req.body.stageId = req.body.stageId ? req.body.stageId : 0;
+                                    req.body.statusId = req.body.statusId ? req.body.statusId : 0;
+                                    req.body.ecr = req.body.ecr ? req.body.ecr : 0;
+
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(JSON.stringify(req.body.reqApp)),
+                                        req.st.db.escape(req.body.requirementId),
+                                        req.st.db.escape(req.body.applicantName),
+                                        req.st.db.escape(req.body.passportNumber),
+                                        req.st.db.escape(req.body.visaNumber),
+                                        req.st.db.escape(req.body.visaStatus),
+                                        req.st.db.escape(req.body.dateOfIssue),
+                                        req.st.db.escape(req.body.dateOfExpiry),
+                                        req.st.db.escape(req.body.visaType),
+                                        req.st.db.escape(JSON.stringify(country)),
+                                        req.st.db.escape(req.body.visaDateOfIssue),
+                                        req.st.db.escape(req.body.visaDateOfExpiry),
+                                        req.st.db.escape(req.body.authority),
+                                        req.st.db.escape(req.body.notes),
+                                        req.st.db.escape(req.body.visaSponsor),
+                                        req.st.db.escape(req.body.travelStatus),
+                                        req.st.db.escape(req.body.pickUpDatetime),
+                                        req.st.db.escape(req.body.pickUpFrom),
+                                        req.st.db.escape(req.body.dropTo),
+                                        req.st.db.escape(req.body.airlines),
+                                        req.st.db.escape(req.body.ticketNumber),
+                                        req.st.db.escape(req.body.insuranceReferenceNumber),
+                                        req.st.db.escape(req.body.validityFrom),
+                                        req.st.db.escape(req.body.validityTo),
+                                        req.st.db.escape(req.body.coverageDetails),
+                                        req.st.db.escape(req.body.billTo),
+                                        req.st.db.escape(JSON.stringify(visaCurrency)),
+                                        req.st.db.escape(JSON.stringify(visaScale)),
+                                        req.st.db.escape(req.body.visaAmount),
+                                        req.st.db.escape(req.body.stageId),
+                                        req.st.db.escape(req.body.statusId),
+                                        req.st.db.escape(req.body.ecr),
+                                        req.st.db.escape(JSON.stringify(cdnFilePath)),
+                                        req.st.db.escape(req.body.visaCategory || "")
+                                    ];
+                                    var procQuery = 'CALL wm_save_paceVisa( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+
+                                            if (!err && result && result[0][0]) {
+                                                response.status = true;
+                                                response.message = "Visa data saved sucessfully";
+                                                response.error = null;
+                                                result[0][0].visaCurrency = result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency) : {};
+                                                result[0][0].country = result[0][0].country ? JSON.parse(result[0][0].country) : {};
+                                                result[0][0].visaScale = result[0][0].visaScale ? JSON.parse(result[0][0].visaScale) : {};
+                                                result[0][0].cdnFilePath = result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath) : {};
+
+                                                response.data = {
+                                                    visaDetails: (result[0] && result[0][0]) ? result[0][0] : {},
+                                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
+                                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : [],
+                                                    visaHistory: result[3] && result[3][0] && result[3][0].visaHistory ? JSON.parse(result[3][0].visaHistory) : []
+                                                }
+
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    try {
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    }
+                                                    catch (ex) {
+                                                        console.log(ex);
+                                                        error_logger.error = ex;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                });
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while saving visa data";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
                     }
-
-                });
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 gulfCtrl.getVisa = function (req, res, next) {
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'gulfCtrl.getVisa'
     }
-    if (!req.query.reqApplicantId) {
-        error.reqApplicantId = 'Invalid reqApplicantId';
-        validationFlag *= false;
-    }
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.reqApplicantId)
-                ];
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
+        if (!req.query.reqApplicantId) {
+            error.reqApplicantId = 'Invalid reqApplicantId';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                var procQuery = 'CALL wm_get_paceVisa( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
+                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                    var isWeb = req.query.isWeb;
-                    if (!err && result && result[0] || result[1]) {
-                        response.status = true;
-                        response.message = "Visa data loaded successfully";
-                        response.error = null;
-                        if (result[0][0]) {
-                            result[0][0].visaCurrency = result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency) : {};
-                            result[0][0].country = result[0][0].country ? JSON.parse(result[0][0].country) : {};
-                            result[0][0].visaScale = result[0][0].visaScale ? JSON.parse(result[0][0].visaScale) : {};
-                            result[0][0].cdnFilePath = result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath) : {};
-                        }
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.query.reqApplicantId)
+                        ];
 
-                        var visaDetails = {};
-                        if (result[0] && result[0][0]){
-                            visaDetails =(result && result[0] && result[0][0]) ? result[0][0] : {}; 
-                        }
-                        else{
-                            visaDetails.applicantName = result[3] && result[3][0] && result[3][0].applicantName ? result[3][0].applicantName  : ""; 
-                        }
+                        var procQuery = 'CALL wm_get_paceVisa( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            try {
+                                console.log(err);
 
-                        response.data = {
-                            visaDetails: visaDetails,
-                            passportDetails: result[1] && result[1][0] ? result[1][0] : {},
-                            visaHistory: result[2] && result[2][0] && result[2][0].visaHistory ? JSON.parse(result[2][0].visaHistory) : []
-                        };
+                                var isWeb = req.query.isWeb;
+                                if (!err && result && result[0] || result[1]) {
+                                    response.status = true;
+                                    response.message = "Visa data loaded successfully";
+                                    response.error = null;
+                                    if (result[0][0]) {
+                                        result[0][0].visaCurrency = result[0][0].visaCurrency ? JSON.parse(result[0][0].visaCurrency) : {};
+                                        result[0][0].country = result[0][0].country ? JSON.parse(result[0][0].country) : {};
+                                        result[0][0].visaScale = result[0][0].visaScale ? JSON.parse(result[0][0].visaScale) : {};
+                                        result[0][0].cdnFilePath = result[0][0].cdnFilePath ? JSON.parse(result[0][0].cdnFilePath) : {};
+                                    }
 
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
+                                    var visaDetails = {};
+                                    if (result[0] && result[0][0]) {
+                                        visaDetails = (result && result[0] && result[0][0]) ? result[0][0] : {};
+                                    }
+                                    else {
+                                        visaDetails.applicantName = result[3] && result[3][0] && result[3][0].applicantName ? result[3][0].applicantName : "";
+                                    }
+
+                                    response.data = {
+                                        visaDetails: visaDetails,
+                                        passportDetails: result[1] && result[1][0] ? result[1][0] : {},
+                                        visaHistory: result[2] && result[2][0] && result[2][0].visaHistory ? JSON.parse(result[2][0].visaHistory) : []
+                                    };
+
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        try {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
+                                else if (!err) {
+                                    response.status = false;
+                                    response.message = "No results found";
+                                    response.error = null;
+                                    response.data = {};
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while getting visa data";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
                         });
                     }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {};
-                        res.status(200).json(response);
-                    }
                     else {
-                        response.status = false;
-                        response.message = "Error while getting visa data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        res.status(401).json(response);
                     }
-                });
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 
 gulfCtrl.saveAttestation = function (req, res, next) {
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+    var error_logger = {
+        details: 'gulfCtrl.saveAttestation'
     }
 
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid heMasterId';
-        validationFlag *= false;
-    }
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid heMasterId';
+            validationFlag *= false;
+        }
 
 
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the error';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the error';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                        zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                            try {
+                                req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    if (!req.body.reqApplicantId) {
-                        error.reqApplicantId = 'Invalid reqApplicantId';
-                        validationFlag *= false;
-                    }
-
-                    var attestation = req.body.attestation;
-                    if (typeof (attestation) == "string") {
-                        attestation = JSON.parse(attestation);
-                    }
-                    if (!attestation) {
-                        attestation = [];
-                    }
-
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                        req.body.applicantName = req.body.applicantName ? req.body.applicantName : '';
-                        req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
-                        req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
-                        req.body.statusId = req.body.statusId ? req.body.statusId : 0;
-                        req.body.stageId = req.body.stageId ? req.body.stageId : 0;
-
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.reqApplicantId),
-                            req.st.db.escape(req.body.applicantId),
-                            req.st.db.escape(req.body.requirementId),
-                            req.st.db.escape(req.body.applicantName),
-                            req.st.db.escape(req.body.statusId),
-                            req.st.db.escape(JSON.stringify(attestation)),
-                            req.st.db.escape(req.body.stageId)
-                        ];
-                        var procQuery = 'CALL wm_save_paceAttestation( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, result) {
-                            console.log(err);
-
-                            if (!err && result && result[0][0]) {
-                                response.status = true;
-                                response.message = "Attestation data saved sucessfully";
-                                response.error = null;
-
-                                result[0][0].attestation = (result[0][0].attestation) ? JSON.parse(result[0][0].attestation) : [];
-                                if (result[0][0].attestation) {
-                                    var temp = [];
-                                    for (var i = 0; i < result[0][0].attestation.length; i++) {
-
-                                        result[0][0].attestation[i].attestationDoc = result[0][0].attestation[i].attestationDoc ? JSON.parse(result[0][0].attestation[i].attestationDoc) : [];
-
-                                        temp.push(result[0][0].attestation[i]);
-                                    }
-                                    result[0][0].attestation = temp;
+                                if (!req.body.reqApplicantId) {
+                                    error.reqApplicantId = 'Invalid reqApplicantId';
+                                    validationFlag *= false;
                                 }
-                                response.data = {
-                                    attestationDetails: (result[0] && result[0][0]) ? result[0][0] : {},
-                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
-                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
-                                }
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
 
+                                var attestation = req.body.attestation;
+                                if (typeof (attestation) == "string") {
+                                    attestation = JSON.parse(attestation);
+                                }
+                                if (!attestation) {
+                                    attestation = [];
+                                }
+
+
+                                if (!validationFlag) {
+                                    response.error = error;
+                                    response.message = 'Please check the errors';
+                                    res.status(400).json(response);
+                                    console.log(response);
+                                }
+                                else {
+                                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                                    req.body.applicantName = req.body.applicantName ? req.body.applicantName : '';
+                                    req.body.applicantId = req.body.applicantId ? req.body.applicantId : 0;
+                                    req.body.requirementId = req.body.requirementId ? req.body.requirementId : 0;
+                                    req.body.statusId = req.body.statusId ? req.body.statusId : 0;
+                                    req.body.stageId = req.body.stageId ? req.body.stageId : 0;
+
+                                    var inputs = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.query.heMasterId),
+                                        req.st.db.escape(req.body.reqApplicantId),
+                                        req.st.db.escape(req.body.applicantId),
+                                        req.st.db.escape(req.body.requirementId),
+                                        req.st.db.escape(req.body.applicantName),
+                                        req.st.db.escape(req.body.statusId),
+                                        req.st.db.escape(JSON.stringify(attestation)),
+                                        req.st.db.escape(req.body.stageId)
+                                    ];
+                                    var procQuery = 'CALL wm_save_paceAttestation( ' + inputs.join(',') + ')';
+                                    console.log(procQuery);
+                                    req.db.query(procQuery, function (err, result) {
+                                        try {
+                                            console.log(err);
+
+                                            if (!err && result && result[0][0]) {
+                                                response.status = true;
+                                                response.message = "Attestation data saved sucessfully";
+                                                response.error = null;
+
+                                                result[0][0].attestation = (result[0][0].attestation) ? JSON.parse(result[0][0].attestation) : [];
+                                                if (result[0][0].attestation) {
+                                                    var temp = [];
+                                                    for (var i = 0; i < result[0][0].attestation.length; i++) {
+
+                                                        result[0][0].attestation[i].attestationDoc = result[0][0].attestation[i].attestationDoc ? JSON.parse(result[0][0].attestation[i].attestationDoc) : [];
+
+                                                        temp.push(result[0][0].attestation[i]);
+                                                    }
+                                                    result[0][0].attestation = temp;
+                                                }
+                                                response.data = {
+                                                    attestationDetails: (result[0] && result[0][0]) ? result[0][0] : {},
+                                                    reqAppList: (result[1] && result[1][0]) ? result[1] : [],
+                                                    transactionHistory: (result[2] && result[2][0]) ? result[2] : []
+                                                }
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    try {
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    }
+                                                    catch (ex) {
+                                                        console.log(ex);
+                                                        error_logger.error = ex;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                });
+
+                                            }
+
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while saving Attestation data";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                }
                             }
-
-                            else {
-                                response.status = false;
-                                response.message = "Error while saving Attestation data";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                            catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
                             }
                         });
+
+
                     }
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
 
-                });
-
-
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+            });
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
 gulfCtrl.getAttestation = function (req, res, next) {
-    var response = {
+    var error_response = {
         status: false,
-        message: "Invalid token",
-        data: null,
-        error: null
-    };
-
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
+        message: "Some error occurred!",
+        error: null,
+        data: null
     }
-    if (!req.query.heMasterId) {
-        error.heMasterId = 'Invalid company';
-        validationFlag *= false;
-    }
-    if (!req.query.reqApplicantId) {
-        error.reqApplicantId = 'Invalid reqApplicantId';
-        validationFlag *= false;
-    }
-    if (!validationFlag) {
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+    s
 
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.reqApplicantId)
-                ];
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
+        if (!req.query.reqApplicantId) {
+            error.reqApplicantId = 'Invalid reqApplicantId';
+            validationFlag *= false;
+        }
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
 
-                var procQuery = 'CALL wm_get_paceAttestation( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
+                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                    var isWeb = req.query.isWeb;
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Attestation data loaded successfully";
-                        response.error = null;
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.query.reqApplicantId)
+                        ];
 
-                        result[0][0].attestation = (result[0][0].attestation) ? JSON.parse(result[0][0].attestation) : [];
-                        if (result[0][0].attestation) {
-                            var temp = [];
-                            for (var i = 0; i < result[0][0].attestation.length; i++) {
+                        var procQuery = 'CALL wm_get_paceAttestation( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            try {
+                                console.log(err);
 
-                                result[0][0].attestation[i].attestationDoc = result[0][0].attestation[i].attestationDoc ? JSON.parse(result[0][0].attestation[i].attestationDoc) : [];
+                                var isWeb = req.query.isWeb;
+                                if (!err && result && result[0] && result[0][0]) {
+                                    response.status = true;
+                                    response.message = "Attestation data loaded successfully";
+                                    response.error = null;
 
-                                temp.push(result[0][0].attestation[i]);
+                                    result[0][0].attestation = (result[0][0].attestation) ? JSON.parse(result[0][0].attestation) : [];
+                                    if (result[0][0].attestation) {
+                                        var temp = [];
+                                        for (var i = 0; i < result[0][0].attestation.length; i++) {
+
+                                            result[0][0].attestation[i].attestationDoc = result[0][0].attestation[i].attestationDoc ? JSON.parse(result[0][0].attestation[i].attestationDoc) : [];
+
+                                            temp.push(result[0][0].attestation[i]);
+                                        }
+                                        result[0][0].attestation = temp;
+                                    }
+                                    response.data = result[0][0];
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        try {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+
+                                }
+                                else if (!err) {
+                                    response.status = false;
+                                    response.message = "No results found";
+                                    response.error = null;
+                                    response.data = [];
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while getting attestation data";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
                             }
-                            result[0][0].attestation = temp;
-                        }
-                        response.data = result[0][0];
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
+                            catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
                         });
-
-                    }
-                    else if (!err) {
-                        response.status = false;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = [];
-                        res.status(200).json(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while getting attestation data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        res.status(401).json(response);
                     }
-                });
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
 };
 
