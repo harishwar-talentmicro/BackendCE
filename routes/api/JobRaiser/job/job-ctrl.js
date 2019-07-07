@@ -1633,9 +1633,9 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                         var shortSignature = results[5][i].shortSignature;
                                         var displayName = results[5][i].displayName;
 
-                                        var tags = results[5][i].tags ? JSON.parse(results[5][i].tags) : [];
+                                        var tags = results[5][i].tags ? JSON.parse(results[5][i].tags) : {};
 
-                                        if (tags && tags.length) {
+                                        if (tags && tags.requirement && tags.requirement.length) {
                                             for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
                                                 // 
                                                 if ((results[5][i][tags.requirement[tagIndex].tagName] && results[5][i][tags.requirement[tagIndex].tagName] != null && results[5][i][tags.requirement[tagIndex].tagName] != 'null' && results[5][i][tags.requirement[tagIndex].tagName] != '') || results[5][i][tags.requirement[tagIndex].tagName] >= 0) {
@@ -1649,6 +1649,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                 }
                                             }
                                         }
+                                        console.log("Requirement mail data after replace",results[5]);
 
                                         if (results[5][i].mailbody != "") {
                                             results[5][i].mailbody = results[5][i].mailbody.replace("[FullName]", (firstname + ' ' + lastname));
