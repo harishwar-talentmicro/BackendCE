@@ -35,4 +35,11 @@ router.get('/referredCVList',loginCtrl.getReferredCVs);
 router.get('/interviewScheduleList',loginCtrl.getInterviewScheduler);
 router.get('/documentRequestList',loginCtrl.getDocumentRequestList);
 
+router.get('/expense/detailReport',loginCtrl.getClaimDetails);
+router.post('/expense/updateClaimData',loginCtrl.updateExpenseClaimTransactionData);
+
+router.post('/expense/saveExpenseTypes',loginCtrl.saveExpenseTypes);
+router.get('/expense/getExpenseTypes',loginCtrl.getExpenseTypes);
+
+
 module.exports = router;

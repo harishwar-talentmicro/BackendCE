@@ -6,6 +6,9 @@ var LoginCtrl = {};
 var error = {};
 var appConfig = require('../../../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
+var notifyMessages = require('../../../../routes/api/messagebox/notifyMessages.js');
+var notifyMessages = new notifyMessages();
+
 
 LoginCtrl.login = function (req, res, next) {
     var response = {
@@ -188,12 +191,11 @@ LoginCtrl.getFormStatus = function (req, res, next) {
                         response.message = "Data loaded successfully";
                         response.error = null;
                         if ((req.query.formTypeId) == '0000') {
-                            for(var i=0;i< taskList[0].length;i++)
-                            {
-                            taskList[0][i].statusDetails=taskList[0][i].statusDetails?JSON.parse(taskList[0][i].statusDetails):'[]';
+                            for (var i = 0; i < taskList[0].length; i++) {
+                                taskList[0][i].statusDetails = taskList[0][i].statusDetails ? JSON.parse(taskList[0][i].statusDetails) : '[]';
                             }
-                       
-                        //     }
+
+                            //     }
                         }
                         response.data = taskList[0];
                         res.status(200).json(response);
@@ -895,7 +897,7 @@ LoginCtrl.getTravelClaim = function (req, res, next) {
         req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                req.query.status = req.query.status ? req.query.status : 0;
+                req.query.status = req.query.status ? req.query.status : 1;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
                 req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
@@ -909,7 +911,8 @@ LoginCtrl.getTravelClaim = function (req, res, next) {
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(tokenResult[0].masterid),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.query.isExpenseClaim || 0)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -918,10 +921,16 @@ LoginCtrl.getTravelClaim = function (req, res, next) {
                 var procQuery = 'CALL WhatMate_get_TravelClaim( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, travelClaim) {
-                    if (!err && travelClaim && travelClaim[0]) {
+                    console.log(err);
+                    if (!err && travelClaim && travelClaim[0] && travelClaim[0][0]) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
+
+                        for (var i = 0; i < travelClaim[0].length; i++) {
+                            travelClaim[0][i].claimDetails = travelClaim[0][i] && travelClaim[0][i].claimDetails && JSON.parse(travelClaim[0][i].claimDetails) ? JSON.parse(travelClaim[0][i].claimDetails) : [];
+                        }
+
                         response.data = {
                             travelClaim: travelClaim[0],
                             count: travelClaim[1][0].count
@@ -932,7 +941,10 @@ LoginCtrl.getTravelClaim = function (req, res, next) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
-                        response.data = null;
+                        response.data = {
+                            travelClaim : [],
+                            count : 0
+                        };
                         res.status(200).json(response);
                     }
                     else {
@@ -1986,6 +1998,414 @@ LoginCtrl.getDocumentRequestList = function (req, res, next) {
         });
     }
 
+};
+
+
+LoginCtrl.getClaimDetails = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.transId) {
+        error.transId = 'Invalid transId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.parentId || 0),
+                    req.st.db.escape(req.query.transId),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(DBSecretKey)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL whatmate_get_claimDetails( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[0].length; i++) {
+                            result[0][i].attachments = result[0][i] && result[0][i].attachments ? JSON.parse(result[0][i].attachments) : [];
+                            if (!result[0][i].attachments[0].CDNPath || result[0][i].attachments[0].CDNPath == null) {
+                                result[0][i].attachments = [];
+                            }
+                        }
+
+                        response.data = {
+                            claimDetails: result[0] && result[0][0] ? result[0] : []
+                        }
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            claimDetails : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+LoginCtrl.updateExpenseClaimTransactionData = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!req.query.APIKey) {
+        error.APIKey = 'Invalid APIKey';
+        validationFlag *= false;
+    }
+
+    if (!req.body.parentId) {
+        error.parentId = 'Invalid parentId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.transId) {
+        error.transId = 'Invalid transId';
+        validationFlag *= false;
+    }
+
+    if (!req.body.status) {
+        error.status = 'Invalid status';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                console.log(req.body);
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.parentId),
+                    req.st.db.escape(req.body.transId),
+                    req.st.db.escape(JSON.stringify(req.body.expenseList || [])),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.notes || ""),
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(req.body.referenceNumber || "")
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL whatmate_update_claimTransactionData( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "Data updated successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < result[1].length; i++) {
+                            result[1][i].attachments = result[1][i] && result[1][i].attachments ? JSON.parse(result[1][i].attachments) : [];
+                            if (!result[1][i].attachments[0].CDNPath || result[1][i].attachments[0].CDNPath == null) {
+                                result[1][i].attachments = [];
+                            }
+                        }
+
+                        notifyMessages.getMessagesNeedToNotify();
+
+                        
+                        response.data = {
+                            details: result[0] && result[0][0] ? result[0][0] : null
+                        }
+                        response.data.expenseList = result[1] && result[1][0] ? result[1] : []
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            details : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+LoginCtrl.saveExpenseTypes = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    // if (!req.query.APIKey) {
+    //     error.APIKey = 'Invalid APIKey';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                console.log(req.body);
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.body.typeTitle),
+                    req.st.db.escape(req.body.GLCode || ""),
+                    req.st.db.escape(req.body.expenseTypeId || 0),
+                    req.st.db.escape(req.body.minAmount || 0),
+                    req.st.db.escape(req.body.maxAmount || 0)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_save_mheexpensetypes( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "Data saved successfully";
+                        response.error = null;
+
+                        response.data = {
+                            expenseTypeList: result[0] && result[0][0] ? result[0] : []
+                        }
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            expenseTypeList : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+LoginCtrl.getExpenseTypes = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    // if (!req.query.APIKey) {
+    //     error.APIKey = 'Invalid APIKey';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                // console.log(req.body);
+
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+                /**
+                 * Calling procedure to get form template
+                 * @type {string}
+                 */
+                var procQuery = 'CALL wm_get_expenseTypesList( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+
+                        response.data = {
+                            expenseTypeList: result[0] && result[0][0] ? result[0] : []
+                        }
+
+                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        // zlib.gzip(buf, function (_, result) {
+                        //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        res.status(200).json(response);
+                        // });
+
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.error = null;
+                        response.data = {
+                            expenseTypeList : []
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
 };
 
 module.exports = LoginCtrl;

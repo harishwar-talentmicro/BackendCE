@@ -600,6 +600,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
         var isdMobile = '';
         var mobileNo = '';
         var message = '';
+        var smsSenderId='';
 
         if (!validationFlag) {
             response.error = error;
@@ -731,7 +732,8 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
 
                                                 if (result[2] && result[2][0]) {
                                                     isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
-                                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
+                                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0,
+                                                        smsSenderId = result[2][0].smsSenderId ? result[2][0].smsSenderId : ""
                                                 }
 
                                                 if (!err && result && result[0] && result[0][0]) {
@@ -854,7 +856,7 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                                                         qs: {
                                                                             user_name: 'janardana@hirecraft.com',
                                                                             password: 'Ezeid2015',
-                                                                            sender_id: 'WtMate',
+                                                                            sender_id: smsSenderId,
                                                                             service: 'TRANS',
                                                                             mobile_no: mobileNo,
                                                                             message: message,
@@ -1709,7 +1711,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
         var isdMobile = '';
         var mobileNo = '';
         var message = '';
-
+        var smsSenderId = '';
 
         //html styling for table in submission mailer
 
@@ -1848,7 +1850,8 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
 
                                                 if (result[3] && result[3][0]) {
                                                     isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
-                                                        isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0
+                                                        isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0,
+                                                        smsSenderId = result[3][0].smsSenderId ? result[3][0].smsSenderId : '', 
                                                 }
                                                 console.log('isSendgrid and isSMS', isSendgrid, isSMS);
 
@@ -1983,7 +1986,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                                                         qs: {
                                                                             user_name: 'janardana@hirecraft.com',
                                                                             password: 'Ezeid2015',
-                                                                            sender_id: 'WtMate',
+                                                                            sender_id: smsSenderId,
                                                                             service: 'TRANS',
                                                                             mobile_no: mobileNo,
                                                                             message: message,
@@ -2828,7 +2831,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
         var isdMobile = '';
         var mobileNo = '';
         var message = '';
-
+        var smsSenderId = '';
         //html styling for table in submission mailer
 
         if (!req.query.heMasterId) {
@@ -2987,7 +2990,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
 
                                             if (result[4] && result[4][0]) {
                                                 isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
-                                                    isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                                                    isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0,
+                                                    smsSenderId = result[4][0].smsSenderId ? result[4][0].smsSenderId : ''
                                             }
 
                                             if (!err && result && result[0] && result[0][0]) {
@@ -3258,7 +3262,7 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                                                     qs: {
                                                                         user_name: 'janardana@hirecraft.com',
                                                                         password: 'Ezeid2015',
-                                                                        sender_id: 'WtMate',
+                                                                        sender_id: smsSenderId,
                                                                         service: 'TRANS',
                                                                         mobile_no: mobileNo,
                                                                         message: message,
@@ -3915,7 +3919,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
         var isdMobile = '';
         var mobileNo = '';
         var message = '';
-
+        var smsSenderId = '';
         //html styling for table in submission mailer
 
         if (!req.query.heMasterId) {
@@ -4042,7 +4046,8 @@ sendgridCtrl.clientMailer = function (req, res, next) {
 
                                                 if (result[2] && result[2][0]) {
                                                     isSendgrid = result[2][0].isSendgrid ? result[2][0].isSendgrid : 0,
-                                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0
+                                                        isSMS = result[2][0].isSMS ? result[2][0].isSMS : 0,
+                                                        smsSenderId = result[2][0].smsSenderId ? result[2][0].smsSenderId : 0
                                                 }
 
                                                 if (!err && result && result[0]) {
@@ -4175,7 +4180,7 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                                                         qs: {
                                                                             user_name: 'janardana@hirecraft.com',
                                                                             password: 'Ezeid2015',
-                                                                            sender_id: 'WtMate',
+                                                                            sender_id: smsSenderId,
                                                                             service: 'TRANS',
                                                                             mobile_no: mobileNo,
                                                                             message: message,
@@ -5114,7 +5119,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
         var isdMobile = '';
         var mobileNo = '';
         var message = '';
-
+        var smsSenderId = '';
 
         //html styling for table in submission mailer
 
@@ -5275,7 +5280,8 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
 
                                                 if (result[4] && result[4][0]) {
                                                     isSendgrid = result[4][0].isSendgrid ? result[4][0].isSendgrid : 0,
-                                                        isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0
+                                                        isSMS = result[4][0].isSMS ? result[4][0].isSMS : 0,
+                                                        smsSenderId = result[4][0].smsSenderId ? result[4][0].smsSenderId : 0
                                                 }
 
                                                 if (!err && result && result[0] && result[0][0]) {
@@ -5586,7 +5592,7 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                                                         qs: {
                                                                             user_name: 'janardana@hirecraft.com',
                                                                             password: 'Ezeid2015',
-                                                                            sender_id: 'WtMate',
+                                                                            sender_id: smsSenderId,
                                                                             service: 'TRANS',
                                                                             mobile_no: mobileNo,
                                                                             message: message,
@@ -8958,7 +8964,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                         qs: {
                                             user_name: 'janardana@hirecraft.com',
                                             password: 'Ezeid2015',
-                                            sender_id: 'PCEHCM',
+                                            sender_id: result[3][0].smsSenderId,
                                             service: 'TRANS',
                                             mobile_no: mobileNo,
                                             message: message,

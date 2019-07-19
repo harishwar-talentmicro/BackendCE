@@ -157,71 +157,6 @@ supportCtrl.saveSupportRequest = function (req, res, next) {
                             console.log(results);
                             if (!err && results && results[0]) {
                                 senderGroupId = results[0][0].senderId;
-                                // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
-                                //     senderName : results[0][0].message
-                                // });
-                                //
-                                // for (var i = 0; i < results[1].length; i++ ) {
-                                //     if (notificationTemplaterRes.parsedTpl) {
-                                //
-                                //         var formDataJSON = JSON.parse(results[1][i].formDataJSON) ;
-                                //
-                                //         notification.publish(
-                                //             results[1][i].receiverId,
-                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                //             results[0][0].senderId,
-                                //             notificationTemplaterRes.parsedTpl,
-                                //             31,
-                                //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                //             0,
-                                //             0,
-                                //             0,
-                                //             0,
-                                //             1,
-                                //             moment().format("YYYY-MM-DD HH:mm:ss"),
-                                //             '',
-                                //             0,
-                                //             0,
-                                //             null,
-                                //             '',
-                                //             /** Data object property to be sent with notification **/
-                                //             {
-                                //                 messageList: {
-                                //                     messageId: results[1][i].messageId,
-                                //                     message: results[1][i].message,
-                                //                     messageLink: results[1][i].messageLink,
-                                //                     createdDate: results[1][i].createdDate,
-                                //                     messageType: results[1][i].messageType,
-                                //                     messageStatus: results[1][i].messageStatus,
-                                //                     priority: results[1][i].priority,
-                                //                     senderName: results[1][i].senderName,
-                                //                     senderId: results[1][i].senderId,
-                                //                     receiverId: results[1][i].receiverId,
-                                //                     groupId: results[1][i].senderId,
-                                //                     groupType: 2,
-                                //                     transId : results[1][i].transId,
-                                //                     formId : results[1][i].formId,
-                                //                     currentStatus : results[1][i].currentStatus,
-                                //                     currentTransId : results[1][i].currentTransId,
-                                //                     parentId : results[1][i].parentId,
-                                //                     accessUserType : results[1][i].accessUserType,
-                                //                     heUserId : results[1][i].heUserId,
-                                //                     formData : JSON.parse(results[1][i].formDataJSON)
-                                //                 }
-                                //             },
-                                //             null,
-                                //             tokenResult[0].isWhatMate,
-                                //             results[1][i].secretKey);
-                                //         console.log('postNotification : notification for compose_message is sent successfully');
-                                //     }
-                                //     else {
-                                //         console.log('Error in parsing notification compose_message template - ',
-                                //             notificationTemplaterRes.error);
-                                //         console.log('postNotification : notification for compose_message is sent successfully');
-                                //     }
-                                // }
                                 notifyMessages.getMessagesNeedToNotify();
                                 response.status = true;
                                 response.message = "Support request saved successfully";
@@ -249,35 +184,6 @@ supportCtrl.saveSupportRequest = function (req, res, next) {
                                         accessUserType: results[0][0].accessUserType,
                                         heUserId: results[0][0].heUserId,
                                         formData: JSON.parse(results[0][0].formDataJSON)
-                                        // formData : {
-                                        //     stage : formDataJSON1.stage,
-                                        //     amount : formDataJSON1.amount,
-                                        //     reason : formDataJSON1.reason,
-                                        //     status : formDataJSON1.status,
-                                        //     transId : formDataJSON1.transId,
-                                        //     clientId : formDataJSON1.clientId,
-                                        //     parentId : formDataJSON1.parentId,
-                                        //     changeLog : formDataJSON1.changeLog,
-                                        //     formTitle : formDataJSON1.formTitle,
-                                        //     categoryId : formDataJSON1.categoryId,
-                                        //     clientName : formDataJSON1.clientName,
-                                        //     currencyId : formDataJSON1.currencyId,
-                                        //     stageTitle : formDataJSON1.stageTitle,
-                                        //     probability : formDataJSON1.probability,
-                                        //     requirement : formDataJSON1.requirement,
-                                        //     senderNotes : formDataJSON1.senderNotes,
-                                        //     statusTitle : formDataJSON1.statusTitle,
-                                        //     infoToSender : formDataJSON1.infoToSender,
-                                        //     approverCount : formDataJSON1.approverCount,
-                                        //     assignHistory :  (formDataJSON1.assignHistory) ? JSON.parse(formDataJSON1.assignHistory) : null,
-                                        //     categoryTitle : formDataJSON1.categoryTitle,
-                                        //     currencyTitle : formDataJSON1.currencyTitle,
-                                        //     receiverCount : formDataJSON1.receiverCount,
-                                        //     receiverNotes : formDataJSON1.receiverNotes,
-                                        //     statusHistory : (formDataJSON1.statusHistory) ? JSON.parse(formDataJSON1.statusHistory) : null,
-                                        //     accessUserType : formDataJSON1.accessUserType,
-                                        //     attachmentList : (formDataJSON1.attachmentList) ? JSON.parse(formDataJSON1.attachmentList) : null
-                                        // }
                                     }
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -304,7 +210,6 @@ supportCtrl.saveSupportRequest = function (req, res, next) {
             }
         });
     }
-
 };
 
 supportCtrl.assignToUser = function (req, res, next) {
@@ -508,106 +413,196 @@ supportCtrl.getSupportTracker = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        console.log(req.body);
 
-                    var priority = req.body.priority;
-                    if (typeof (priority) == "string") {
-                        priority = JSON.parse(priority);
-                    }
-                    if (!priority) {
-                        priority = [];
-                    }
+        if (req.body.nkFlag == 1) {
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.body.type = (req.body.type) ? (req.body.type) : 1;
-                        req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
-                        req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
-                        var startPage = 0;
+            var priority = req.body.priority;
+            if (typeof (priority) == "string") {
+                priority = JSON.parse(priority);
+            }
+            if (!priority) {
+                priority = [];
+            }
 
-                        startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
-                        req.body.userId = (req.body.userId) ? (req.body.userId) : 0;
+            if (!req.body.whatmateId) {
+                error.whatmateId = 'Invalid whatmateId';
+                validationFlag *= false;
+            }
 
-                        var procParams = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.groupId),
-                            req.st.db.escape(req.body.type),
-                            req.st.db.escape(startPage),
-                            req.st.db.escape(req.query.limit),
-                            req.st.db.escape(req.body.status),
-                            req.st.db.escape(JSON.stringify(priority)),
-                            req.st.db.escape(req.body.userId)
-                        ];
-                        /**
-                         * Calling procedure for sales request
-                         * @type {string}
-                         */
-
-                        var procQuery = 'CALL HE_get_supportTracker1( ' + procParams.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            console.log(results);
-                            if (!err && results && results[0]) {
-                                response.status = true;
-                                response.message = "support Tracker loaded successfully";
-                                response.error = null;
-                                response.data = {
-                                    chartData: results[0] ? results[0] : [],
-                                    TransactionData: results[1] ? results[1] : [],
-                                    count: results[2] && results[2][0] && results[2][0].count ? results[2][0].count : 0,
-                                    isSupportMember: results[3][0] && results[3][0].isSupportMember ? results[3][0].isSupportMember : 0,
-                                    isCompanyMember: results[4][0] && results[4][0].isCompanyMember ? results[4][0].isCompanyMember : 0
-                                };
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
-                            else if (!err) {
-                                response.status = true;
-                                response.message = "support Tracker loaded successfully";
-                                response.error = null;
-                                response.data = {
-                                    chartData: [],
-                                    transactionData: [],
-                                    count: 0,
-                                    isSupportMember: 0,
-                                    isCompanyMember: 0
-                                };
-
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
-                            else {
-                                response.status = false;
-                                response.message = "Error while loading support Tracker";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
-                    }
-
-                });
-
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
             }
             else {
-                res.status(401).json(response);
+
+                req.body.type = (req.body.type) ? (req.body.type) : 1;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+                req.body.userId = (req.body.userId) ? (req.body.userId) : 0;
+
+                var procParams = [
+                    req.st.db.escape(req.query.groupId),
+                    // req.st.db.escape(req.body.type),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(JSON.stringify(priority)),
+                    // req.st.db.escape(req.body.userId),
+                    req.st.db.escape(req.body.whatmateId)
+                ];
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL nk_wm_get_customerSalesTracker( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+                    console.log(err);
+                    if (!err && results && results[0] && results[0][0]) {
+                        response.status = true;
+                        response.message = "support Tracker loaded successfully";
+                        response.error = null;
+
+                        for (var i = 0; i < results[0].length; i++) {
+                            results[0][i].attachmentList = results[0] && results[0][i] && results[0][i].attachmentList ? JSON.parse(results[0][i].attachmentList) : [];
+                        }
+
+                        response.data = {
+                            supportTrackerList: results[0] ? results[0] : [],
+                            count: results[1] && results[1][0] && results[1][0].count ? results[1][0].count : 0
+                        };
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "support Tracker loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            transactionData: [],
+                            count: 0
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading support Tracker";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
             }
-        });
+        }
+
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        var priority = req.body.priority;
+                        if (typeof (priority) == "string") {
+                            priority = JSON.parse(priority);
+                        }
+                        if (!priority) {
+                            priority = [];
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.body.type = (req.body.type) ? (req.body.type) : 1;
+                            req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                            req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                            var startPage = 0;
+
+                            startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+                            req.body.userId = (req.body.userId) ? (req.body.userId) : 0;
+
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.groupId),
+                                req.st.db.escape(req.body.type),
+                                req.st.db.escape(startPage),
+                                req.st.db.escape(req.query.limit),
+                                req.st.db.escape(req.body.status),
+                                req.st.db.escape(JSON.stringify(priority)),
+                                req.st.db.escape(req.body.userId)
+                            ];
+                            /**
+                             * Calling procedure for sales request
+                             * @type {string}
+                             */
+
+                            var procQuery = 'CALL HE_get_supportTracker1( ' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+                                if (!err && results && results[0]) {
+                                    response.status = true;
+                                    response.message = "support Tracker loaded successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        chartData: results[0] ? results[0] : [],
+                                        TransactionData: results[1] ? results[1] : [],
+                                        count: results[2] && results[2][0] && results[2][0].count ? results[2][0].count : 0,
+                                        isSupportMember: results[3][0] && results[3][0].isSupportMember ? results[3][0].isSupportMember : 0,
+                                        isCompanyMember: results[4][0] && results[4][0].isCompanyMember ? results[4][0].isCompanyMember : 0
+                                    };
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "support Tracker loaded successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        chartData: [],
+                                        transactionData: [],
+                                        count: 0,
+                                        isSupportMember: 0,
+                                        isCompanyMember: 0
+                                    };
+
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while loading support Tracker";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+
+                    });
+
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
     }
 };
 
@@ -949,9 +944,10 @@ supportCtrl.getMasterData = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
 
+
+        var supportMasterFunction = function (tokenResult) {
+            try {
                 var procParams = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.groupId),
@@ -963,58 +959,129 @@ supportCtrl.getMasterData = function (req, res, next) {
                 var procQuery = 'CALL HE_get_app_suppourtmaster( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, masterData) {
-                    if (!err && masterData[0] && masterData[0][0]) {
-                        var output = [];
-                        for (var i = 0; i < masterData[0].length; i++) {
-                            var res1 = {};
-                            res1.stageId = masterData[0][i].stageId;
-                            res1.stageTitle = masterData[0][i].stageTitle;
-                            res1.stageProgress = masterData[0][i].stageProgress;
-                            res1.statusList = (masterData[0][i].statusList) ? JSON.parse(masterData[0][i].statusList) : [];
-                            output.push(res1);
+                    console.log(err);
+                    try {
+                        if (!err && masterData[0] && masterData[0][0]) {
+                            var output = [];
+                            for (var i = 0; i < masterData[0].length; i++) {
+                                var res1 = {};
+                                res1.stageId = masterData[0][i].stageId;
+                                res1.stageTitle = masterData[0][i].stageTitle;
+                                res1.stageProgress = masterData[0][i].stageProgress;
+                                res1.statusList = (masterData[0][i].statusList) ? JSON.parse(masterData[0][i].statusList) : [];
+                                output.push(res1);
+                            }
+                            response.status = true;
+                            response.message = "Data loaded successfully";
+                            response.data = {
+                                stageStatusList: output,
+                                categoryList: masterData[1] ? masterData[1] : [],
+                                currencyList: masterData[2] ? masterData[2] : [],
+                                memberList: masterData[3] ? masterData[3] : [],
+                                currency: {
+                                    currencySymbol: (masterData[4] && masterData[4][0] && masterData[4][0].currencySymbol) ? masterData[4][0].currencySymbol : '',
+                                    currencyId: (masterData[4] && masterData[4][0] && masterData[4][0].currencyId) ? masterData[4][0].currencyId : 0
+                                },
+                                probability: masterData[5] ? masterData[5] : [],
+                                templateList: masterData[6] ? masterData[6] : [],
+                                isReportingManager: masterData[7][0] && masterData[7][0].isReportingManager ? masterData[7][0].isReportingManager : 0,
+                                isCompanyMember: masterData[7][0] && masterData[7][0].isCompanyMember ? masterData[7][0].isCompanyMember : 0
+                            };
+                            response.error = null;
+                            // res.status(200).json(response);
+                            if (req.query.nkFlag) {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                console.log("resp for whatmate app");
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    try {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    } catch (ex) {
+                                        console.log(ex);
+                                        response.message = "Error while getting data";
+                                        res.status(500).json(response);
+                                    }
+                                });
+                            }
                         }
-                        response.status = true;
-                        response.message = "Data loaded successfully";
-                        response.data = {
-                            stageStatusList: output,
-                            categoryList: masterData[1] ? masterData[1] : [],
-                            currencyList: masterData[2] ? masterData[2] : [],
-                            memberList: masterData[3] ? masterData[3] : [],
-                            currency: {
-                                currencySymbol: (masterData[4] && masterData[4][0] && masterData[4][0].currencySymbol) ? masterData[4][0].currencySymbol : '',
-                                currencyId: (masterData[4] && masterData[4][0] && masterData[4][0].currencyId) ? masterData[4][0].currencyId : 0
-                            },
-                            probability: masterData[5] ? masterData[5] : [],
-                            templateList: masterData[6] ? masterData[6] : [],
-                            isReportingManager: masterData[7][0] && masterData[7][0].isReportingManager ? masterData[7][0].isReportingManager : 0,
-                            isCompanyMember: masterData[7][0] && masterData[7][0].isCompanyMember ? masterData[7][0].isCompanyMember : 0
-                        };
-                        response.error = null;
-                        // res.status(200).json(response);
-
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                stageStatusList: [],
+                                categoryList: [],
+                                currencyList: [],
+                                memberList: [],
+                                templateList: []
+                            };
+                            response.error = null;
+                            // res.status(200).json(response);
+                            if (req.query.nkFlag) {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    res.status(200).json(response);
+                                });
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    } catch (ex) {
+                        console.log(ex);
+                        response.message = "Error while getting data";
+                        res.status(500).json(response);
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No data found";
-                        response.data = {
-                            stageStatusList: [],
-                            categoryList: [],
-                            currencyList: [],
-                            memberList: [],
-                            templateList: []
-                        };
+                });
+            } catch (ex) {
+                console.log(ex);
+                response.message = "Error while getting data";
+                res.status(500).json(response);
+            }
+        }
+
+        if (req.query.nkFlag == 1 && req.query.whatmateId) {
+            if (!req.query.whatmateId) {
+                error.whatmateId = 'Invalid whatmateId';
+                validationFlag *= false;
+            }
+
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
+            }
+            else {
+
+                var input = [
+                    req.st.db.escape(req.query.whatmateId)
+                ];
+
+                var procQuery = 'CALL nk_whatmate_userValidation( ' + input.join(',') + ')';
+                req.db.query(procQuery, function (err, masterData) {
+                    console.log(err);
+                    console.log("whatmate id validation", masterData);
+                    if (!err && masterData[0] && masterData[0][0] && masterData[0][0].masterid) {
+                        console.log("valid whatmate user");
+                        supportMasterFunction([]);
+
+                    } else if (!err) {
+                        response.status = false;
+                        response.message = "Invalid Customer";
                         response.error = null;
-                        // res.status(200).json(response);
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                        response.data = null;
+                        res.status(200).json(response);
                     }
                     else {
                         response.status = false;
@@ -1025,11 +1092,21 @@ supportCtrl.getMasterData = function (req, res, next) {
                     }
                 });
             }
-            else {
-                res.status(401).json(response);
-            }
-        });
+        }
+        else {
+            console.log("whatmate app");
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    console.log("tokenResult", tokenResult);
+                    supportMasterFunction(tokenResult);
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
     }
+
 
 };
 

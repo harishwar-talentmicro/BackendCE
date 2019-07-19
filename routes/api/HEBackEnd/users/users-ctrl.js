@@ -2129,7 +2129,7 @@ userCtrl.userNotifySave = function (req, res, next) {
                                 if (userresult[0][i].status == "New") {
 
                                     //whatmateId
-                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId) + ',Password: ' + password;
+                                    message = 'Dear ' + name + ', Your WhatMate credentials, Login ID: ' + (userresult[0][i].loginId ? userresult[0][i].loginId : userresult[0][i].whatmateId) + ',Password: ' + password+' Download WhatMate App. Android: http://bit.ly/WmateA  iOS:http://bit.ly/WhatMate Check Email for details- HR Team';
 
 
                                     message = userresult[0][i].whatmateSignUpMessage ? userresult[0][i].whatmateSignUpMessage : message;

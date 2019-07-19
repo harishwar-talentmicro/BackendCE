@@ -52,6 +52,8 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                 var decryptBuf = encryption.decrypt1((req.body.data),tokenResult[0].secretKey);
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    
+                    console.log(req.body);
                     // if (!req.body.travelRequestId) {
                     //     error.travelRequestId = 'Invalid travelRequestId';
                     //     validationFlag *= false;
@@ -94,7 +96,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                         req.body.totalAmount = req.body.totalAmount ? req.body.totalAmount : 0;
                         req.body.totalPayableCurrencyId = req.body.totalPayableCurrencyId ? req.body.totalPayableCurrencyId : 0;
                         req.body.totalPayableAmount = req.body.totalPayableAmount ? req.body.totalPayableAmount : 0;
-                        req.body.settlementPaid = (req.body.settlementPaid == undefined) ? 1 : req.body.settlementPaid;
+                        req.body.settlementPaid = (req.body.settlementPaid == undefined) ? 0 : req.body.settlementPaid;
                         req.body.advanceCurrencyId = req.body.advanceCurrencyId ? req.body.advanceCurrencyId : 0;
                         req.body.advanceAmount = req.body.advanceAmount ? req.body.advanceAmount : 0;
                         req.body.receiverNotes = req.body.receiverNotes ? req.body.receiverNotes : '';
@@ -134,7 +136,8 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(req.body.travelRequestData),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)    
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.isExpenseClaim || 0)
                    ];
 
                         var travelClaimFormId=1007;
@@ -142,7 +145,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(travelClaimFormId),
                             req.st.db.escape(JSON.stringify(keywordList)),
-                            req.st.db.escape(req.body.groupId)  
+                            req.st.db.escape(req.body.groupId)
                         ];
                         /**
                          * Calling procedure to save form template

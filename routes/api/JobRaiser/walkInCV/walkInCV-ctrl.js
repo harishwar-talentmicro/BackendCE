@@ -3708,8 +3708,8 @@ walkInCvCtrl.walkInPDfGeneration = function (req, res, next) {
                     req.st.db.escape(req.body.isExcel || 0),
                     req.st.db.escape(req.body.start || 0),
                     req.st.db.escape(req.body.limit || 0),
-                    req.st.db.escape(req.body.walkInJobId || 0)
-
+                    req.st.db.escape(req.body.walkInJobId || 0),
+                    req.st.db.escape(req.body.directWalkIn || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_walkInPdfGeneration( ' + inputs.join(',') + ')';

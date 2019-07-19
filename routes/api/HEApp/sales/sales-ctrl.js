@@ -14,7 +14,7 @@ var Notification_aws = require('../../../modules/notification/aws-sns-push');
 
 var _Notification_aws = new Notification_aws();
 
-
+var request = require('request');
 
 var salesCtrl = {};
 var error = {};
@@ -52,100 +52,182 @@ salesCtrl.getMasterData = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        if (req.query.nkFlag == 1) {
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.groupId),
+                req.st.db.escape(DBSecretKey)
+            ];
+            /**
+             * Calling procedure to save form sales items
+             */
+            var procQuery = 'CALL HE_get_app_salesmaster( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, masterData) {
+                if (!err && masterData[0] && masterData[0][0]) {
+                    var output = [];
+                    for (var i = 0; i < masterData[0].length; i++) {
+                        var res1 = {};
+                        res1.stageId = masterData[0][i].stageId;
+                        res1.stageTitle = masterData[0][i].stageTitle;
+                        res1.stageProgress = masterData[0][i].stageProgress;
+                        res1.statusList = JSON.parse(masterData[0][i].statusList);
+                        output.push(res1);
+                    }
 
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(DBSecretKey)
-                ];
-                /**
-                 * Calling procedure to save form sales items
-                 */
-                var procQuery = 'CALL HE_get_app_salesmaster( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, masterData) {
-                    if (!err && masterData[0] && masterData[0][0]) {
-                        var output = [];
-                        for (var i = 0; i < masterData[0].length; i++) {
-                            var res1 = {};
-                            res1.stageId = masterData[0][i].stageId;
-                            res1.stageTitle = masterData[0][i].stageTitle;
-                            res1.stageProgress = masterData[0][i].stageProgress;
-                            res1.statusList = JSON.parse(masterData[0][i].statusList);
-                            output.push(res1);
+                    response.status = true;
+                    response.message = "Data loaded successfully";
+                    response.data = {
+                        stageStatusList: output,
+                        categoryList: masterData[1] && masterData[1][0] ? masterData[1] : [],
+                        currencyList: masterData[2] ? masterData[2] : [],
+                        memberList: masterData[3] ? masterData[3] : [],
+                        salesType: masterData[4] ? masterData[4][0].salesDisplayFormat : 0,
+                        currency: {
+                            currencySymbol: (masterData[5] && masterData[5][0] && masterData[5][0].currencySymbol) ? masterData[5][0].currencySymbol : '',
+                            currencyId: (masterData[5] && masterData[5][0] && masterData[5][0].currencyId) ? masterData[5][0].currencyId : 0
+                        },
+                        probability: masterData[6] ? masterData[6] : [],
+                        enableValueField1: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField1 ? masterData[7][0].enableValueField1 : 0,
+                        enableValueField2: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField2 ? masterData[7][0].enableValueField2 : 0,
+                        valueFieldTitle1: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle1 ? masterData[7][0].valueFieldTitle1 : "",
+                        valueFieldTitle2: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle2 ? masterData[7][0].valueFieldTitle2 : "",
+                        isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0,
+                        isTaskSchedules: masterData[7] && masterData[7][0] && masterData[7][0].isTaskSchedules ? masterData[7][0].isTaskSchedules : 0,
+                        isExpenseClaim: masterData[7] && masterData[7][0] && masterData[7][0].isExpenseClaim ? masterData[7][0].isExpenseClaim : 0,
+                        showForcastSection: masterData[7] && masterData[7][0] && masterData[7][0].showForcastSection ? masterData[7][0].showForcastSection : 0,
+                        targetPeriod: masterData[7] && masterData[7][0] && masterData[7][0].targetPeriod ? masterData[7][0].targetPeriod : 0,
+                        enableConsiderThisForForecast: masterData[7] && masterData[7][0] && masterData[7][0].enableConsiderThisForForecast ? masterData[7][0].enableConsiderThisForForecast : 0,
+                        isSendProposal: masterData[7] && masterData[7][0] && masterData[7][0].isSendProposal ? masterData[7][0].isSendProposal : 0,
+                        isTargetDate: masterData[7] && masterData[7][0] && masterData[7][0].isTargetDate ? masterData[7][0].isTargetDate : 0,
+                        expenseList: masterData[8] ? masterData[8] : [],
+                        templateList: masterData[9] ? masterData[9] : [],
+                        isReportingManager: masterData[10][0] && masterData[10][0].isReportingManager ? masterData[10][0].isReportingManager : 0,
+                        isCompanyMember: masterData[10][0] && masterData[10][0].isCompanyMember ? masterData[10][0].isCompanyMember : 0
+                    };
+                    response.error = null;
+                    res.status(200).json(response);
+                }
+                else if (!err) {
+                    response.status = true;
+                    response.message = "No data found";
+                    response.data = {
+                        stageStatusList: [],
+                        categoryList: [],
+                        currencyList: [],
+                        memberList: [],
+                        templateList: []
+                    };
+                    response.error = null;
+                    res.status(200).json(response);
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while getting data";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.groupId),
+                        req.st.db.escape(DBSecretKey),
+                        // req.st.db.escape(req.query.whatmateId)
+                    ];
+                    /**
+                     * Calling procedure to save form sales items
+                     */
+                    var procQuery = 'CALL HE_get_app_salesmaster( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, masterData) {
+                        if (!err && masterData[0] && masterData[0][0]) {
+                            var output = [];
+                            for (var i = 0; i < masterData[0].length; i++) {
+                                var res1 = {};
+                                res1.stageId = masterData[0][i].stageId;
+                                res1.stageTitle = masterData[0][i].stageTitle;
+                                res1.stageProgress = masterData[0][i].stageProgress;
+                                res1.statusList = JSON.parse(masterData[0][i].statusList);
+                                output.push(res1);
+                            }
+
+                            response.status = true;
+                            response.message = "Data loaded successfully";
+                            response.data = {
+                                stageStatusList: output,
+                                categoryList: masterData[1] && masterData[1][0] ? masterData[1] : [],
+                                currencyList: masterData[2] ? masterData[2] : [],
+                                memberList: masterData[3] ? masterData[3] : [],
+                                salesType: masterData[4] ? masterData[4][0].salesDisplayFormat : 0,
+                                currency: {
+                                    currencySymbol: (masterData[5] && masterData[5][0] && masterData[5][0].currencySymbol) ? masterData[5][0].currencySymbol : '',
+                                    currencyId: (masterData[5] && masterData[5][0] && masterData[5][0].currencyId) ? masterData[5][0].currencyId : 0
+                                },
+                                probability: masterData[6] ? masterData[6] : [],
+                                enableValueField1: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField1 ? masterData[7][0].enableValueField1 : 0,
+                                enableValueField2: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField2 ? masterData[7][0].enableValueField2 : 0,
+                                valueFieldTitle1: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle1 ? masterData[7][0].valueFieldTitle1 : "",
+                                valueFieldTitle2: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle2 ? masterData[7][0].valueFieldTitle2 : "",
+                                isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0,
+                                isTaskSchedules: masterData[7] && masterData[7][0] && masterData[7][0].isTaskSchedules ? masterData[7][0].isTaskSchedules : 0,
+                                isExpenseClaim: masterData[7] && masterData[7][0] && masterData[7][0].isExpenseClaim ? masterData[7][0].isExpenseClaim : 0,
+                                showForcastSection: masterData[7] && masterData[7][0] && masterData[7][0].showForcastSection ? masterData[7][0].showForcastSection : 0,
+                                targetPeriod: masterData[7] && masterData[7][0] && masterData[7][0].targetPeriod ? masterData[7][0].targetPeriod : 0,
+                                enableConsiderThisForForecast: masterData[7] && masterData[7][0] && masterData[7][0].enableConsiderThisForForecast ? masterData[7][0].enableConsiderThisForForecast : 0,
+                                isSendProposal: masterData[7] && masterData[7][0] && masterData[7][0].isSendProposal ? masterData[7][0].isSendProposal : 0,
+                                isTargetDate: masterData[7] && masterData[7][0] && masterData[7][0].isTargetDate ? masterData[7][0].isTargetDate : 0,
+                                expenseList: masterData[8] ? masterData[8] : [],
+                                templateList: masterData[9] ? masterData[9] : [],
+                                isReportingManager: masterData[10][0] && masterData[10][0].isReportingManager ? masterData[10][0].isReportingManager : 0,
+                                isCompanyMember: masterData[10][0] && masterData[10][0].isCompanyMember ? masterData[10][0].isCompanyMember : 0
+                            };
+                            response.error = null;
+                            // res.status(200).json(response);
+
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
                         }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.data = {
+                                stageStatusList: [],
+                                categoryList: [],
+                                currencyList: [],
+                                memberList: [],
+                                templateList: []
+                            };
+                            response.error = null;
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
 
-                        response.status = true;
-                        response.message = "Data loaded successfully";
-                        response.data = {
-                            stageStatusList: output,
-                            categoryList: masterData[1] && masterData[1][0] ? masterData[1] : [],
-                            currencyList: masterData[2] ? masterData[2] : [],
-                            memberList: masterData[3] ? masterData[3] : [],
-                            salesType: masterData[4] ? masterData[4][0].salesDisplayFormat : 0,
-                            currency: {
-                                currencySymbol: (masterData[5] && masterData[5][0] && masterData[5][0].currencySymbol) ? masterData[5][0].currencySymbol : '',
-                                currencyId: (masterData[5] && masterData[5][0] && masterData[5][0].currencyId) ? masterData[5][0].currencyId : 0
-                            },
-                            probability: masterData[6] ? masterData[6] : [],
-                            enableValueField1: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField1 ? masterData[7][0].enableValueField1 : 0,
-                            enableValueField2: masterData[7] && masterData[7][0] && masterData[7][0].enableValueField2 ? masterData[7][0].enableValueField2 : 0,
-                            valueFieldTitle1: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle1 ? masterData[7][0].valueFieldTitle1 : "",
-                            valueFieldTitle2: masterData[7] && masterData[7][0] && masterData[7][0].valueFieldTitle2 ? masterData[7][0].valueFieldTitle2 : "",
-                            isCompanyMandatory: masterData[7] && masterData[7][0] && masterData[7][0].isCompanyMandatory ? masterData[7][0].isCompanyMandatory : 0,
-                            isTaskSchedules: masterData[7] && masterData[7][0] && masterData[7][0].isTaskSchedules ? masterData[7][0].isTaskSchedules : 0,
-                            isExpenseClaim: masterData[7] && masterData[7][0] && masterData[7][0].isExpenseClaim ? masterData[7][0].isExpenseClaim : 0,
-                            showForcastSection: masterData[7] && masterData[7][0] && masterData[7][0].showForcastSection ? masterData[7][0].showForcastSection : 0,
-                            targetPeriod: masterData[7] && masterData[7][0] && masterData[7][0].targetPeriod ? masterData[7][0].targetPeriod : 0,
-                            enableConsiderThisForForecast: masterData[7] && masterData[7][0] && masterData[7][0].enableConsiderThisForForecast ? masterData[7][0].enableConsiderThisForForecast : 0,
-                            isSendProposal: masterData[7] && masterData[7][0] && masterData[7][0].isSendProposal ? masterData[7][0].isSendProposal : 0,
-                            isTargetDate: masterData[7] && masterData[7][0] && masterData[7][0].isTargetDate ? masterData[7][0].isTargetDate : 0,
-                            expenseList: masterData[8] ? masterData[8] : [],
-                            templateList: masterData[9] ? masterData[9] : [],
-                            isReportingManager: masterData[10][0] && masterData[10][0].isReportingManager ? masterData[10][0].isReportingManager : 0,
-                            isCompanyMember: masterData[10][0] && masterData[10][0].isCompanyMember ? masterData[10][0].isCompanyMember : 0
-                        };
-                        response.error = null;
-                        // res.status(200).json(response);
-
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-                    }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No data found";
-                        response.data = {
-                            stageStatusList: [],
-                            categoryList: [],
-                            currencyList: [],
-                            memberList: [],
-                            templateList: []
-                        };
-                        response.error = null;
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while getting data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
     }
 
 };
@@ -791,78 +873,181 @@ salesCtrl.saveSalesFeedback = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    if (!req.body.parentId) {
-                        error.parentId = 'Invalid parentId';
-                        validationFlag *= false;
-                    }
-                    if (!req.body.formId) {
-                        error.formId = 'Invalid formId';
-                        validationFlag *= false;
-                    }
+        console.log(req.body);
+        if (req.body.nkFlag == 1) {
+            if (!req.body.parentId) {
+                error.parentId = 'Invalid parentId';
+                validationFlag *= false;
+            }
+            if (!req.body.formId) {
+                error.formId = 'Invalid formId';
+                validationFlag *= false;
+            }
 
-                    if (!req.body.groupId) {
-                        error.groupId = 'Invalid groupId';
-                        validationFlag *= false;
-                    }
-                    var senderGroupId;
+            if (!req.body.groupId) {
+                error.groupId = 'Invalid groupId';
+                validationFlag *= false;
+            }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        var procParams = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.parentId),
-                            req.st.db.escape(req.body.groupId),
-                            req.st.db.escape(req.body.requirement),
-                            req.st.db.escape(req.body.feedback),
-                            req.st.db.escape(req.body.rating),
-                            req.st.db.escape(req.body.formId)
-                        ];
+            if (!req.body.whatmateId) {
+                error.whatmateId = 'Invalid whatmateId';
+                validationFlag *= false;
+            }
 
-                        /**
-                         * Calling procedure for sales request
-                         * @type {string}
-                         */
+            var senderGroupId;
 
-                        var procQuery = 'CALL he_save_Feedback( ' + procParams.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            console.log(results);
-                            if (!err && results && results[0]) {
-                                response.status = true;
-                                response.message = "Feedback saved successfully";
-                                response.error = null;
-                                response.data = results[0][0];
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
+            }
+            else {
+                var procParams = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.body.parentId),
+                    req.st.db.escape(req.body.groupId),
+                    req.st.db.escape(req.body.requirement),
+                    req.st.db.escape(req.body.feedback),
+                    req.st.db.escape(req.body.rating),
+                    req.st.db.escape(req.body.formId),
+                    req.st.db.escape(req.body.feedbackSign || ""),
+                    req.st.db.escape(req.body.whatmateId),
+                    req.st.db.escape(req.body.nkFlag || 0)
+                ];
+
+                /**
+                 * Calling procedure for sales request
+                 * @type {string}
+                 */
+
+                var procQuery = 'CALL he_save_Feedback( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, results) {
+                    console.log(results);
+                    if (!err && results && results[0]) {
+
+                        var url = "http://23.236.49.140:3001/api/nk/ServiceEnquiryNotification";
+                        var dbResponse = {
+                            whatmateId: req.body.whatmateId,
+                            parentId: req.body.parentId,
+                            groupId: req.body.groupId,
+                            feedback: req.body.feedback,
+                            rating: req.body.rating,
+                            notificationType: req.body.notificationType,
+                            feedbackStatus: 1,
+                            feedbackSign: req.body.feedbackSign
+                        };
+
+                        request({
+                            url: url,
+                            method: "POST",
+                            json: true,   // <--Very important!!!
+                            body: dbResponse
+                        }, function (error, response, body) {
+                            console.log(error);
+                            if (!error && body) {
+                                console.log('Notifcation saved and sent successfull for nearkart user');
                             }
                             else {
-                                response.status = false;
-                                response.message = "Error while saving feedback";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
+                                console.log('Error occured in Nearkart notification api');
                             }
                         });
+
+
+                        response.status = true;
+                        response.message = "Feedback saved successfully";
+                        response.error = null;
+                        response.data = results[0][0];
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while saving feedback";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
                     }
                 });
             }
-            else {
-                res.status(401).json(response);
-            }
-        });
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        if (!req.body.parentId) {
+                            error.parentId = 'Invalid parentId';
+                            validationFlag *= false;
+                        }
+                        if (!req.body.formId) {
+                            error.formId = 'Invalid formId';
+                            validationFlag *= false;
+                        }
+
+                        if (!req.body.groupId) {
+                            error.groupId = 'Invalid groupId';
+                            validationFlag *= false;
+                        }
+                        var senderGroupId;
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.body.parentId),
+                                req.st.db.escape(req.body.groupId),
+                                req.st.db.escape(req.body.requirement),
+                                req.st.db.escape(req.body.feedback),
+                                req.st.db.escape(req.body.rating),
+                                req.st.db.escape(req.body.formId),
+                                req.st.db.escape(req.body.feedbackSign || ""),
+                                req.st.db.escape(req.body.whatmateId || ""),
+                                req.st.db.escape(req.body.nkFlag || 0)
+                            ];
+
+                            /**
+                             * Calling procedure for sales request
+                             * @type {string}
+                             */
+
+                            var procQuery = 'CALL he_save_Feedback( ' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(results);
+                                if (!err && results && results[0]) {
+                                    response.status = true;
+                                    response.message = "Feedback saved successfully";
+                                    response.error = null;
+                                    response.data = results[0][0];
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while saving feedback";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
     }
 };
 
@@ -892,80 +1077,143 @@ salesCtrl.getSalesItems = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                req.query.keywords = req.query.keywords ? req.query.keywords : "";
+        if (req.query.nkFlag == 1) {
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.query.groupId),
+                req.st.db.escape(req.query.keywords),
+                // req.st.db.escape(req.query.whatmateId)
+            ];
+            /**
+             * Calling procedure to save form sales items
+             */
+            var procQuery = 'CALL he_get_app_salesItems( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, salesItems) {
+                if (!err && salesItems[0] && salesItems[0][0]) {
+                    var output = [];
+                    for (var i = 0; i < salesItems[0].length; i++) {
+                        var res1 = {};
+                        res1.description = salesItems[0][i].description;
+                        res1.itemId = salesItems[0][i].itemId;
+                        res1.itemCode = salesItems[0][i].itemCode;
+                        res1.itemImage = (salesItems[0][i].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][i].itemImage) : "";
+                        res1.itemName = salesItems[0][i].itemName;
+                        res1.itemRate = salesItems[0][i].itemRate;
+                        res1.maxQuantity = salesItems[0][i].maxQuantity;
+                        res1.minQuantity = salesItems[0][i].minQuantity;
+                        res1.notes = salesItems[0][i].notes;
+                        res1.UOM = salesItems[0][i].UOM;
+                        res1.UOMTitle = salesItems[0][i].UOMTitle;
+                        res1.itemBanners = salesItems[0][i].itemBanners && JSON.parse(salesItems[0][i].itemBanners) ? JSON.parse(salesItems[0][i].itemBanners) : [];
+                        output.push(res1);
+                    }
 
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.groupId),
-                    req.st.db.escape(req.query.keywords)
-                ];
-                /**
-                 * Calling procedure to save form sales items
-                 */
-                var procQuery = 'CALL he_get_app_salesItems( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, salesItems) {
-                    if (!err && salesItems[0] && salesItems[0][0]) {
-                        var output = [];
-                        for (var i = 0; i < salesItems[0].length; i++) {
-                            var res1 = {};
-                            res1.description = salesItems[0][i].description;
-                            res1.itemId = salesItems[0][i].itemId;
-                            res1.itemCode = salesItems[0][i].itemCode;
-                            res1.itemImage = (salesItems[0][i].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][i].itemImage) : "";
-                            res1.itemName = salesItems[0][i].itemName;
-                            res1.itemRate = salesItems[0][i].itemRate;
-                            res1.maxQuantity = salesItems[0][i].maxQuantity;
-                            res1.minQuantity = salesItems[0][i].minQuantity;
-                            res1.notes = salesItems[0][i].notes;
-                            res1.UOM = salesItems[0][i].UOM;
-                            res1.UOMTitle = salesItems[0][i].UOMTitle;
-                            res1.itemBanners = salesItems[0][i].itemBanners && JSON.parse(salesItems[0][i].itemBanners) ? JSON.parse(salesItems[0][i].itemBanners) : [];
-                            output.push(res1);
+                    response.status = true;
+                    response.message = "Items loaded successfully";
+                    response.data = {
+                        salesItems: output
+                    };
+                    response.error = null;
+                    res.status(200).json(response);
+
+                }
+                else if (!err) {
+                    response.status = true;
+                    response.message = "No items found";
+                    response.data = {
+                        salesItems: []
+                    };
+                    response.error = null;
+                    res.status(200).json(response);
+                }
+                else {
+                    response.status = false;
+                    response.message = "Error while getting items";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    req.query.keywords = req.query.keywords ? req.query.keywords : "";
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.groupId),
+                        req.st.db.escape(req.query.keywords)
+                    ];
+                    /**
+                     * Calling procedure to save form sales items
+                     */
+                    var procQuery = 'CALL he_get_app_salesItems( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, salesItems) {
+                        if (!err && salesItems[0] && salesItems[0][0]) {
+                            var output = [];
+                            for (var i = 0; i < salesItems[0].length; i++) {
+                                var res1 = {};
+                                res1.description = salesItems[0][i].description;
+                                res1.itemId = salesItems[0][i].itemId;
+                                res1.itemCode = salesItems[0][i].itemCode;
+                                res1.itemImage = (salesItems[0][i].itemImage) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + salesItems[0][i].itemImage) : "";
+                                res1.itemName = salesItems[0][i].itemName;
+                                res1.itemRate = salesItems[0][i].itemRate;
+                                res1.maxQuantity = salesItems[0][i].maxQuantity;
+                                res1.minQuantity = salesItems[0][i].minQuantity;
+                                res1.notes = salesItems[0][i].notes;
+                                res1.UOM = salesItems[0][i].UOM;
+                                res1.UOMTitle = salesItems[0][i].UOMTitle;
+                                res1.itemBanners = salesItems[0][i].itemBanners && JSON.parse(salesItems[0][i].itemBanners) ? JSON.parse(salesItems[0][i].itemBanners) : [];
+                                output.push(res1);
+                            }
+
+                            response.status = true;
+                            response.message = "Items loaded successfully";
+                            response.data = {
+                                salesItems: output
+                            };
+                            response.error = null;
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+
                         }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No items found";
+                            response.data = {
+                                salesItems: []
+                            };
+                            response.error = null;
 
-                        response.status = true;
-                        response.message = "Items loaded successfully";
-                        response.data = {
-                            salesItems: output
-                        };
-                        response.error = null;
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting items";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
 
-                    }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No items found";
-                        response.data = {
-                            salesItems: []
-                        };
-                        response.error = null;
-
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-                    }
-                    else {
-                        response.status = false;
-                        response.message = "Error while getting items";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else {
-                res.status(401).json(response);
-            }
-        });
     }
 
 };
@@ -998,123 +1246,220 @@ salesCtrl.getSalesTracker = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                    var stageStatusList = req.body.stageStatusList;
-                    if (typeof (stageStatusList) == "string") {
-                        stageStatusList = JSON.parse(stageStatusList);
-                    }
-                    if (!stageStatusList) {
-                        stageStatusList = {};
-                    }
+        if (req.body.nkFlag == 1) {
+            var stageStatusList = req.body.stageStatusList;
+            if (typeof (stageStatusList) == "string") {
+                stageStatusList = JSON.parse(stageStatusList);
+            }
+            if (!stageStatusList) {
+                stageStatusList = {};
+            }
 
-                    var probability = req.body.probability;
-                    if (typeof (probability) == "string") {
-                        probability = JSON.parse(probability);
-                    }
-                    if (!probability) {
-                        probability = {};
-                    }
+            var probability = req.body.probability;
+            if (typeof (probability) == "string") {
+                probability = JSON.parse(probability);
+            }
+            if (!probability) {
+                probability = {};
+            }
 
+            if (!req.body.whatmateId) {
+                error.whatmateId = 'Invalid whatmateId';
+                validationFlag *= false;
+            }
+        
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
+            }
+            else {
+                req.body.type = req.body.type ? req.body.type : 3;
+                req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                var startPage = 0;
+
+                startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+                req.body.userId = req.body.userId ? req.body.userId : 0;
+                req.body.timeline = req.body.timeline ? req.body.timeline : "";
+
+                var procParams = [
+                    req.st.db.escape(req.query.groupId),
+                    req.st.db.escape(startPage),
+                    req.st.db.escape(req.query.limit),
+                    req.st.db.escape(req.body.status),
+                    req.st.db.escape(req.body.whatmateId)
+                ];
+                /**
+                 * Calling procedure to save form sales items
+                 */
+                var procQuery = 'CALL nk_whatmate_salesTracker( ' + procParams.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, salesItems) {
+                    if (!err && salesItems && salesItems[0] && salesItems[0][0]) {
+
+                        response.status = true;
+                        response.message = "Sales tracker data loaded successfully";
+
+                        for (var i = 0; i < salesItems[0].length; i++) {
+                            salesItems[0][i].itemList = salesItems[0][i] && salesItems[0][i].itemList && JSON.parse(salesItems[0][i].itemList) ? JSON.parse(salesItems[0][i].itemList) : [];
+                            salesItems[0][i].attachmentList = salesItems[0][i] && salesItems[0][i].attachmentList && JSON.parse(salesItems[0][i].attachmentList) ? JSON.parse(salesItems[0][i].attachmentList) : [];
+                        }
+
+                        response.data = {
+                            transactionData: salesItems[0],
+                            count: salesItems[1][0].count
+                        };
+
+                        response.error = null;
+                        res.status(200).json(response);
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No data found";
+                        response.data = {
+                            chartData: [],
+                            transactionData: [],
+                            count: 0,
+                            isSalesMember: 0,
+                            isReportingManager: 0
+                        };
+                        response.error = null;
+                        res.status(200).json(response);
                     }
                     else {
-                        req.body.type = req.body.type ? req.body.type : 3;
-                        req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
-                        req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
-                        var startPage = 0;
-
-                        startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
-
-                        req.body.userId = req.body.userId ? req.body.userId : 0;
-                        req.body.timeline = req.body.timeline ? req.body.timeline : "";
-
-                        var procParams = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.groupId),
-                            req.st.db.escape(req.body.type),
-                            req.st.db.escape(startPage),
-                            req.st.db.escape(req.query.limit),
-                            req.st.db.escape(JSON.stringify(stageStatusList)),
-                            req.st.db.escape(JSON.stringify(probability)),
-                            req.st.db.escape(req.body.timeline),
-                            req.st.db.escape(req.body.userId)
-
-                        ];
-                        /**
-                         * Calling procedure to save form sales items
-                         */
-                        var procQuery = 'CALL HE_get_salesTracker1( ' + procParams.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, salesItems) {
-                            if (!err && salesItems && salesItems[0]) {
-
-                                response.status = true;
-                                response.message = "Sales tracker data loaded successfully";
-
-                                for (var i = 0; i < salesItems[1].length; i++) {
-                                    salesItems[1][i].itemList = salesItems[1][i] && salesItems[1][i].itemList && JSON.parse(salesItems[1][i].itemList) ? JSON.parse(salesItems[1][i].itemList) : [];
-                                }
-
-                                response.data = {
-                                    chartData: salesItems[0],
-                                    transactionData: salesItems[1],
-                                    count: salesItems[2][0].count,
-                                    isSalesMember: salesItems[3][0].isSalesMember,
-                                    isReportingManager: salesItems[4][0] && salesItems[4][0].isReportingManager ? salesItems[4][0].isReportingManager : 0
-                                };
-
-                                response.error = null;
-
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-
-                            }
-                            else if (!err) {
-                                response.status = true;
-                                response.message = "No data found";
-                                response.data = {
-                                    chartData: [],
-                                    transactionData: [],
-                                    count: 0,
-                                    isSalesMember: 0,
-                                    isReportingManager: 0
-                                };
-                                response.error = null;
-
-                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                zlib.gzip(buf, function (_, result) {
-                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                });
-                            }
-                            else {
-                                response.status = false;
-                                response.message = "Error while getting sales tracker";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
+                        response.status = false;
+                        response.message = "Error while getting sales tracker";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
                     }
                 });
             }
-            else {
-                res.status(401).json(response);
-            }
-        });
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        var stageStatusList = req.body.stageStatusList;
+                        if (typeof (stageStatusList) == "string") {
+                            stageStatusList = JSON.parse(stageStatusList);
+                        }
+                        if (!stageStatusList) {
+                            stageStatusList = {};
+                        }
+
+                        var probability = req.body.probability;
+                        if (typeof (probability) == "string") {
+                            probability = JSON.parse(probability);
+                        }
+                        if (!probability) {
+                            probability = {};
+                        }
+
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.body.type = req.body.type ? req.body.type : 3;
+                            req.query.limit = (req.query.limit) ? (req.query.limit) : 25;
+                            req.query.startPage = (req.query.startPage) ? (req.query.startPage) : 1;
+                            var startPage = 0;
+
+                            startPage = ((((parseInt(req.query.startPage)) * req.query.limit) + 1) - req.query.limit) - 1;
+
+                            req.body.userId = req.body.userId ? req.body.userId : 0;
+                            req.body.timeline = req.body.timeline ? req.body.timeline : "";
+
+                            var procParams = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.groupId),
+                                req.st.db.escape(req.body.type),
+                                req.st.db.escape(startPage),
+                                req.st.db.escape(req.query.limit),
+                                req.st.db.escape(JSON.stringify(stageStatusList)),
+                                req.st.db.escape(JSON.stringify(probability)),
+                                req.st.db.escape(req.body.timeline),
+                                req.st.db.escape(req.body.userId)
+
+                            ];
+                            /**
+                             * Calling procedure to save form sales items
+                             */
+                            var procQuery = 'CALL HE_get_salesTracker1( ' + procParams.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, salesItems) {
+                                if (!err && salesItems && salesItems[0]) {
+
+                                    response.status = true;
+                                    response.message = "Sales tracker data loaded successfully";
+
+                                    for (var i = 0; i < salesItems[1].length; i++) {
+                                        salesItems[1][i].itemList = salesItems[1][i] && salesItems[1][i].itemList && JSON.parse(salesItems[1][i].itemList) ? JSON.parse(salesItems[1][i].itemList) : [];
+                                    }
+
+                                    response.data = {
+                                        chartData: salesItems[0],
+                                        transactionData: salesItems[1],
+                                        count: salesItems[2][0].count,
+                                        isSalesMember: salesItems[3][0].isSalesMember,
+                                        isReportingManager: salesItems[4][0] && salesItems[4][0].isReportingManager ? salesItems[4][0].isReportingManager : 0
+                                    };
+
+                                    response.error = null;
+
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "No data found";
+                                    response.data = {
+                                        chartData: [],
+                                        transactionData: [],
+                                        count: 0,
+                                        isSalesMember: 0,
+                                        isReportingManager: 0
+                                    };
+                                    response.error = null;
+
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while getting sales tracker";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
     }
 };
 
@@ -2232,415 +2577,774 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-                    console.log(req.body);
-                    // if (!req.body.requirement) {
-                    //     error.requirement = 'Invalid requirement';
-                    //     validationFlag *= false;
-                    // }
+        console.log(req.body);
+        if (req.body.nkFlag == 1) {
+            var keywordList = req.body.keywordList;
+            if (typeof (keywordList) == "string") {
+                keywordList = JSON.parse(keywordList);
+            }
+            if (!keywordList) {
+                keywordList = [];
+            }
 
-                    var keywordList = req.body.keywordList;
-                    if (typeof (keywordList) == "string") {
-                        keywordList = JSON.parse(keywordList);
-                    }
-                    if (!keywordList) {
-                        keywordList = [];
-                    }
+            var attachmentList = req.body.attachmentList;
+            if (typeof (attachmentList) == "string") {
+                attachmentList = JSON.parse(attachmentList);
+            }
+            if (!attachmentList) {
+                attachmentList = [];
+            }
 
-                    var attachmentList = req.body.attachmentList;
-                    if (typeof (attachmentList) == "string") {
-                        attachmentList = JSON.parse(attachmentList);
-                    }
-                    if (!attachmentList) {
-                        attachmentList = [];
-                    }
+            var items = req.body.items;
+            if (typeof (items) == "string") {
+                items = JSON.parse(items);
+            }
+            if (!items) {
+                items = [];
+            }
 
-                    var items = req.body.items;
-                    if (typeof (items) == "string") {
-                        items = JSON.parse(items);
-                    }
-                    if (!items) {
-                        items = [];
-                    }
+            if (!req.body.groupId) {
+                error.groupId = 'Invalid groupId';
+                validationFlag *= false;
+            }
 
-                    if (!req.body.groupId) {
-                        error.groupId = 'Invalid groupId';
-                        validationFlag *= false;
-                    }
-
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
-
-                        if (req.body.phoneNo == "") {
-                            req.body.isdPhone = "";
-                        }
-                        var taskDetails;
-                        return new Promise(function (resolve, reject) {
-                            if (req.body.taskIdList && req.body.taskIdList.length > 0) {
-
-                                var taskDetailsInput = [
-                                    req.st.db.escape(req.query.token),
-                                    req.st.db.escape(req.body.groupId),
-                                    req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
-                                    req.st.db.escape(DBSecretKey)
-                                ];
-                                var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
-                                // console.log(taskDetailsInput);
-                                req.db.query(taskDetailsInput, function (err, taskresults) {
-                                    console.log(err);
-                                    if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
-
-                                        taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
-                                        taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
-
-                                        for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
-                                            taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
-                                        }
-
-                                        taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
-
-                                        taskDetails = taskresults[0][0];
-                                        console.log("promise in");
-                                        resolve(taskDetails);
-                                    }
-                                    else {
-                                        resolve('');
-                                    }
-                                });
-                            }
-                            else {
-                                console.log("promise out");
-                                resolve('');
-                            }
-                        }).then(function (resp) {
-                            var procParams = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.body.parentId || 0),
-                                req.st.db.escape(req.body.categoryId || 0),
-                                req.st.db.escape(req.body.requirement || ""),
-                                req.st.db.escape(req.body.senderNotes || ""),
-                                req.st.db.escape(req.body.stage || 0),
-                                req.st.db.escape(req.body.status || 0),
-                                req.st.db.escape(req.body.reason || ""),
-                                req.st.db.escape(req.body.receiverNotes || ""),
-                                req.st.db.escape(req.body.currencyId || 0),
-                                req.st.db.escape(req.body.amount || 0),
-                                req.st.db.escape(req.body.probability || 0),
-                                req.st.db.escape(req.body.infoToSender || ""),
-                                req.st.db.escape(JSON.stringify(attachmentList || [])),
-                                req.st.db.escape(req.body.changeLog || ""),
-                                req.st.db.escape(req.body.groupId),
-                                req.st.db.escape(req.body.learnMessageId || 0),
-                                req.st.db.escape(req.body.accessUserType || 0),
-                                req.st.db.escape(req.body.categoryTitle || ""),
-                                req.st.db.escape(req.body.stageTitle || ""),
-                                req.st.db.escape(req.body.statusTitle || ""),
-                                req.st.db.escape(req.body.currencyTitle || ""),
-                                req.st.db.escape(req.body.isInfoToSenderChanged || 0),
-                                req.st.db.escape(req.body.discount || 0),
-                                req.st.db.escape(JSON.stringify(items || [])),
-                                req.st.db.escape(req.body.itemCurrencyId || 0),
-                                req.st.db.escape(req.body.itemCurrencySymbol || ""),
-                                req.st.db.escape(req.body.targetDate || null),
-                                req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.timestamp || ""),
-                                req.st.db.escape(req.body.createdTimeStamp || null),
-                                req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
-                                req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
-                                req.st.db.escape(req.body.forcastValue || 0),
-                                req.st.db.escape(JSON.stringify(taskDetails || null)),
-                                req.st.db.escape(req.body.isReportingManager || 0),
-                                req.st.db.escape(req.body.isTargetDate || 0),
-                                req.st.db.escape(req.body.isConsider || 0),
-                                req.st.db.escape(req.body.amount2 || 0),
-                                req.st.db.escape(req.body.currencyId2 || 0),
-                                req.st.db.escape(req.body.currencyTitle2 || "")
-                            ];
-
-                            var salesFormId = 2000;
-                            var keywordsParams = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(salesFormId),
-                                req.st.db.escape(JSON.stringify(keywordList)),
-                                req.st.db.escape(req.body.groupId)
-                            ];
-
-                            var procQuery = 'CALL he_save_salesRequest_WithTask_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, results) {
-                                console.log(err);
-                                // console.log("results",results);
-                                if (!err && results && results[0] && results[0][0]) {
-
-                                    senderGroupId = results[0][0].senderId;
-
-                                    notifyMessages.getMessagesNeedToNotify();
-
-                                    if (results && results[2] && results[2][0] && results[2][0].receiverId) {
-                                        if (notificationTemplaterRes.parsedTpl) {
-                                            notification.publish(
-                                                results[2][0].receiverId,
-                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                results[0][0].senderId,
-                                                notificationTemplaterRes.parsedTpl,
-                                                41,
-                                                0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
-                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                                0,
-                                                0,
-                                                0,
-                                                0,
-                                                1,
-                                                moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                '',
-                                                0,
-                                                0,
-                                                null,
-                                                '',
-                                                /** Data object property to be sent with notification **/
-                                                {
-                                                    parentId: results[2][0].parentId,
-                                                    groupId: results[2][0].groupId,
-                                                    requirement: results[2][0].requirement,
-                                                    feedback: results[2][0].feedback,
-                                                    rating: results[2][0].rating,
-                                                    updatedDate: results[2][0].updatedDate,
-                                                    status: results[2][0].status
-                                                },
-                                                null,
-                                                tokenResult[0].isWhatMate,
-                                                results[1][i].secretKey);
-                                            console.log('postNotification : notification for compose_message is sent successfully');
-                                        }
-                                        else {
-                                            console.log('Error in parsing notification compose_message template - ',
-                                                notificationTemplaterRes.error);
-                                            console.log('postNotification : notification for compose_message is sent successfully');
-                                        }
-                                    }
-
-                                    console.log("results[2]", results[2]);
-
-                                    // reminder alert
-                                    if (results[2] && results[2][0]) {
-                                        for (var i = 0; i < results[2].length; i++) {
-                                            if (results[2] && results[2][i]) {
-
-                                                var messagePayload = {
-                                                    message: "",
-                                                    alarmType: 4,
-                                                    type: 301,
-                                                    data: {
-                                                        eventList: results[2][i] && results[2][i].eventList && JSON.parse(results[2][i].eventList) ? JSON.parse(results[2][i].eventList) : []
-                                                    }
-                                                    // {
-                                                    //     taskId: results[2][i] && results[2][i].taskId ? results[2][i].taskId : 0,
-                                                    //     title: results[2][i] && results[2][i].title ? results[2][i].title : "",
-                                                    //     description: results[2][i] && results[2][i].description ? results[2][i].description : "",
-                                                    //     reminderTime: results[2][i] && results[2][i].reminderTime ? results[2][i].reminderTime : 0,
-                                                    //     meetingStartDate: results[2][i] && results[2][i].meetingStartDate ? results[2][i].meetingStartDate : null,
-
-                                                    //     address: results[2][i] && results[2][i].address ? results[2][i].address : "",
-
-                                                    //     duration: results[2][i] && results[2][i].duration ? results[2][i].duration : 0,
-                                                    //     latitude: results[2][i] && results[2][i].latitude ? results[2][i].latitude : 0,
-                                                    //     longitude: results[2][i] && results[2][i].longitude ? results[2][i].longitude : 0,
-                                                    //     fromLatitude: results[2][i] && results[2][i].fromLatitude ? results[2][i].fromLatitude : 0,
-                                                    //     fromLongitude: results[2][i] && results[2][i].fromLongitude ? results[2][i].fromLongitude : 0,
-                                                    //     andEventId: results[2][i] && results[2][i].andEventId ? results[2][i].andEventId : '0',
-                                                    //     iosEventId : results[2][i] && results[2][i].iosEventId ? results[2][i].iosEventId : '0'
-                                                    // }
-                                                }
-                                                console.log('messagePayload', messagePayload);
-
-                                                if (results && results[2] && results[2][i] && results[2][i].APNS_Id) {
-                                                    console.log('IOS notification');
-                                                    _Notification_aws.publish_IOS(results[2][i].APNS_Id, messagePayload, 0);
-
-                                                }
-
-                                                // if (results && results[2] && results[2][i] && results[2][i].creatorAPNS_Id) {
-                                                //     _Notification_aws.publish_IOS(results[2][i].creatorAPNS_Id, messagePayload, 0);
-                                                // }
-
-
-                                                if (results && results[2] && results[2][i] && results[2][i].GCM_Id) {
-                                                    _Notification_aws.publish_Android(results[2][i].GCM_Id, messagePayload);
-                                                }
-
-                                                // if (results && results[2] && results[2][i] && results[2][i].creatorGCM_Id) {
-                                                //     console.log("reminder for creator");
-                                                //     console.log("messagePayload", messagePayload);
-                                                //     _Notification_aws.publish_Android(results[2][i].creatorGCM_Id, messagePayload, 0);
-                                                // }
-                                            }
-                                        }
-                                    }
-
-
-                                    // travel alert
-                                    // console.log('results[3]',results[3]);
-                                    // if (results[3] && results[3][0]){
-                                    //     for(var i=0; i < results[3].length; i++){
-                                    //         if (results[3] && results[3][i] && results[3][i].isTravelAlert && results[3][i].reminderTime) {
-                                    //             var messagePayload = {
-                                    //                 message: "",
-                                    //                 alarmType: 4,
-                                    //                 type: 301,
-                                    //                 data: {
-                                    //                     taskId: results[3][i] && results[3][i].taskId ? results[3][i].taskId : 0,
-                                    //                     title: results[3][i] && results[3][i].title ? results[3][i].title : "",
-                                    //                     description: results[3][i] && results[3][i].description ? results[3][i].description : "",
-                                    //                     reminderTime: results[3][i] && results[3][i].reminderTime ? results[3][i].reminderTime : 0,
-                                    //                     meetingStartDate: results[3][i] && results[3][i].meetingStartDate ? results[3][i].meetingStartDate : null,
-
-                                    //                     address: results[3][i] && results[3][i].address ? results[3][i].address : "",
-
-                                    //                     duration: results[3][i] && results[3][i].duration ? results[3][i].duration : 0,
-                                    //                     latitude: results[3][i] && results[3][i].latitude ? results[3][i].latitude : 0,
-                                    //                     longitude: results[3][i] && results[3][i].longitude ? results[3][i].longitude : 0,
-                                    //                     fromLatitude: results[3][i] && results[3][i].fromLatitude ? results[3][i].fromLatitude : 0,
-                                    //                     fromLongitude: results[3][i] && results[3][i].fromLongitude ? results[3][i].fromLongitude : 0,
-                                    //                     andEventId: results[3][i] && results[3][i].andEventId ? results[3][i].andEventId : '0',
-                                    //                     iosEventId : results[3][i] && results[3][i].iosEventId ? results[3][i].iosEventId : '0'
-                                    //                 }
-                                    //             }
-
-                                    //             if (results && results[3] && results[3][i] && results[3][i].APNS_Id) {
-                                    //                 _Notification_aws.publish_IOS(results[3][i].APNS_Id, messagePayload, 0);
-                                    //             }
-
-                                    //             // if (results && results[3] && results[3][i] && results[3][i].creatorAPNS_Id) {
-                                    //             //     _Notification_aws.publish_IOS(results[3][i].creatorAPNS_Id, messagePayload, 0);
-                                    //             // }
-
-
-                                    //             if (results && results[3] && results[3][i] && results[3][i].GCM_Id) {
-                                    //                 _Notification_aws.publish_Android(results[3][i].GCM_Id, messagePayload);
-                                    //             }
-
-                                    //             // if (results && results[3] && results[3][i] && results[3][i].creatorGCM_Id) {
-                                    //             //     console.log("reminder for creator");
-                                    //             //     console.log("messagePayload", messagePayload);
-                                    //             //     _Notification_aws.publish_Android(results[3][i].creatorGCM_Id, messagePayload, 0);
-                                    //             // }
-                                    //         }
-                                    //     }    
-                                    // }
-
-                                    // old
-                                    // if (results[3] && results[3][0] && results[3][0].isTravelAlert && results[3][0].reminderTime) {
-                                    //     console.log('results[3][0]',results[3][0]);
-
-                                    //     var messagePayload = {
-                                    //         message: "",
-                                    //         alarmType: 4,
-                                    //         type: 301,
-                                    //         data: {
-                                    //             taskId: results[3][0] && results[3][0].taskId ? results[3][0].taskId : 0,
-                                    //             title: results[3][0] && results[3][0].title ? results[3][0].title : "",
-                                    //             description: results[3][0] && results[3][0].description ? results[3][0].description : "",
-                                    //             reminderTime: results[3][0] && results[3][0].reminderTime ? results[3][0].reminderTime : 0,
-                                    //             meetingStartDate: results[3][0] && results[3][0].meetingStartDate ? results[3][0].meetingStartDate : null,
-
-                                    //             address: results[3][0] && results[3][0].address ? results[3][0].address : "",
-
-                                    //             duration: results[3][0] && results[3][0].duration ? results[3][0].duration : 0,
-                                    //             latitude: results[3][0] && results[3][0].latitude ? results[3][0].latitude : 0,
-                                    //             longitude: results[3][0] && results[3][0].longitude ? results[3][0].longitude : 0,
-                                    //             fromLatitude: results[2][0] && results[2][0].fromLatitude ? results[2][0].fromLatitude : 0,
-                                    //             fromLongitude: results[2][0] && results[2][0].fromLongitude ? results[2][0].fromLongitude : 0
-                                    //         }
-                                    //     }
-
-                                    //     if (results && results[2] && results[2][0] && results[2][0].APNS_Id) {
-                                    //         _Notification_aws.publish_IOS(results[2][0].APNS_Id, messagePayload, 0);
-                                    //     }
-
-                                    //     if (results && results[2] && results[2][0] && results[2][0].creatorAPNS_Id) {
-                                    //         _Notification_aws.publish_IOS(results[2][0].creatorAPNS_Id, messagePayload, 0);
-                                    //     }
-
-
-                                    //     if (results && results[2] && results[2][0] && results[2][0].GCM_Id) {
-                                    //         _Notification_aws.publish_Android(results[2][0].GCM_Id, messagePayload);
-                                    //     }
-
-                                    //     if (results && results[2] && results[2][0] && results[2][0].creatorGCM_Id) {
-                                    //         console.log("reminder for creator");
-                                    //         console.log("messagePayload", messagePayload);
-                                    //         _Notification_aws.publish_Android(results[2][0].creatorGCM_Id, messagePayload, 0);
-                                    //     }
-                                    // }
-
-                                    response.status = true;
-                                    response.message = "Sales query submitted successfully";
-                                    response.error = null;
-                                    response.data = {
-                                        messageList: {
-                                            messageId: results[0][0].messageId,
-                                            message: results[0][0].message,
-                                            messageLink: results[0][0].messageLink,
-                                            createdDate: results[0][0].createdDate,
-                                            messageType: results[0][0].messageType,
-                                            messageStatus: results[0][0].messageStatus,
-                                            priority: results[0][0].priority,
-                                            senderName: results[0][0].senderName,
-                                            senderId: results[0][0].senderId,
-                                            receiverId: results[0][0].receiverId,
-                                            transId: results[0][0].transId,
-                                            formId: results[0][0].formId,
-                                            groupId: req.body.groupId,
-                                            currentStatus: results[0][0].currentStatus,
-                                            currentTransId: results[0][0].currentTransId,
-                                            localMessageId: req.body.localMessageId,
-                                            parentId: results[0][0].parentId,
-                                            accessUserType: results[0][0].accessUserType,
-                                            heUserId: results[0][0].heUserId,
-                                            formData: JSON.parse(results[0][0].formDataJSON)
-                                        }
-                                    };
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                    });
-
-                                }
-                                else if (!err) {
-                                    response.status = false;
-                                    response.message = "Failed to update sales query";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(200).json(response);
-                                }
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while saving sales query";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                }
-                            });
-                        });
-                    }
-                });
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
             }
             else {
-                res.status(401).json(response);
+                req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                if (req.body.phoneNo == "") {
+                    req.body.isdPhone = "";
+                }
+                var taskDetails;
+                return new Promise(function (resolve, reject) {
+                    if (req.body.taskIdList && req.body.taskIdList.length > 0) {
+
+                        var taskDetailsInput = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+                        var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                        // console.log(taskDetailsInput);
+                        req.db.query(taskDetailsInput, function (err, taskresults) {
+                            console.log(err);
+                            if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
+
+                                taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
+                                taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
+
+                                for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
+                                    taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
+                                }
+
+                                taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
+
+                                taskDetails = taskresults[0][0];
+                                console.log("promise in");
+                                resolve(taskDetails);
+                            }
+                            else {
+                                resolve('');
+                            }
+                        });
+                    }
+                    else {
+                        console.log("promise out");
+                        resolve('');
+                    }
+                }).then(function (resp) {
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.parentId || 0),
+                        req.st.db.escape(req.body.categoryId || 0),
+                        req.st.db.escape(req.body.requirement || ""),
+                        req.st.db.escape(req.body.senderNotes || ""),
+                        req.st.db.escape(req.body.stage || 0),
+                        req.st.db.escape(req.body.status || 0),
+                        req.st.db.escape(req.body.reason || ""),
+                        req.st.db.escape(req.body.receiverNotes || ""),
+                        req.st.db.escape(req.body.currencyId || 0),
+                        req.st.db.escape(req.body.amount || 0),
+                        req.st.db.escape(req.body.probability || 0),
+                        req.st.db.escape(req.body.infoToSender || ""),
+                        req.st.db.escape(JSON.stringify(attachmentList || [])),
+                        req.st.db.escape(req.body.changeLog || ""),
+                        req.st.db.escape(req.body.groupId),
+                        req.st.db.escape(req.body.learnMessageId || 0),
+                        req.st.db.escape(req.body.accessUserType || 0),
+                        req.st.db.escape(req.body.categoryTitle || ""),
+                        req.st.db.escape(req.body.stageTitle || ""),
+                        req.st.db.escape(req.body.statusTitle || ""),
+                        req.st.db.escape(req.body.currencyTitle || ""),
+                        req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                        req.st.db.escape(req.body.discount || 0),
+                        req.st.db.escape(JSON.stringify(items || [])),
+                        req.st.db.escape(req.body.itemCurrencyId || 0),
+                        req.st.db.escape(req.body.itemCurrencySymbol || ""),
+                        req.st.db.escape(req.body.targetDate || null),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.timestamp || ""),
+                        req.st.db.escape(req.body.createdTimeStamp || null),
+                        req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                        req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                        req.st.db.escape(req.body.forcastValue || 0),
+                        req.st.db.escape(JSON.stringify(taskDetails || null)),
+                        req.st.db.escape(req.body.isReportingManager || 0),
+                        req.st.db.escape(req.body.isTargetDate || 0),
+                        req.st.db.escape(req.body.isConsider || 0),
+                        req.st.db.escape(req.body.amount2 || 0),
+                        req.st.db.escape(req.body.currencyId2 || 0),
+                        req.st.db.escape(req.body.currencyTitle2 || ""),
+                        req.st.db.escape(req.body.whatmateId || ""),
+                        req.st.db.escape(req.body.nkFlag || 0)
+                    ];
+
+                    var salesFormId = 2000;
+                    var keywordsParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(salesFormId),
+                        req.st.db.escape(JSON.stringify(keywordList)),
+                        req.st.db.escape(req.body.groupId)
+                    ];
+
+                    var procQuery = 'CALL he_save_salesRequest_WithTask_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        console.log(err);
+                        // console.log("results",results);
+                        if (!err && results && results[0] && results[0][0]) {
+
+                            senderGroupId = results[0][0].senderId;
+
+                            notifyMessages.getMessagesNeedToNotify();
+
+                            console.log("results[2]", results[2]);
+
+                            // reminder alert
+                            if (results[2] && results[2][0]) {
+                                for (var i = 0; i < results[2].length; i++) {
+                                    if (results[2] && results[2][i]) {
+
+                                        var messagePayload = {
+                                            message: "",
+                                            alarmType: 4,
+                                            type: 301,
+                                            data: {
+                                                eventList: results[2][i] && results[2][i].eventList && JSON.parse(results[2][i].eventList) ? JSON.parse(results[2][i].eventList) : []
+                                            }
+                                            // {
+                                            //     taskId: results[2][i] && results[2][i].taskId ? results[2][i].taskId : 0,
+                                            //     title: results[2][i] && results[2][i].title ? results[2][i].title : "",
+                                            //     description: results[2][i] && results[2][i].description ? results[2][i].description : "",
+                                            //     reminderTime: results[2][i] && results[2][i].reminderTime ? results[2][i].reminderTime : 0,
+                                            //     meetingStartDate: results[2][i] && results[2][i].meetingStartDate ? results[2][i].meetingStartDate : null,
+
+                                            //     address: results[2][i] && results[2][i].address ? results[2][i].address : "",
+
+                                            //     duration: results[2][i] && results[2][i].duration ? results[2][i].duration : 0,
+                                            //     latitude: results[2][i] && results[2][i].latitude ? results[2][i].latitude : 0,
+                                            //     longitude: results[2][i] && results[2][i].longitude ? results[2][i].longitude : 0,
+                                            //     fromLatitude: results[2][i] && results[2][i].fromLatitude ? results[2][i].fromLatitude : 0,
+                                            //     fromLongitude: results[2][i] && results[2][i].fromLongitude ? results[2][i].fromLongitude : 0,
+                                            //     andEventId: results[2][i] && results[2][i].andEventId ? results[2][i].andEventId : '0',
+                                            //     iosEventId : results[2][i] && results[2][i].iosEventId ? results[2][i].iosEventId : '0'
+                                            // }
+                                        }
+                                        console.log('messagePayload', messagePayload);
+
+                                        if (results && results[2] && results[2][i] && results[2][i].APNS_Id) {
+                                            console.log('IOS notification');
+                                            _Notification_aws.publish_IOS(results[2][i].APNS_Id, messagePayload, 0);
+
+                                        }
+
+                                        // if (results && results[2] && results[2][i] && results[2][i].creatorAPNS_Id) {
+                                        //     _Notification_aws.publish_IOS(results[2][i].creatorAPNS_Id, messagePayload, 0);
+                                        // }
+
+
+                                        if (results && results[2] && results[2][i] && results[2][i].GCM_Id) {
+                                            _Notification_aws.publish_Android(results[2][i].GCM_Id, messagePayload);
+                                        }
+
+                                        // if (results && results[2] && results[2][i] && results[2][i].creatorGCM_Id) {
+                                        //     console.log("reminder for creator");
+                                        //     console.log("messagePayload", messagePayload);
+                                        //     _Notification_aws.publish_Android(results[2][i].creatorGCM_Id, messagePayload, 0);
+                                        // }
+                                    }
+                                }
+                            }
+
+
+                            // travel alert
+                            // console.log('results[3]',results[3]);
+                            // if (results[3] && results[3][0]){
+                            //     for(var i=0; i < results[3].length; i++){
+                            //         if (results[3] && results[3][i] && results[3][i].isTravelAlert && results[3][i].reminderTime) {
+                            //             var messagePayload = {
+                            //                 message: "",
+                            //                 alarmType: 4,
+                            //                 type: 301,
+                            //                 data: {
+                            //                     taskId: results[3][i] && results[3][i].taskId ? results[3][i].taskId : 0,
+                            //                     title: results[3][i] && results[3][i].title ? results[3][i].title : "",
+                            //                     description: results[3][i] && results[3][i].description ? results[3][i].description : "",
+                            //                     reminderTime: results[3][i] && results[3][i].reminderTime ? results[3][i].reminderTime : 0,
+                            //                     meetingStartDate: results[3][i] && results[3][i].meetingStartDate ? results[3][i].meetingStartDate : null,
+
+                            //                     address: results[3][i] && results[3][i].address ? results[3][i].address : "",
+
+                            //                     duration: results[3][i] && results[3][i].duration ? results[3][i].duration : 0,
+                            //                     latitude: results[3][i] && results[3][i].latitude ? results[3][i].latitude : 0,
+                            //                     longitude: results[3][i] && results[3][i].longitude ? results[3][i].longitude : 0,
+                            //                     fromLatitude: results[3][i] && results[3][i].fromLatitude ? results[3][i].fromLatitude : 0,
+                            //                     fromLongitude: results[3][i] && results[3][i].fromLongitude ? results[3][i].fromLongitude : 0,
+                            //                     andEventId: results[3][i] && results[3][i].andEventId ? results[3][i].andEventId : '0',
+                            //                     iosEventId : results[3][i] && results[3][i].iosEventId ? results[3][i].iosEventId : '0'
+                            //                 }
+                            //             }
+
+                            //             if (results && results[3] && results[3][i] && results[3][i].APNS_Id) {
+                            //                 _Notification_aws.publish_IOS(results[3][i].APNS_Id, messagePayload, 0);
+                            //             }
+
+                            //             // if (results && results[3] && results[3][i] && results[3][i].creatorAPNS_Id) {
+                            //             //     _Notification_aws.publish_IOS(results[3][i].creatorAPNS_Id, messagePayload, 0);
+                            //             // }
+
+
+                            //             if (results && results[3] && results[3][i] && results[3][i].GCM_Id) {
+                            //                 _Notification_aws.publish_Android(results[3][i].GCM_Id, messagePayload);
+                            //             }
+
+                            //             // if (results && results[3] && results[3][i] && results[3][i].creatorGCM_Id) {
+                            //             //     console.log("reminder for creator");
+                            //             //     console.log("messagePayload", messagePayload);
+                            //             //     _Notification_aws.publish_Android(results[3][i].creatorGCM_Id, messagePayload, 0);
+                            //             // }
+                            //         }
+                            //     }    
+                            // }
+
+                            // old
+                            // if (results[3] && results[3][0] && results[3][0].isTravelAlert && results[3][0].reminderTime) {
+                            //     console.log('results[3][0]',results[3][0]);
+
+                            //     var messagePayload = {
+                            //         message: "",
+                            //         alarmType: 4,
+                            //         type: 301,
+                            //         data: {
+                            //             taskId: results[3][0] && results[3][0].taskId ? results[3][0].taskId : 0,
+                            //             title: results[3][0] && results[3][0].title ? results[3][0].title : "",
+                            //             description: results[3][0] && results[3][0].description ? results[3][0].description : "",
+                            //             reminderTime: results[3][0] && results[3][0].reminderTime ? results[3][0].reminderTime : 0,
+                            //             meetingStartDate: results[3][0] && results[3][0].meetingStartDate ? results[3][0].meetingStartDate : null,
+
+                            //             address: results[3][0] && results[3][0].address ? results[3][0].address : "",
+
+                            //             duration: results[3][0] && results[3][0].duration ? results[3][0].duration : 0,
+                            //             latitude: results[3][0] && results[3][0].latitude ? results[3][0].latitude : 0,
+                            //             longitude: results[3][0] && results[3][0].longitude ? results[3][0].longitude : 0,
+                            //             fromLatitude: results[2][0] && results[2][0].fromLatitude ? results[2][0].fromLatitude : 0,
+                            //             fromLongitude: results[2][0] && results[2][0].fromLongitude ? results[2][0].fromLongitude : 0
+                            //         }
+                            //     }
+
+                            //     if (results && results[2] && results[2][0] && results[2][0].APNS_Id) {
+                            //         _Notification_aws.publish_IOS(results[2][0].APNS_Id, messagePayload, 0);
+                            //     }
+
+                            //     if (results && results[2] && results[2][0] && results[2][0].creatorAPNS_Id) {
+                            //         _Notification_aws.publish_IOS(results[2][0].creatorAPNS_Id, messagePayload, 0);
+                            //     }
+
+
+                            //     if (results && results[2] && results[2][0] && results[2][0].GCM_Id) {
+                            //         _Notification_aws.publish_Android(results[2][0].GCM_Id, messagePayload);
+                            //     }
+
+                            //     if (results && results[2] && results[2][0] && results[2][0].creatorGCM_Id) {
+                            //         console.log("reminder for creator");
+                            //         console.log("messagePayload", messagePayload);
+                            //         _Notification_aws.publish_Android(results[2][0].creatorGCM_Id, messagePayload, 0);
+                            //     }
+                            // }
+
+                            response.status = true;
+                            response.message = "Sales query submitted successfully";
+                            response.error = null;
+                            response.data = {
+                                messageList: {
+                                    messageId: results[0][0].messageId,
+                                    message: results[0][0].message,
+                                    messageLink: results[0][0].messageLink,
+                                    createdDate: results[0][0].createdDate,
+                                    messageType: results[0][0].messageType,
+                                    messageStatus: results[0][0].messageStatus,
+                                    priority: results[0][0].priority,
+                                    senderName: results[0][0].senderName,
+                                    senderId: results[0][0].senderId,
+                                    receiverId: results[0][0].receiverId,
+                                    transId: results[0][0].transId,
+                                    formId: results[0][0].formId,
+                                    groupId: req.body.groupId,
+                                    currentStatus: results[0][0].currentStatus,
+                                    currentTransId: results[0][0].currentTransId,
+                                    localMessageId: req.body.localMessageId,
+                                    parentId: results[0][0].parentId,
+                                    accessUserType: results[0][0].accessUserType,
+                                    heUserId: results[0][0].heUserId,
+                                    formData: JSON.parse(results[0][0].formDataJSON)
+                                }
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+
+                        }
+                        else if (!err) {
+                            response.status = false;
+                            response.message = "Failed to update sales query";
+                            response.error = null;
+                            response.data = null;
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving sales query";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                });
             }
-        });
+        }
+        else {
+
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                        console.log(req.body);
+                        // if (!req.body.requirement) {
+                        //     error.requirement = 'Invalid requirement';
+                        //     validationFlag *= false;
+                        // }
+
+                        var keywordList = req.body.keywordList;
+                        if (typeof (keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if (!keywordList) {
+                            keywordList = [];
+                        }
+
+                        var attachmentList = req.body.attachmentList;
+                        if (typeof (attachmentList) == "string") {
+                            attachmentList = JSON.parse(attachmentList);
+                        }
+                        if (!attachmentList) {
+                            attachmentList = [];
+                        }
+
+                        var items = req.body.items;
+                        if (typeof (items) == "string") {
+                            items = JSON.parse(items);
+                        }
+                        if (!items) {
+                            items = [];
+                        }
+
+                        if (!req.body.groupId) {
+                            error.groupId = 'Invalid groupId';
+                            validationFlag *= false;
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                            if (req.body.phoneNo == "") {
+                                req.body.isdPhone = "";
+                            }
+                            var taskDetails;
+                            return new Promise(function (resolve, reject) {
+                                if (req.body.taskIdList && req.body.taskIdList.length > 0) {
+
+                                    var taskDetailsInput = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.body.groupId),
+                                        req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                        req.st.db.escape(DBSecretKey)
+                                    ];
+                                    var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                                    // console.log(taskDetailsInput);
+                                    req.db.query(taskDetailsInput, function (err, taskresults) {
+                                        console.log(err);
+                                        if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
+
+                                            taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
+                                            taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
+
+                                            for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
+                                                taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
+                                            }
+
+                                            taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
+
+                                            taskDetails = taskresults[0][0];
+                                            console.log("promise in");
+                                            resolve(taskDetails);
+                                        }
+                                        else {
+                                            resolve('');
+                                        }
+                                    });
+                                }
+                                else {
+                                    console.log("promise out");
+                                    resolve('');
+                                }
+                            }).then(function (resp) {
+                                var procParams = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.body.parentId || 0),
+                                    req.st.db.escape(req.body.categoryId || 0),
+                                    req.st.db.escape(req.body.requirement || ""),
+                                    req.st.db.escape(req.body.senderNotes || ""),
+                                    req.st.db.escape(req.body.stage || 0),
+                                    req.st.db.escape(req.body.status || 0),
+                                    req.st.db.escape(req.body.reason || ""),
+                                    req.st.db.escape(req.body.receiverNotes || ""),
+                                    req.st.db.escape(req.body.currencyId || 0),
+                                    req.st.db.escape(req.body.amount || 0),
+                                    req.st.db.escape(req.body.probability || 0),
+                                    req.st.db.escape(req.body.infoToSender || ""),
+                                    req.st.db.escape(JSON.stringify(attachmentList || [])),
+                                    req.st.db.escape(req.body.changeLog || ""),
+                                    req.st.db.escape(req.body.groupId),
+                                    req.st.db.escape(req.body.learnMessageId || 0),
+                                    req.st.db.escape(req.body.accessUserType || 0),
+                                    req.st.db.escape(req.body.categoryTitle || ""),
+                                    req.st.db.escape(req.body.stageTitle || ""),
+                                    req.st.db.escape(req.body.statusTitle || ""),
+                                    req.st.db.escape(req.body.currencyTitle || ""),
+                                    req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                                    req.st.db.escape(req.body.discount || 0),
+                                    req.st.db.escape(JSON.stringify(items || [])),
+                                    req.st.db.escape(req.body.itemCurrencyId || 0),
+                                    req.st.db.escape(req.body.itemCurrencySymbol || ""),
+                                    req.st.db.escape(req.body.targetDate || null),
+                                    req.st.db.escape(DBSecretKey),
+                                    req.st.db.escape(req.body.timestamp || ""),
+                                    req.st.db.escape(req.body.createdTimeStamp || null),
+                                    req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                    req.st.db.escape(req.body.forcastValue || 0),
+                                    req.st.db.escape(JSON.stringify(taskDetails || null)),
+                                    req.st.db.escape(req.body.isReportingManager || 0),
+                                    req.st.db.escape(req.body.isTargetDate || 0),
+                                    req.st.db.escape(req.body.isConsider || 0),
+                                    req.st.db.escape(req.body.amount2 || 0),
+                                    req.st.db.escape(req.body.currencyId2 || 0),
+                                    req.st.db.escape(req.body.currencyTitle2 || ""),
+                                    req.st.db.escape(req.body.whatmateId || ""),
+                                    req.st.db.escape(req.body.nkFlag || 0)
+            
+                                ];
+
+                                var salesFormId = 2000;
+                                var keywordsParams = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(salesFormId),
+                                    req.st.db.escape(JSON.stringify(keywordList)),
+                                    req.st.db.escape(req.body.groupId)
+                                ];
+
+                                var procQuery = 'CALL he_save_salesRequest_WithTask_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, results) {
+                                    console.log(err);
+                                    // console.log("results",results);
+                                    if (!err && results && results[0] && results[0][0]) {
+
+                                        senderGroupId = results[0][0].senderId;
+
+                                        notifyMessages.getMessagesNeedToNotify();
+
+                                        if (results && results[2] && results[2][0] && results[2][0].receiverId) {
+                                            if (notificationTemplaterRes.parsedTpl) {
+                                                notification.publish(
+                                                    results[2][0].receiverId,
+                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                    results[0][0].senderId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    41,
+                                                    0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
+                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0,
+                                                    null,
+                                                    '',
+                                                    /** Data object property to be sent with notification **/
+                                                    {
+                                                        parentId: results[2][0].parentId,
+                                                        groupId: results[2][0].groupId,
+                                                        requirement: results[2][0].requirement,
+                                                        feedback: results[2][0].feedback,
+                                                        rating: results[2][0].rating,
+                                                        updatedDate: results[2][0].updatedDate,
+                                                        status: results[2][0].status
+                                                    },
+                                                    null,
+                                                    tokenResult[0].isWhatMate,
+                                                    results[1][i].secretKey);
+                                                console.log('postNotification : notification for compose_message is sent successfully');
+                                            }
+                                            else {
+                                                console.log('Error in parsing notification compose_message template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification for compose_message is sent successfully');
+                                            }
+                                        }
+
+                                        console.log("results[2]", results[2]);
+
+                                        // reminder alert
+                                        if (results[2] && results[2][0]) {
+                                            for (var i = 0; i < results[2].length; i++) {
+                                                if (results[2] && results[2][i]) {
+
+                                                    var messagePayload = {
+                                                        message: "",
+                                                        alarmType: 4,
+                                                        type: 301,
+                                                        data: {
+                                                            eventList: results[2][i] && results[2][i].eventList && JSON.parse(results[2][i].eventList) ? JSON.parse(results[2][i].eventList) : []
+                                                        }
+                                                        // {
+                                                        //     taskId: results[2][i] && results[2][i].taskId ? results[2][i].taskId : 0,
+                                                        //     title: results[2][i] && results[2][i].title ? results[2][i].title : "",
+                                                        //     description: results[2][i] && results[2][i].description ? results[2][i].description : "",
+                                                        //     reminderTime: results[2][i] && results[2][i].reminderTime ? results[2][i].reminderTime : 0,
+                                                        //     meetingStartDate: results[2][i] && results[2][i].meetingStartDate ? results[2][i].meetingStartDate : null,
+
+                                                        //     address: results[2][i] && results[2][i].address ? results[2][i].address : "",
+
+                                                        //     duration: results[2][i] && results[2][i].duration ? results[2][i].duration : 0,
+                                                        //     latitude: results[2][i] && results[2][i].latitude ? results[2][i].latitude : 0,
+                                                        //     longitude: results[2][i] && results[2][i].longitude ? results[2][i].longitude : 0,
+                                                        //     fromLatitude: results[2][i] && results[2][i].fromLatitude ? results[2][i].fromLatitude : 0,
+                                                        //     fromLongitude: results[2][i] && results[2][i].fromLongitude ? results[2][i].fromLongitude : 0,
+                                                        //     andEventId: results[2][i] && results[2][i].andEventId ? results[2][i].andEventId : '0',
+                                                        //     iosEventId : results[2][i] && results[2][i].iosEventId ? results[2][i].iosEventId : '0'
+                                                        // }
+                                                    }
+                                                    console.log('messagePayload', messagePayload);
+
+                                                    if (results && results[2] && results[2][i] && results[2][i].APNS_Id) {
+                                                        console.log('IOS notification');
+                                                        _Notification_aws.publish_IOS(results[2][i].APNS_Id, messagePayload, 0);
+
+                                                    }
+
+                                                    // if (results && results[2] && results[2][i] && results[2][i].creatorAPNS_Id) {
+                                                    //     _Notification_aws.publish_IOS(results[2][i].creatorAPNS_Id, messagePayload, 0);
+                                                    // }
+
+
+                                                    if (results && results[2] && results[2][i] && results[2][i].GCM_Id) {
+                                                        _Notification_aws.publish_Android(results[2][i].GCM_Id, messagePayload);
+                                                    }
+
+                                                    // if (results && results[2] && results[2][i] && results[2][i].creatorGCM_Id) {
+                                                    //     console.log("reminder for creator");
+                                                    //     console.log("messagePayload", messagePayload);
+                                                    //     _Notification_aws.publish_Android(results[2][i].creatorGCM_Id, messagePayload, 0);
+                                                    // }
+                                                }
+                                            }
+                                        }
+
+
+                                        // travel alert
+                                        // console.log('results[3]',results[3]);
+                                        // if (results[3] && results[3][0]){
+                                        //     for(var i=0; i < results[3].length; i++){
+                                        //         if (results[3] && results[3][i] && results[3][i].isTravelAlert && results[3][i].reminderTime) {
+                                        //             var messagePayload = {
+                                        //                 message: "",
+                                        //                 alarmType: 4,
+                                        //                 type: 301,
+                                        //                 data: {
+                                        //                     taskId: results[3][i] && results[3][i].taskId ? results[3][i].taskId : 0,
+                                        //                     title: results[3][i] && results[3][i].title ? results[3][i].title : "",
+                                        //                     description: results[3][i] && results[3][i].description ? results[3][i].description : "",
+                                        //                     reminderTime: results[3][i] && results[3][i].reminderTime ? results[3][i].reminderTime : 0,
+                                        //                     meetingStartDate: results[3][i] && results[3][i].meetingStartDate ? results[3][i].meetingStartDate : null,
+
+                                        //                     address: results[3][i] && results[3][i].address ? results[3][i].address : "",
+
+                                        //                     duration: results[3][i] && results[3][i].duration ? results[3][i].duration : 0,
+                                        //                     latitude: results[3][i] && results[3][i].latitude ? results[3][i].latitude : 0,
+                                        //                     longitude: results[3][i] && results[3][i].longitude ? results[3][i].longitude : 0,
+                                        //                     fromLatitude: results[3][i] && results[3][i].fromLatitude ? results[3][i].fromLatitude : 0,
+                                        //                     fromLongitude: results[3][i] && results[3][i].fromLongitude ? results[3][i].fromLongitude : 0,
+                                        //                     andEventId: results[3][i] && results[3][i].andEventId ? results[3][i].andEventId : '0',
+                                        //                     iosEventId : results[3][i] && results[3][i].iosEventId ? results[3][i].iosEventId : '0'
+                                        //                 }
+                                        //             }
+
+                                        //             if (results && results[3] && results[3][i] && results[3][i].APNS_Id) {
+                                        //                 _Notification_aws.publish_IOS(results[3][i].APNS_Id, messagePayload, 0);
+                                        //             }
+
+                                        //             // if (results && results[3] && results[3][i] && results[3][i].creatorAPNS_Id) {
+                                        //             //     _Notification_aws.publish_IOS(results[3][i].creatorAPNS_Id, messagePayload, 0);
+                                        //             // }
+
+
+                                        //             if (results && results[3] && results[3][i] && results[3][i].GCM_Id) {
+                                        //                 _Notification_aws.publish_Android(results[3][i].GCM_Id, messagePayload);
+                                        //             }
+
+                                        //             // if (results && results[3] && results[3][i] && results[3][i].creatorGCM_Id) {
+                                        //             //     console.log("reminder for creator");
+                                        //             //     console.log("messagePayload", messagePayload);
+                                        //             //     _Notification_aws.publish_Android(results[3][i].creatorGCM_Id, messagePayload, 0);
+                                        //             // }
+                                        //         }
+                                        //     }    
+                                        // }
+
+                                        // old
+                                        // if (results[3] && results[3][0] && results[3][0].isTravelAlert && results[3][0].reminderTime) {
+                                        //     console.log('results[3][0]',results[3][0]);
+
+                                        //     var messagePayload = {
+                                        //         message: "",
+                                        //         alarmType: 4,
+                                        //         type: 301,
+                                        //         data: {
+                                        //             taskId: results[3][0] && results[3][0].taskId ? results[3][0].taskId : 0,
+                                        //             title: results[3][0] && results[3][0].title ? results[3][0].title : "",
+                                        //             description: results[3][0] && results[3][0].description ? results[3][0].description : "",
+                                        //             reminderTime: results[3][0] && results[3][0].reminderTime ? results[3][0].reminderTime : 0,
+                                        //             meetingStartDate: results[3][0] && results[3][0].meetingStartDate ? results[3][0].meetingStartDate : null,
+
+                                        //             address: results[3][0] && results[3][0].address ? results[3][0].address : "",
+
+                                        //             duration: results[3][0] && results[3][0].duration ? results[3][0].duration : 0,
+                                        //             latitude: results[3][0] && results[3][0].latitude ? results[3][0].latitude : 0,
+                                        //             longitude: results[3][0] && results[3][0].longitude ? results[3][0].longitude : 0,
+                                        //             fromLatitude: results[2][0] && results[2][0].fromLatitude ? results[2][0].fromLatitude : 0,
+                                        //             fromLongitude: results[2][0] && results[2][0].fromLongitude ? results[2][0].fromLongitude : 0
+                                        //         }
+                                        //     }
+
+                                        //     if (results && results[2] && results[2][0] && results[2][0].APNS_Id) {
+                                        //         _Notification_aws.publish_IOS(results[2][0].APNS_Id, messagePayload, 0);
+                                        //     }
+
+                                        //     if (results && results[2] && results[2][0] && results[2][0].creatorAPNS_Id) {
+                                        //         _Notification_aws.publish_IOS(results[2][0].creatorAPNS_Id, messagePayload, 0);
+                                        //     }
+
+
+                                        //     if (results && results[2] && results[2][0] && results[2][0].GCM_Id) {
+                                        //         _Notification_aws.publish_Android(results[2][0].GCM_Id, messagePayload);
+                                        //     }
+
+                                        //     if (results && results[2] && results[2][0] && results[2][0].creatorGCM_Id) {
+                                        //         console.log("reminder for creator");
+                                        //         console.log("messagePayload", messagePayload);
+                                        //         _Notification_aws.publish_Android(results[2][0].creatorGCM_Id, messagePayload, 0);
+                                        //     }
+                                        // }
+
+                                        response.status = true;
+                                        response.message = "Sales query submitted successfully";
+                                        response.error = null;
+                                        response.data = {
+                                            messageList: {
+                                                messageId: results[0][0].messageId,
+                                                message: results[0][0].message,
+                                                messageLink: results[0][0].messageLink,
+                                                createdDate: results[0][0].createdDate,
+                                                messageType: results[0][0].messageType,
+                                                messageStatus: results[0][0].messageStatus,
+                                                priority: results[0][0].priority,
+                                                senderName: results[0][0].senderName,
+                                                senderId: results[0][0].senderId,
+                                                receiverId: results[0][0].receiverId,
+                                                transId: results[0][0].transId,
+                                                formId: results[0][0].formId,
+                                                groupId: req.body.groupId,
+                                                currentStatus: results[0][0].currentStatus,
+                                                currentTransId: results[0][0].currentTransId,
+                                                localMessageId: req.body.localMessageId,
+                                                parentId: results[0][0].parentId,
+                                                accessUserType: results[0][0].accessUserType,
+                                                heUserId: results[0][0].heUserId,
+                                                formData: JSON.parse(results[0][0].formDataJSON)
+                                            }
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+
+                                    }
+                                    else if (!err) {
+                                        response.status = false;
+                                        response.message = "Failed to update sales query";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(200).json(response);
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Error while saving sales query";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
     }
 };
 
@@ -3748,217 +4452,457 @@ salesCtrl.saveSupportRequestNew = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
-                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        console.log(req.body);
+        if (req.body.nkFlag == 1) {
+            var keywordList = req.body.keywordList;
+            if (typeof (keywordList) == "string") {
+                keywordList = JSON.parse(keywordList);
+            }
+            if (!keywordList) {
+                keywordList = [];
+            }
 
-                    var keywordList = req.body.keywordList;
-                    if (typeof (keywordList) == "string") {
-                        keywordList = JSON.parse(keywordList);
-                    }
-                    if (!keywordList) {
-                        keywordList = [];
-                    }
+            var attachmentList = req.body.attachmentList;
+            if (typeof (attachmentList) == "string") {
+                attachmentList = JSON.parse(attachmentList);
+            }
+            if (!attachmentList) {
+                attachmentList = [];
+            }
 
-                    var attachmentList = req.body.attachmentList;
-                    if (typeof (attachmentList) == "string") {
-                        attachmentList = JSON.parse(attachmentList);
-                    }
-                    if (!attachmentList) {
-                        attachmentList = [];
-                    }
+            if (!req.body.groupId) {
+                error.groupId = 'Invalid groupId';
+                validationFlag *= false;
+            }
 
-                    if (!req.body.groupId) {
-                        error.groupId = 'Invalid groupId';
-                        validationFlag *= false;
-                    }
+            if (!req.body.whatmateId) {
+                error.whatmateId = 'Invalid whatmateId';
+                validationFlag *= false;
+            }
 
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
-                    }
-                    else {
-                        req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
-
-                        var taskDetails;
-                        return new Promise(function (resolve, reject) {
-                            if (req.body.taskIdList && req.body.taskIdList.length > 0) {
-
-                                var taskDetailsInput = [
-                                    req.st.db.escape(req.query.token),
-                                    req.st.db.escape(req.body.groupId),
-                                    req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
-                                    req.st.db.escape(DBSecretKey)
-                                ];
-                                var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
-                                req.db.query(taskDetailsInput, function (err, taskresults) {
-                                    console.log(err);
-                                    if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
-
-                                        taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
-                                        taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
-
-                                        for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
-                                            taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
-                                        }
-
-                                        taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
-
-                                        taskDetails = taskresults[0][0];
-                                        console.log("promise in");
-                                        resolve(taskDetails);
-                                    }
-                                    else {
-                                        resolve('');
-                                    }
-                                });
-                            }
-                            else {
-                                console.log("promise out");
-                                resolve('');
-                            }
-                        }).then(function (resp) {
-                            var procParams = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.body.parentId || 0),
-                                req.st.db.escape(req.body.categoryId || 0),
-                                req.st.db.escape(req.body.description),
-                                req.st.db.escape(req.body.priority),
-                                req.st.db.escape(req.body.senderNotes || ""),
-                                req.st.db.escape(req.body.status || 3),
-                                req.st.db.escape(req.body.receiverNotes || ""),
-                                req.st.db.escape(req.body.infoToSender || ""),
-                                req.st.db.escape(JSON.stringify(attachmentList || [])),
-                                req.st.db.escape(req.body.changeLog || ""),
-                                req.st.db.escape(req.body.groupId),
-                                req.st.db.escape(req.body.learnMessageId || 0),
-                                req.st.db.escape(req.body.accessUserType || 0),
-                                req.st.db.escape(req.body.categoryTitle || ""),
-                                req.st.db.escape(req.body.isInfoToSenderChanged || 0),
-                                req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.timestamp),
-                                req.st.db.escape(req.body.createdTimeStamp),
-                                req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
-                                req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
-                                req.st.db.escape(JSON.stringify(taskDetails || null)),
-                                req.st.db.escape(req.body.isReportingManager || 0)
-                            ];
-
-                            var salesFormId = 2000;
-                            var keywordsParams = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(salesFormId),
-                                req.st.db.escape(JSON.stringify(keywordList)),
-                                req.st.db.escape(req.body.groupId)
-                            ];
-
-                            var procQuery = 'CALL he_save_supportRequestWithTask_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, results) {
-                                console.log(err);
-                                if (!err && results && results[0] && results[0][0]) {
-                                    senderGroupId = results[0][0].senderId;
-
-                                    notifyMessages.getMessagesNeedToNotify();
-
-                                    if (results && results[2] && results[2][0] && results[2][0].receiverId) {
-                                        if (notificationTemplaterRes.parsedTpl) {
-                                            notification.publish(
-                                                results[2][0].receiverId,
-                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                                results[0][0].senderId,
-                                                notificationTemplaterRes.parsedTpl,
-                                                41,
-                                                0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
-                                                (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                                0,
-                                                0,
-                                                0,
-                                                0,
-                                                1,
-                                                moment().format("YYYY-MM-DD HH:mm:ss"),
-                                                '',
-                                                0,
-                                                0,
-                                                null,
-                                                '',
-                                                /** Data object property to be sent with notification **/
-                                                {
-                                                    parentId: results[2][0].parentId,
-                                                    groupId: results[2][0].groupId,
-                                                    requirement: results[2][0].requirement,
-                                                    feedback: results[2][0].feedback,
-                                                    rating: results[2][0].rating,
-                                                    updatedDate: results[2][0].updatedDate,
-                                                    status: results[2][0].status
-                                                },
-                                                null,
-                                                tokenResult[0].isWhatMate,
-                                                results[1][i].secretKey);
-                                            console.log('postNotification : notification for compose_message is sent successfully');
-                                        }
-                                        else {
-                                            console.log('Error in parsing notification compose_message template - ',
-                                                notificationTemplaterRes.error);
-                                            console.log('postNotification : notification for compose_message is sent successfully');
-                                        }
-                                    }
-
-                                    response.status = true;
-                                    response.message = "Support query submitted successfully";
-                                    response.error = null;
-                                    response.data = {
-                                        messageList: {
-                                            messageId: results[0][0].messageId,
-                                            message: results[0][0].message,
-                                            messageLink: results[0][0].messageLink,
-                                            createdDate: results[0][0].createdDate,
-                                            messageType: results[0][0].messageType,
-                                            messageStatus: results[0][0].messageStatus,
-                                            priority: results[0][0].priority,
-                                            senderName: results[0][0].senderName,
-                                            senderId: results[0][0].senderId,
-                                            receiverId: results[0][0].receiverId,
-                                            transId: results[0][0].transId,
-                                            formId: results[0][0].formId,
-                                            groupId: req.body.groupId,
-                                            currentStatus: results[0][0].currentStatus,
-                                            currentTransId: results[0][0].currentTransId,
-                                            localMessageId: req.body.localMessageId,
-                                            parentId: results[0][0].parentId,
-                                            accessUserType: results[0][0].accessUserType,
-                                            heUserId: results[0][0].heUserId,
-                                            formData: JSON.parse(results[0][0].formDataJSON)
-                                        }
-                                    };
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                    });
-
-                                }
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while saving support query";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                }
-                            });
-                        });
-                    }
-                });
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
             }
             else {
-                res.status(401).json(response);
+                req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                var taskDetails;
+                return new Promise(function (resolve, reject) {
+                    if (req.body.taskIdList && req.body.taskIdList.length > 0) {
+
+                        var taskDetailsInput = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.body.groupId),
+                            req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                            req.st.db.escape(DBSecretKey)
+                        ];
+                        var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                        req.db.query(taskDetailsInput, function (err, taskresults) {
+                            console.log(err);
+                            if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
+
+                                taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
+                                taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
+
+                                for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
+                                    taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
+                                }
+
+                                taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
+
+                                taskDetails = taskresults[0][0];
+                                console.log("promise in");
+                                resolve(taskDetails);
+                            }
+                            else {
+                                resolve('');
+                            }
+                        });
+                    }
+                    else {
+                        console.log("promise out");
+                        resolve('');
+                    }
+                }).then(function (resp) {
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.body.parentId || 0),
+                        req.st.db.escape(req.body.categoryId || 0),
+                        req.st.db.escape(req.body.description),
+                        req.st.db.escape(req.body.priority),
+                        req.st.db.escape(req.body.senderNotes || ""),
+                        req.st.db.escape(req.body.status || 3),
+                        req.st.db.escape(req.body.receiverNotes || ""),
+                        req.st.db.escape(req.body.infoToSender || ""),
+                        req.st.db.escape(JSON.stringify(attachmentList || [])),
+                        req.st.db.escape(req.body.changeLog || ""),
+                        req.st.db.escape(req.body.groupId),
+                        req.st.db.escape(req.body.learnMessageId || 0),
+                        req.st.db.escape(req.body.accessUserType || 0),
+                        req.st.db.escape(req.body.categoryTitle || ""),
+                        req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                        req.st.db.escape(DBSecretKey),
+                        req.st.db.escape(req.body.timestamp),
+                        req.st.db.escape(req.body.createdTimeStamp),
+                        req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                        req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                        req.st.db.escape(JSON.stringify(taskDetails || null)),
+                        req.st.db.escape(req.body.isReportingManager || 0),
+                        req.st.db.escape(req.body.whatmateId || ""),
+                        req.st.db.escape(req.body.nkFlag || 0)
+                    ];
+
+                    var salesFormId = 2000;
+                    var keywordsParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(salesFormId),
+                        req.st.db.escape(JSON.stringify(keywordList)),
+                        req.st.db.escape(req.body.groupId)
+                    ];
+
+                    var procQuery = 'CALL he_save_supportRequestWithTask_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        console.log(err);
+                        if (!err && results && results[0] && results[0][0]) {
+                            // senderGroupId = results[0][0].senderId;
+
+                            notifyMessages.getMessagesNeedToNotify();
+
+                            // if (results && results[2] && results[2][0] && results[2][0].receiverId) {
+                            //     if (notificationTemplaterRes.parsedTpl) {
+                            //         notification.publish(
+                            //             results[2][0].receiverId,
+                            //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                            //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                            //             results[0][0].senderId,
+                            //             notificationTemplaterRes.parsedTpl,
+                            //             41,
+                            //             0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
+                            //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                            //             0,
+                            //             0,
+                            //             0,
+                            //             0,
+                            //             1,
+                            //             moment().format("YYYY-MM-DD HH:mm:ss"),
+                            //             '',
+                            //             0,
+                            //             0,
+                            //             null,
+                            //             '',
+                            //             /** Data object property to be sent with notification **/
+                            //             {
+                            //                 parentId: results[2][0].parentId,
+                            //                 groupId: results[2][0].groupId,
+                            //                 requirement: results[2][0].requirement,
+                            //                 feedback: results[2][0].feedback,
+                            //                 rating: results[2][0].rating,
+                            //                 updatedDate: results[2][0].updatedDate,
+                            //                 status: results[2][0].status
+                            //             },
+                            //             null,
+                            //             tokenResult[0].isWhatMate,
+                            //             results[1][i].secretKey);
+                            //         console.log('postNotification : notification for compose_message is sent successfully');
+                            //     }
+                            //     else {
+                            //         console.log('Error in parsing notification compose_message template - ',
+                            //             notificationTemplaterRes.error);
+                            //         console.log('postNotification : notification for compose_message is sent successfully');
+                            //     }
+                            // }
+
+                            response.status = true;
+                            response.message = "Support query submitted successfully";
+                            response.error = null;
+                            response.data = {
+                                messageList: {
+                                    messageId: results[0][0].messageId,
+                                    message: results[0][0].message,
+                                    messageLink: results[0][0].messageLink,
+                                    createdDate: results[0][0].createdDate,
+                                    messageType: results[0][0].messageType,
+                                    messageStatus: results[0][0].messageStatus,
+                                    priority: results[0][0].priority,
+                                    senderName: results[0][0].senderName,
+                                    senderId: results[0][0].senderId,
+                                    receiverId: results[0][0].receiverId,
+                                    transId: results[0][0].transId,
+                                    formId: results[0][0].formId,
+                                    groupId: req.body.groupId,
+                                    currentStatus: results[0][0].currentStatus,
+                                    currentTransId: results[0][0].currentTransId,
+                                    localMessageId: req.body.localMessageId,
+                                    parentId: results[0][0].parentId,
+                                    accessUserType: results[0][0].accessUserType,
+                                    heUserId: results[0][0].heUserId,
+                                    formData: JSON.parse(results[0][0].formDataJSON)
+                                }
+                            };
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while saving support query";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                });
             }
-        });
+        }
+        else {
+
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                if ((!err) && tokenResult) {
+                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                        var keywordList = req.body.keywordList;
+                        if (typeof (keywordList) == "string") {
+                            keywordList = JSON.parse(keywordList);
+                        }
+                        if (!keywordList) {
+                            keywordList = [];
+                        }
+
+                        var attachmentList = req.body.attachmentList;
+                        if (typeof (attachmentList) == "string") {
+                            attachmentList = JSON.parse(attachmentList);
+                        }
+                        if (!attachmentList) {
+                            attachmentList = [];
+                        }
+
+                        if (!req.body.groupId) {
+                            error.groupId = 'Invalid groupId';
+                            validationFlag *= false;
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.body.timestamp = req.body.timestamp ? req.body.timestamp : '';
+
+                            var taskDetails;
+                            return new Promise(function (resolve, reject) {
+                                if (req.body.taskIdList && req.body.taskIdList.length > 0) {
+
+                                    var taskDetailsInput = [
+                                        req.st.db.escape(req.query.token),
+                                        req.st.db.escape(req.body.groupId),
+                                        req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                        req.st.db.escape(DBSecretKey)
+                                    ];
+                                    var taskDetailsInput = 'CALL wm_get_latest_taskDetails( ' + taskDetailsInput.join(',') + ')';
+                                    req.db.query(taskDetailsInput, function (err, taskresults) {
+                                        console.log(err);
+                                        if (!err && taskresults && taskresults[0] && taskresults[0][0]) {
+
+                                            taskresults[0][0].memberList = taskresults[0][0] && JSON.parse(taskresults[0][0].memberList) ? JSON.parse(taskresults[0][0].memberList) : [];
+                                            taskresults[0][0].expenseList = taskresults[0][0] && JSON.parse(taskresults[0][0].expenseList) ? JSON.parse(taskresults[0][0].expenseList) : [];
+
+                                            for (var j = 0; j < taskresults[0][0].expenseList.length; j++) {
+                                                taskresults[0][0].expenseList[j].attachmentList = taskresults[0][0].expenseList[j] && JSON.parse(taskresults[0][0].expenseList[j].attachmentList) ? JSON.parse(taskresults[0][0].expenseList[j].attachmentList) : [];
+                                            }
+
+                                            taskresults[0][0].attachmentList = taskresults[0][0] && JSON.parse(taskresults[0][0].attachmentList) ? JSON.parse(taskresults[0][0].attachmentList) : [];
+
+                                            taskDetails = taskresults[0][0];
+                                            console.log("promise in");
+                                            resolve(taskDetails);
+                                        }
+                                        else {
+                                            resolve('');
+                                        }
+                                    });
+                                }
+                                else {
+                                    console.log("promise out");
+                                    resolve('');
+                                }
+                            }).then(function (resp) {
+                                var procParams = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.body.parentId || 0),
+                                    req.st.db.escape(req.body.categoryId || 0),
+                                    req.st.db.escape(req.body.description),
+                                    req.st.db.escape(req.body.priority),
+                                    req.st.db.escape(req.body.senderNotes || ""),
+                                    req.st.db.escape(req.body.status || 3),
+                                    req.st.db.escape(req.body.receiverNotes || ""),
+                                    req.st.db.escape(req.body.infoToSender || ""),
+                                    req.st.db.escape(JSON.stringify(attachmentList || [])),
+                                    req.st.db.escape(req.body.changeLog || ""),
+                                    req.st.db.escape(req.body.groupId),
+                                    req.st.db.escape(req.body.learnMessageId || 0),
+                                    req.st.db.escape(req.body.accessUserType || 0),
+                                    req.st.db.escape(req.body.categoryTitle || ""),
+                                    req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                                    req.st.db.escape(DBSecretKey),
+                                    req.st.db.escape(req.body.timestamp),
+                                    req.st.db.escape(req.body.createdTimeStamp),
+                                    req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                                    req.st.db.escape(JSON.stringify(taskDetails || null)),
+                                    req.st.db.escape(req.body.isReportingManager || 0),
+                                    req.st.db.escape(req.body.whatmateId || ""),
+                                    req.st.db.escape(req.body.nkFlag || 0)
+                                ];
+
+                                var salesFormId = 2000;
+                                var keywordsParams = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(salesFormId),
+                                    req.st.db.escape(JSON.stringify(keywordList)),
+                                    req.st.db.escape(req.body.groupId)
+                                ];
+
+                                var procQuery = 'CALL he_save_supportRequestWithTask_new( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, results) {
+                                    console.log(err);
+                                    if (!err && results && results[0] && results[0][0]) {
+                                        senderGroupId = results[0][0].senderId;
+
+                                        notifyMessages.getMessagesNeedToNotify();
+
+
+                                        if (req.body.status == 8) {
+                                            console.log("If resolved then send notification for nearkart");
+                                            var url = "http://23.236.49.140:3001/api/nk/ServiceEnquiryNotification";
+                                            var dbResponse = {
+                                                whatmateId: results[0][0].whatmateId,
+                                                parentId: results[0][0].parentId,
+                                                groupId: req.body.groupId,
+                                                feedback: "",
+                                                rating: 0,
+                                                notificationType: 3,
+                                                feedbackStatus: 0
+                                            };
+
+                                            request({
+                                                url: url,
+                                                method: "POST",
+                                                json: true,   // <--Very important!!!
+                                                body: dbResponse
+                                            }, function (error, response, body) {
+                                                console.log("error", error);
+                                                if (!error && body) {
+                                                    console.log('Notifcation saved and sent successfull for nearkart user');
+                                                }
+                                                else {
+                                                    console.log('Error occured in Nearkart notification api');
+                                                }
+                                            });
+                                        }
+
+
+                                        if (results && results[2] && results[2][0] && results[2][0].receiverId) {
+                                            if (notificationTemplaterRes.parsedTpl) {
+                                                notification.publish(
+                                                    results[2][0].receiverId,
+                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                    (results[0][0].groupName) ? (results[0][0].groupName) : '',
+                                                    results[0][0].senderId,
+                                                    notificationTemplaterRes.parsedTpl,
+                                                    41,
+                                                    0, (results[2][0].iphoneId) ? (results[2][0].iphoneId) : '',
+                                                    (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    moment().format("YYYY-MM-DD HH:mm:ss"),
+                                                    '',
+                                                    0,
+                                                    0,
+                                                    null,
+                                                    '',
+                                                    /** Data object property to be sent with notification **/
+                                                    {
+                                                        parentId: results[2][0].parentId,
+                                                        groupId: results[2][0].groupId,
+                                                        requirement: results[2][0].requirement,
+                                                        feedback: results[2][0].feedback,
+                                                        rating: results[2][0].rating,
+                                                        updatedDate: results[2][0].updatedDate,
+                                                        status: results[2][0].status
+                                                    },
+                                                    null,
+                                                    tokenResult[0].isWhatMate,
+                                                    results[1][i].secretKey);
+                                                console.log('postNotification : notification for compose_message is sent successfully');
+                                            }
+                                            else {
+                                                console.log('Error in parsing notification compose_message template - ',
+                                                    notificationTemplaterRes.error);
+                                                console.log('postNotification : notification for compose_message is sent successfully');
+                                            }
+                                        }
+
+                                        response.status = true;
+                                        response.message = "Support query submitted successfully";
+                                        response.error = null;
+                                        response.data = {
+                                            messageList: {
+                                                messageId: results[0][0].messageId,
+                                                message: results[0][0].message,
+                                                messageLink: results[0][0].messageLink,
+                                                createdDate: results[0][0].createdDate,
+                                                messageType: results[0][0].messageType,
+                                                messageStatus: results[0][0].messageStatus,
+                                                priority: results[0][0].priority,
+                                                senderName: results[0][0].senderName,
+                                                senderId: results[0][0].senderId,
+                                                receiverId: results[0][0].receiverId,
+                                                transId: results[0][0].transId,
+                                                formId: results[0][0].formId,
+                                                groupId: req.body.groupId,
+                                                currentStatus: results[0][0].currentStatus,
+                                                currentTransId: results[0][0].currentTransId,
+                                                localMessageId: req.body.localMessageId,
+                                                parentId: results[0][0].parentId,
+                                                accessUserType: results[0][0].accessUserType,
+                                                heUserId: results[0][0].heUserId,
+                                                formData: JSON.parse(results[0][0].formDataJSON)
+                                            }
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                        });
+
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Error while saving support query";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+                else {
+                    res.status(401).json(response);
+                }
+            });
+        }
     }
 };
 
