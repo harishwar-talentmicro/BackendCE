@@ -1851,7 +1851,7 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                                 if (result[3] && result[3][0]) {
                                                     isSendgrid = result[3][0].isSendgrid ? result[3][0].isSendgrid : 0,
                                                         isSMS = result[3][0].isSMS ? result[3][0].isSMS : 0,
-                                                        smsSenderId = result[3][0].smsSenderId ? result[3][0].smsSenderId : '', 
+                                                        smsSenderId = result[3][0].smsSenderId ? result[3][0].smsSenderId : ''
                                                 }
                                                 console.log('isSendgrid and isSMS', isSendgrid, isSMS);
 
