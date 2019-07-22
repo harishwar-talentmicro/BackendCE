@@ -1637,12 +1637,12 @@ jobCtrl.saveRequirement = function (req, res, next) {
 
                                         if (tags && tags.requirement && tags.requirement.length) {
                                             function escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+                                                return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                                            }
 
-function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
-    return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
-}
+                                            function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
+                                                return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
+                                            }
 
                                             for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
                                                 // 
@@ -1657,7 +1657,7 @@ function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
                                                 }
                                             }
                                         }
-                                        console.log("Requirement mail data after replace",results[5]);
+                                        console.log("Requirement mail data after replace", results[5]);
 
                                         if (results[5][i].mailbody != "") {
                                             results[5][i].mailbody = results[5][i].mailbody.replace("[FullName]", (firstname + ' ' + lastname));
@@ -2309,6 +2309,160 @@ jobCtrl.deleteMainBranches = function (req, res, next) {
     }
 };
 
+
+jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid company';
+        validationFlag *= false;
+    }
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.purpose || 1),
+                    req.st.db.escape(req.query.heParentId),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'CALL pace_get_requirementDetails_with_master( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    console.log(req.query.isWeb);
+
+                    var isWeb = req.query.isWeb;
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Master data loaded successfully";
+                        response.error = null;
+                        var intRoundList = [];
+                        if (isWeb) {
+                            intRoundList = result[8] ? result[8] : [];
+                        }
+                        else {
+                            intRoundList = result[13] ? result[13] : [];
+                        }
+
+                        if (result[19] && result[19][0]) {
+                            result[19][0].branchList = (result[19] && result[19][0]) && JSON.parse(result[19][0].branchList) ? JSON.parse(result[19][0].branchList) : {};
+                            result[19][0].contactList = (result[19] && result[19][0]) && JSON.parse(result[19][0].contactList) ? JSON.parse(result[19][0].contactList) : [];
+                            result[19][0].currency = (result[19] && result[19][0]) && JSON.parse(result[19][0].currency) ? JSON.parse(result[19][0].currency) : {};
+                            result[19][0].duration = (result[19] && result[19][0]) && JSON.parse(result[19][0].duration) ? JSON.parse(result[19][0].duration) : {};
+                            result[19][0].educationSpecialization = (result[19] && result[19][0]) && JSON.parse(result[19][0].educationSpecialization) ? JSON.parse(result[19][0].educationSpecialization) : [];
+                            result[19][0].heDepartment = (result[19] && result[19][0]) && JSON.parse(result[19][0].heDepartment) ? JSON.parse(result[19][0].heDepartment) : {};
+                            result[19][0].jobTitle = (result[19] && result[19][0]) && JSON.parse(result[19][0].jobTitle) ? JSON.parse(result[19][0].jobTitle) : {};
+                            result[19][0].jobType = (result[19] && result[19][0]) && JSON.parse(result[19][0].jobType) ? JSON.parse(result[19][0].jobType) : {};
+                            result[19][0].locationlist = (result[19] && result[19][0]) && JSON.parse(result[19][0].locationlist) ? JSON.parse(result[19][0].locationlist) : [];
+                            result[19][0].memberInterviewRound = (result[19] && result[19][0]) && JSON.parse(result[19][0].memberInterviewRound) ? JSON.parse(result[19][0].memberInterviewRound) : [];
+                            result[19][0].members = (result[19] && result[19][0]) && JSON.parse(result[19][0].members) ? JSON.parse(result[19][0].members) : [];
+                            result[19][0].primarySkills = (result[19] && result[19][0]) && JSON.parse(result[19][0].primarySkills) ? JSON.parse(result[19][0].primarySkills) : [];
+                            result[19][0].scale = (result[19] && result[19][0]) && JSON.parse(result[19][0].scale) ? JSON.parse(result[19][0].scale) : {};
+                            result[19][0].secondarySkills = (result[19] && result[19][0]) && JSON.parse(result[19][0].secondarySkills) ? JSON.parse(result[19][0].secondarySkills) : [];
+                            result[19][0].industry = (result[19] && result[19][0]) && JSON.parse(result[19][0].industry) ? JSON.parse(result[19][0].industry) : [];
+                            result[19][0].attachmentList = (result[19] && result[19][0]) && JSON.parse(result[19][0].attachmentList) ? JSON.parse(result[19][0].attachmentList) : [];
+                            result[19][0].functionalAreas = (result[19] && result[19][0] && JSON.parse(result[19][0].functionalAreas)) ? JSON.parse(result[19][0].functionalAreas) : [];
+                            result[19][0].jobLocation = (result[19] && result[19][0] && JSON.parse(result[19][0].jobLocation)) ? JSON.parse(result[2][0].jobLocation) : [];
+                        }
+
+                        if (result[18] && result[18][0]) {
+                            for (var i = 0; i < result[18].length; i++) {
+                                result[18][i].followUpNotes = (result[18] && result[18][i]) ? JSON.parse(result[18][i].followUpNotes) : [];
+                            }
+                        }
+
+
+                        response.data = {
+                            heDepartment: (result && result[0]) ? result[0] : [],
+                            jobType: (result && result[1]) ? result[1] : [],
+                            currency: (result && result[2]) ? result[2] : [],
+                            scale: (result && result[3]) ? result[3] : [],
+                            duration: (result && result[4]) ? result[4] : [],
+                            country: (result && result[5]) ? result[5] : [],
+                            jobTitle: (result && result[6]) ? result[6] : [],
+                            roleList: result[7] ? result[7] : [],
+                            interviewRoundList: intRoundList,
+                            status: result[9] ? result[9] : [],
+                            requirementList: result[10] ? result[10] : [],
+                            portalList: result[11] ? result[11] : [],
+                            reasons: result[12] ? result[12] : [],
+                            teamMembers: result[14] ? result[14] : [],
+                            industry: result[15] ? result[15] : [],
+                            functionalAreas: result[16] ? result[16] : [],
+
+                            jdTemplateList: result[17][0] ? result[17][0] : [],
+                            followUpNotes: (result[18] && result[18][0]) ? result[18] : [],
+                            requirementCompleteDetails: (result[19] && result[19][0]) ? result[19][0] : {}
+
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            heDepartment: [],
+                            jobType: [],
+                            currency: [],
+                            scale: [],
+                            duration: [],
+                            country: [],
+                            jobTitle: [],
+                            roleList: [],
+                            interviewRoundList: [],
+                            status: [],
+                            requirementList: [],
+                            jdTemplateList : [],
+                            followUpNotes : [],
+                            requirementCompleteDetails : {}
+                        };
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while loading master data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+
+};
+
 jobCtrl.getRequirementDetails = function (req, res, next) {
     var response = {
         status: false,
@@ -2380,10 +2534,9 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                             result[3][i].followUpNotes = (result[3] && result[3][i]) ? JSON.parse(result[3][i].followUpNotes) : [];
                         }
                         response.data = {
-                            requirementDetails: result[0][0] ? result[0][0] : [],
-                            //  requirementCompleteDetails: (result[1][0].reqJsonData) ? JSON.parse(result[1][0].reqJsonData) : {},
-                            requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0] : {},
-                            followUpNotes: (result[3] && result[3][0]) ? result[3] : []
+                            jdTemplateList: result[0][0] ? result[0][0] : [],
+                            followUpNotes: (result[1] && result[1][0]) ? result[1] : [],
+                            requirementCompleteDetails: (result[2] && result[2][0]) ? result[2][0] : {}
                         };
 
                         // if (isWeb == 1) {
@@ -2403,9 +2556,8 @@ jobCtrl.getRequirementDetails = function (req, res, next) {
                         response.message = "Requirement Details not found";
                         response.error = null;
                         response.data = {
-                            requirementDetails: {},
+                            jdTemplateList: {},
                             requirementCompleteDetails: {},
-                            requirementNew: {},
                             followUpNotes: []
                         };
                         if (isWeb == 0) {

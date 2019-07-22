@@ -5945,7 +5945,8 @@ applicantCtrl.faceSheetReplaceDetails = function (req, res, next) {
                                     var inputs = [
                                         req.st.db.escape(req.query.token),
                                         req.st.db.escape(req.query.heMasterId),
-                                        req.st.db.escape(req.query.applicantId)
+                                        req.st.db.escape(req.query.applicantId),
+                                        req.st.db.escape(req.query.reqAppId || 0)
                                     ];
 
                                     var procQuery = 'CALL wm_get_fillFaceSheet( ' + inputs.join(',') + ')';

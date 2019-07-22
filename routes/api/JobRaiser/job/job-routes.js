@@ -30,6 +30,7 @@ router.post('/saveLocation',jobCtrl.saveLocation);
 
 router.post('/saveRequirement',jobCtrl.saveRequirement);
 router.get('/requirementDetails',jobCtrl.getRequirementDetails);
+router.get('/requirementDetailsWithMaster',jobCtrl.getRequirementDetailsWithMaster);
 
 router.get('/jdTemplateList',jobCtrl.getJdTemplate);
 router.get('/jdTemplateDetails',jobCtrl.getJdTemplateDetails);
