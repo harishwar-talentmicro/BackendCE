@@ -71,43 +71,57 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
 
                 console.log(path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail);
 
-                var process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail]);
+                var spawn_process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail]);
                 // fs.readFile(path.resolve(__dirname, "word.py"), function (err, res) {
                 //     console.log(err, res);
                 // })
                 // var process = spawn('python', [path.resolve(__dirname, "test.py")]);
 
-                process.stdout.on('data', function (data) {
+                spawn_process.stdout.on('data', function (data) {
                     console.log(data.toString());
-                    try {
+                    if (data.toString().indexOf('File is not a zip file') > -1) {
+                        response.status = true;
+                        response.message = "Error while masking";
+                        res.status(500).json(response);
+                        return;
+                    }
+                    else if (data.toString().indexOf('masked successfully') > -1) {
+                        try {
 
-                        var update = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.body.applicantId),
-                            req.st.db.escape(req.body.reqAppId || 0),
-                            req.st.db.escape(uniqueId)
-                        ];
+                            var update = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.body.applicantId),
+                                req.st.db.escape(req.body.reqAppId || 0),
+                                req.st.db.escape(uniqueId)
+                            ];
 
-                        var procQuery = 'CALL pace_resumeMaskingUpdate( ' + update.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, Result) {
-                            console.log(err);
+                            var procQuery = 'CALL pace_resumeMaskingUpdate( ' + update.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, Result) {
+                                console.log(err);
 
-                            console.log('output: ' + data.toString());
+                                console.log('output: ' + data.toString());
+                                response.status = true;
+                                response.message = "Success";
+                                response.error = null;
+                                response.data = {
+                                    clientCVPath: uniqueId,
+                                    mes: data.toString()
+                                };
+                                console.log(response);
+                                res.status(200).json(response);
+
+                                // res.send(200)
+                            });
+                        } catch (ex) {
+                            console.log(ex);
                             response.status = true;
-                            response.message = "Success";
-                            response.error = null;
-                            response.data = {
-                                clientCVPath: uniqueId
-                            };
-                            console.log(response);
-                            res.status(200).json(response);
-
-                            // res.send(200)
-                        });
-                    } catch (ex) {
-                        console.log(ex);
+                            response.message = "Error while masking";
+                            res.status(500).json(response);
+                        }
+                    }
+                    else {
                         response.status = true;
                         response.message = "Error while masking";
                         res.status(500).json(response);

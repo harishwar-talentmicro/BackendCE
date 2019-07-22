@@ -11,7 +11,7 @@ var encryption = new AES_256_encryption();
 var tesseract = require('node-tesseract');
 
 var jimp = require('jimp');
-var fs=require('fs')
+var fs = require('fs')
 
 var notifyMessages = require('../../../routes/api/messagebox/notifyMessages.js');
 var notifyMessages = new notifyMessages();
@@ -473,56 +473,57 @@ vaultCtrl.saveVaultItem = function (req, res, next) {
                         }
                         else {
                             return new Promise(function (resolve, reject) {
-                                if (attachments.length> 0) {
-                                    var extractedKeywords = '';
-                                    var count = 0;
-                                    for (i = 0; i < attachments.length; i++) {
+                                if (attachments.length > 0) {
+                                    //     var extractedKeywords = '';
+                                    //     var count = 0;
+                                    //     for (i = 0; i < attachments.length; i++) {
 
-                                        var imageRead = new Promise(function (resolve, reject) {
-                                            console.log(i)
-                                            var imageUrl = attachments[i].CDNPath
-                                            console.log(imageUrl);
-                                            var memeType = attachments[i].CDNPath.split(".");
-                                            console.log(memeType);
-                                            console.log(memeType[1]);
-                                            if (memeType[1] == 'png' || memeType[1] == 'jpg') {
+                                    //         var imageRead = new Promise(function (resolve, reject) {
+                                    //             console.log(i)
+                                    //             var imageUrl = attachments[i].CDNPath
+                                    //             console.log(imageUrl);
+                                    //             var memeType = attachments[i].CDNPath.split(".");
+                                    //             console.log(memeType);
+                                    //             console.log(memeType[1]);
+                                    //             if (memeType[1] == 'png' || memeType[1] == 'jpg') {
 
-                                                jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl, function (err, imagefile) {
-                                                    console.log(imagefile);
-                                                    imagefile.write("/home/ezeonetalent/ezeone1/api/routes/api/vault/" + imageUrl, function () {
-                                                        var testImage = imageUrl;
-                                                        console.log(testImage);
-                                                        resolve(testImage);
+                                    //                 jimp.read('https://storage.googleapis.com/ezeone/' + imageUrl, function (err, imagefile) {
+                                    //                     console.log(imagefile);
+                                    //                     imagefile.write("/home/ezeonetalent/ezeone1/api/routes/api/vault/" + imageUrl, function () {
+                                    //                         var testImage = imageUrl;
+                                    //                         console.log(testImage);
+                                    //                         resolve(testImage);
 
-                                                    });
-                                                })
-                                            }
-                                        });
-                                        imageRead.then(function (response) {
-                                            console.log(__dirname);
-                                                    
-                                            tesseract.process(__dirname+'/'+response, function (err, text) {
-                                                if (err){
-                                                    
-                                                    console.error(err);
-                                                    resolve("");
-                                                }
-                                                else {
+                                    //                     });
+                                    //                 })
+                                    //             }
+                                    //         });
+                                    //         imageRead.then(function (response) {
+                                    //             console.log(__dirname);
 
-                                                    extractedKeywords = extractedKeywords + text;
-                                                    count = count + 1;
+                                    //             tesseract.process(__dirname+'/'+response, function (err, text) {
+                                    //                 if (err){
 
-                                                    fs.unlinkSync(__dirname+'/'+response)
-                                                    if (count = (attachments.length)) {
-                                                        resolve(extractedKeywords)
-                                                    }
+                                    //                     console.error(err);
+                                    //                     resolve("");
+                                    //                 }
+                                    //                 else {
 
-                                                }
-                                            });
+                                    //                     extractedKeywords = extractedKeywords + text;
+                                    //                     count = count + 1;
 
-                                        });
+                                    //                     fs.unlinkSync(__dirname+'/'+response)
+                                    //                     if (count = (attachments.length)) {
+                                    //                         resolve(extractedKeywords)
+                                    //                     }
 
-                                    }
+                                    //                 }
+                                    //             });
+
+                                    //         });
+
+                                    //     }
+                                    resolve("");
                                 }
                                 else {
                                     resolve("")
@@ -540,15 +541,15 @@ vaultCtrl.saveVaultItem = function (req, res, next) {
                                 req.body.currencyId = req.body.currencyId ? req.body.currencyId : 0;
                                 req.body.amount = req.body.amount ? req.body.amount : 0.0;
                                 req.body.keywords = resp;
-                                req.body.keywords=req.body.keywords.replace(/[^\x00-\x7F]/g, "");
-                               
-                                req.body.keywords=req.body.keywords.replace('\n','');
-                                req.body.keywords=req.body.keywords.replace('.','');
-                                req.body.keywords=req.body.keywords.replace(',','');
-                                req.body.keywords=req.body.keywords.replace('@','');
-                                req.body.keywords=req.body.keywords.replace('%','');
+                                req.body.keywords = req.body.keywords.replace(/[^\x00-\x7F]/g, "");
 
-                                console.log( req.body.keywords );
+                                req.body.keywords = req.body.keywords.replace('\n', '');
+                                req.body.keywords = req.body.keywords.replace('.', '');
+                                req.body.keywords = req.body.keywords.replace(',', '');
+                                req.body.keywords = req.body.keywords.replace('@', '');
+                                req.body.keywords = req.body.keywords.replace('%', '');
+
+                                console.log(req.body.keywords);
 
                                 var procParams = [
                                     req.st.db.escape(req.query.token),
@@ -929,7 +930,7 @@ vaultCtrl.archiveItem = function (req, res, next) {
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.itemId),
                         req.st.db.escape(req.query.isArchive)
-                   
+
                     ];
 
                     var procQuery = 'CALL wm_save_archiveVaultItem( ' + procParams.join(',') + ')';
@@ -937,10 +938,10 @@ vaultCtrl.archiveItem = function (req, res, next) {
                     req.db.query(procQuery, function (err, vaultResult) {
                         if (!err && vaultResult && vaultResult[0] && vaultResult[0][0]) {
                             response.status = true;
-                            if(req.query.isArchive)
-                            response.message = "File archived successfully";
+                            if (req.query.isArchive)
+                                response.message = "File archived successfully";
                             else
-                            response.message = "File restored successfully";
+                                response.message = "File restored successfully";
 
                             response.error = null;
                             response.data = vaultResult[0][0];

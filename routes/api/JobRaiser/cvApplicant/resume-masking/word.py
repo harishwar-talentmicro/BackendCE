@@ -1,27 +1,27 @@
-from google.cloud import storage
-import re
-from docx import Document
-from docx.shared import Inches
-import requests
-from io import BytesIO
-from io import StringIO
-import base64
-
-import argparse
-import datetime
-import pprint
-
-import os
-import sys
-
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.dirname(__file__)+"/cred.json"
-# os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
-
-# [START storage_upload_file]
-
-print (sys.argv)
-
 try:
+    import re
+    from docx import Document
+    from docx.shared import Inches
+    import requests
+    from io import BytesIO
+    from io import StringIO
+    import base64
+
+    import argparse
+    import datetime
+    import pprint
+
+    import os
+    import sys
+    from google.cloud import storage
+
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.path.dirname(__file__)+"/cred.json"
+    # os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
+
+    # [START storage_upload_file]
+
+    print (sys.argv)
+
     def docx_replace_regex(doc_obj, regex, replace):
 
         for p in doc_obj.paragraphs:
@@ -38,15 +38,16 @@ try:
                 for cell in row.cells:
                     docx_replace_regex(cell, regex, replace)
 
-    regex1 = re.compile(r"(\+)*[ 0-9\-]{8,14}")
-    replace1 = r""
-    regex2 = re.compile(r"[a-zA-Z0-9\._]+@[a-zA-Z]+.[a-zA-Z]+")
-    replace2 = r""
+    # mobile_regex = re.compile(r"(\+)*[ 0-9\-]{8,14}")
+    mobile_regex = re.compile(r"\(* *(\+)*[ \)0-9\-]{8,15}")
+    # email_regex = re.compile(r"[a-zA-Z0-9\._]+@[a-zA-Z]+.[a-zA-Z]+")
+    email_regex = re.compile(r"[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+")
+    replace_with = r""
     # "https://storage.googleapis.com/ezeone/6f8e5aaf-84dd-4ece-99c2-946cd469929f.docx"
     filename = sys.argv[1]+sys.argv[2]
     doc = Document(BytesIO(requests.get(filename).content))
-    docx_replace_regex(doc, regex1, replace1)
-    docx_replace_regex(doc, regex2, replace2)
+    docx_replace_regex(doc, mobile_regex, replace_with)
+    docx_replace_regex(doc, email_regex, replace_with)
     # doc.save('result2.docx')
     # with open("yourfile.ext", "rb") as image_file:
     #     encoded_string = base64.b64encode(image_file.read())
@@ -71,6 +72,7 @@ try:
         doc.save(file_stream)
         file_stream.seek(0)
         blob.upload_from_file(file_stream)
+        print ('masked successfully')
     except Exception as e:
         print(e)
     # print("here")
@@ -83,4 +85,3 @@ try:
     # [END storage_upload_file]
 except Exception as e:
     print(e)
-print ('done')

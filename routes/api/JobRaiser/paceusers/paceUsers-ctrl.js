@@ -525,7 +525,9 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.taskByMonth),
-                    req.st.db.escape(req.query.keywords || "")
+                    req.st.db.escape(req.query.keywords || ""),
+                    req.st.db.escape(req.query.taskByToDate || null),
+                    req.st.db.escape(req.query.isDashBoard || 0)
                 ];
 
                 var procQuery = 'CALL wm_get_pacePlanner( ' + inputs.join(',') + ')';
@@ -3159,7 +3161,7 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
                     });
                 }
                 else {
-                    res.status(401).json(response);
+                    res.status(401).json(respMsg);
                 }
             });
 

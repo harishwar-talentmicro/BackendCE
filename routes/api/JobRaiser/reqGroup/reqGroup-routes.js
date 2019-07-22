@@ -5,6 +5,8 @@ var reqGroup = require('./reqGroup-ctrl');
 
 router.post('/saveRequirementGroup',reqGroup.saveRequirementGroup);
 router.get('/getRequirementGroup',reqGroup.getRequirementGroup);
+router.get('/getRequirementGroupWithMaster',reqGroup.getRequirementGroupWithMaster);
+
 router.get('/getrequirementGroupList',reqGroup.getrequirementGroupList);
 router.post('/requirementViewGroup',reqGroup.getRequirementViewGroup);
 router.post('/applicantViewForReqGroup',reqGroup.getreqApplicantViewWithReqGroup);

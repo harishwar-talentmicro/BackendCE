@@ -2340,7 +2340,7 @@ jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterId),
                     req.st.db.escape(req.query.purpose || 1),
-                    req.st.db.escape(req.query.heParentId),
+                    req.st.db.escape(req.query.heParentId || 0),
                     req.st.db.escape(DBSecretKey)
                 ];
 
@@ -2379,9 +2379,9 @@ jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
                             result[19][0].scale = (result[19] && result[19][0]) && JSON.parse(result[19][0].scale) ? JSON.parse(result[19][0].scale) : {};
                             result[19][0].secondarySkills = (result[19] && result[19][0]) && JSON.parse(result[19][0].secondarySkills) ? JSON.parse(result[19][0].secondarySkills) : [];
                             result[19][0].industry = (result[19] && result[19][0]) && JSON.parse(result[19][0].industry) ? JSON.parse(result[19][0].industry) : [];
-                            result[19][0].attachmentList = (result[19] && result[19][0]) && JSON.parse(result[19][0].attachmentList) ? JSON.parse(result[19][0].attachmentList) : [];
-                            result[19][0].functionalAreas = (result[19] && result[19][0] && JSON.parse(result[19][0].functionalAreas)) ? JSON.parse(result[19][0].functionalAreas) : [];
-                            result[19][0].jobLocation = (result[19] && result[19][0] && JSON.parse(result[19][0].jobLocation)) ? JSON.parse(result[2][0].jobLocation) : [];
+                            result[19][0].attachmentList = (result[19] && result[19][0]) && result[19][0].attachmentList && JSON.parse(result[19][0].attachmentList) ? JSON.parse(result[19][0].attachmentList) : [];
+                            result[19][0].functionalAreas = (result[19] && result[19][0] && result[19][0].functionalAreas && JSON.parse(result[19][0].functionalAreas)) ? JSON.parse(result[19][0].functionalAreas) : [];
+                            result[19][0].jobLocation = (result[19] && result[19][0] && result[19][0].jobLocation &&  JSON.parse(result[19][0].jobLocation)) ? JSON.parse(result[19][0].jobLocation) : [];
                         }
 
                         if (result[18] && result[18][0]) {
@@ -2409,7 +2409,7 @@ jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
                             industry: result[15] ? result[15] : [],
                             functionalAreas: result[16] ? result[16] : [],
 
-                            jdTemplateList: result[17][0] ? result[17][0] : [],
+                            jdTemplateList: result[17][0] ? result[17] : [],
                             followUpNotes: (result[18] && result[18][0]) ? result[18] : [],
                             requirementCompleteDetails: (result[19] && result[19][0]) ? result[19][0] : {}
 

@@ -239,22 +239,22 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                                                                                 html: bodydata// html body
                                                                             };
                                                                             sendgrid.send(mailOptions, function (err, results) {
-                                                                                try{
-                                                                                if (err) {
-                                                                                    console.log("mail not sent", err);
+                                                                                try {
+                                                                                    if (err) {
+                                                                                        console.log("mail not sent", err);
 
-                                                                                }
-                                                                                else {
-                                                                                    console.log('Mail sent successfully');
+                                                                                    }
+                                                                                    else {
+                                                                                        console.log('Mail sent successfully');
 
+                                                                                    }
                                                                                 }
-                                                                            }
-                                                                            catch (ex) {
-                                                                                console.log(ex);
-                                                                                error_logger.error = ex;
-                                                                                logger(req, error_logger);
-                                                                                res.status(500).json(error_response);
-                                                                            }
+                                                                                catch (ex) {
+                                                                                    console.log(ex);
+                                                                                    error_logger.error = ex;
+                                                                                    logger(req, error_logger);
+                                                                                    res.status(500).json(error_response);
+                                                                                }
                                                                             });
 
                                                                         }
@@ -356,9 +356,6 @@ reqGroup.getRequirementGroup = function (req, res, next) {
     var error_logger = {
         details: 'reqGroup.getRequirementGroup'
     }
-
-
-
 
     var error_response = {
         status: false,
@@ -480,26 +477,23 @@ reqGroup.getRequirementGroup = function (req, res, next) {
         logger(req, error_logger);
         res.status(500).json(error_response);
     }
-    
+
 };
 
 
-reqGroup.getrequirementGroupList = function (req, res, next) {
-try{
+reqGroup.getRequirementGroupWithMaster = function (req, res, next) {
+
     var error_logger = {
-        details: 'reqGroup.getrequirementGroupList'
+        details: 'reqGroup.getRequirementGroup'
     }
 
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
     try {
-
-
-        var error_response = {
-            status: false,
-            message: "Some error occurred!",
-            error: null,
-            data: null
-        }
-
         var error = {};
 
         var response = {
@@ -513,13 +507,21 @@ try{
             error.token = 'Invalid token';
             validationFlag *= false;
         }
+
         if (!req.query.heMasterId) {
-            error.heMasterId = 'Invalid company';
+            error.heMasterId = 'Invalid heMasterId';
             validationFlag *= false;
         }
+
+        // if (!req.query.reqGroupId) {
+        //     error.reqGroupId = 'Invalid reqGroupId';
+        //     validationFlag *= false;
+        // }
+
+
         if (!validationFlag) {
             response.error = error;
-            response.message = 'Please check the errors';
+            response.message = 'Please check the error';
             res.status(400).json(response);
             console.log(response);
         }
@@ -532,61 +534,77 @@ try{
                         var inputs = [
                             req.st.db.escape(req.query.token),
                             req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.query.applicantId || 0)
+                            req.st.db.escape(req.query.purpose || 1),
+                            req.st.db.escape(req.query.reqGroupId || 0),
+                            req.st.db.escape(DBSecretKey)
                         ];
 
-                        var procQuery = 'CALL pace_get_requirementGroupList( ' + inputs.join(',') + ')';
+                        var procQuery = 'CALL pace_get_requirementGroupDetails_with_master( ' + inputs.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, result) {
                             try {
                                 console.log(err);
-                                if (!err && result && result[0] || result[1]) {
+
+                                if (!err && result) {
                                     response.status = true;
-                                    response.message = "Requirement list loaded successfully";
+                                    response.message = "Requirement group details loaded successfully";
                                     response.error = null;
-                                    response.data = {
-                                        requirementGroupList: result[0] && result[0][0] ? result[0] : [],
-                                        totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+
+
+                                    var intRoundList = [];
+                                    if (req.query.isWeb) {
+                                        intRoundList = result[8] ? result[8] : [];
                                     }
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        try {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                            res.status(200).json(response);
+                                    else {
+                                        intRoundList = result[13] ? result[13] : [];
+                                    }
+
+                                    if (result[18] && result[18][0]) {
+                                        for (var i = 0; i < result[18].length; i++) {
+                                            result[18][i].followUpNotes = (result[18] && result[18][i]) ? JSON.parse(result[18][i].followUpNotes) : [];
                                         }
-                                        catch (ex) {
-                                            console.log(ex);
-                                            error_logger.error = ex;
-                                            logger(req, error_logger);
-                                            res.status(500).json(error_response);
-                                        }
-                                    });
-                                }
-                                else if (!err) {
-                                    response.status = true;
-                                    response.message = "No results found";
-                                    response.error = null;
+                                    }
+
                                     response.data = {
-                                        requirementGroupList: [],
-                                        totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+                                        heDepartment: (result && result[0]) ? result[0] : [],
+                                        jobType: (result && result[1]) ? result[1] : [],
+                                        currency: (result && result[2]) ? result[2] : [],
+                                        scale: (result && result[3]) ? result[3] : [],
+                                        duration: (result && result[4]) ? result[4] : [],
+                                        country: (result && result[5]) ? result[5] : [],
+                                        jobTitle: (result && result[6]) ? result[6] : [],
+                                        roleList: result[7] ? result[7] : [],
+                                        interviewRoundList: intRoundList,
+                                        status: result[9] ? result[9] : [],
+                                        requirementList: result[10] ? result[10] : [],
+                                        portalList: result[11] ? result[11] : [],
+                                        reasons: result[12] ? result[12] : [],
+                                        teamMembers: result[14] ? result[14] : [],
+                                        industry: result[15] ? result[15] : [],
+                                        functionalAreas: result[16] ? result[16] : [],
+
+                                        reqGroupDetails: result[17][0] ? result[17][0] : null,
+                                        followUpNotes: (result[18] && result[18][0]) ? result[18] : []
                                     };
+
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
-                                        try {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                            res.status(200).json(response);
-                                        }
-                                        catch (ex) {
-                                            console.log(ex);
-                                            error_logger.error = ex;
-                                            logger(req, error_logger);
-                                            res.status(500).json(error_response);
-                                        }
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
                                     });
                                 }
+
+                                else if (!err) {
+                                    response.status = false;
+                                    response.message = "No result found";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+
                                 else {
                                     response.status = false;
-                                    response.message = "Error while getting requirement List";
+                                    response.message = "Error while generating Jobcode";
                                     response.error = null;
                                     response.data = null;
                                     res.status(500).json(response);
@@ -619,13 +637,152 @@ try{
         logger(req, error_logger);
         res.status(500).json(error_response);
     }
-}
-catch (ex) {
-    console.log(ex);
-    error_logger.error = ex;
-    logger(req, error_logger);
-    res.status(500).json(error_response);
-}
+
+};
+
+
+reqGroup.getrequirementGroupList = function (req, res, next) {
+    try {
+        var error_logger = {
+            details: 'reqGroup.getrequirementGroupList'
+        }
+
+        try {
+
+
+            var error_response = {
+                status: false,
+                message: "Some error occurred!",
+                error: null,
+                data: null
+            }
+
+            var error = {};
+
+            var response = {
+                status: false,
+                message: "Invalid token",
+                data: null,
+                error: null
+            };
+            var validationFlag = true;
+            if (!req.query.token) {
+                error.token = 'Invalid token';
+                validationFlag *= false;
+            }
+            if (!req.query.heMasterId) {
+                error.heMasterId = 'Invalid company';
+                validationFlag *= false;
+            }
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
+            }
+            else {
+                req.st.validateToken(req.query.token, function (err, tokenResult) {
+                    try {
+                        if ((!err) && tokenResult) {
+                            req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.query.applicantId || 0)
+                            ];
+
+                            var procQuery = 'CALL pace_get_requirementGroupList( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, result) {
+                                try {
+                                    console.log(err);
+                                    if (!err && result && result[0] || result[1]) {
+                                        response.status = true;
+                                        response.message = "Requirement list loaded successfully";
+                                        response.error = null;
+                                        response.data = {
+                                            requirementGroupList: result[0] && result[0][0] ? result[0] : [],
+                                            totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+                                        }
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            try {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            }
+                                            catch (ex) {
+                                                console.log(ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    }
+                                    else if (!err) {
+                                        response.status = true;
+                                        response.message = "No results found";
+                                        response.error = null;
+                                        response.data = {
+                                            requirementGroupList: [],
+                                            totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+                                        };
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            try {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            }
+                                            catch (ex) {
+                                                console.log(ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Error while getting requirement List";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                }
+                                catch (ex) {
+                                    console.log(ex);
+                                    error_logger.error = ex;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            });
+                        }
+                        else {
+                            res.status(401).json(response);
+                        }
+                    }
+                    catch (ex) {
+                        console.log(ex);
+                        error_logger.error = ex;
+                        logger(req, error_logger);
+                        res.status(500).json(error_response);
+                    }
+                });
+            }
+        }
+        catch (ex) {
+            console.log(ex);
+            error_logger.error = ex;
+            logger(req, error_logger);
+            res.status(500).json(error_response);
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
 };
 
 reqGroup.getRequirementViewGroup = function (req, res, next) {
@@ -1975,9 +2132,9 @@ reqGroup.getRecruiterPerformanceReqAppForRequirementGroups = function (req, res,
                                                 };
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
-                                                    try{
-                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                                    res.status(200).json(response);
+                                                    try {
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
                                                     }
                                                     catch (ex) {
                                                         console.log(ex);
