@@ -280,7 +280,10 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.interviewMailerLimit || 0),
                         req.st.db.escape(req.body.ccToClients || 0),
                         req.st.db.escape(req.body.isTagEditFlag || 0),
-                        req.st.db.escape(JSON.stringify(req.body.tags || []))
+                        req.st.db.escape(JSON.stringify(req.body.tags || [])),
+                        req.st.db.escape(JSON.stringify(req.body.screeningMailTemplate || [])),
+                        req.st.db.escape(JSON.stringify(req.body.submissionMailTemplate || [])),
+                        req.st.db.escape(JSON.stringify(req.body.interviewMailTemplate || []))
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -1724,359 +1727,364 @@ jobCtrl.saveRequirement = function (req, res, next) {
                     zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                         req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
-                        if (!req.body.heMasterId) {
-                            error.heMasterId = 'Invalid tenant';
-                            validationFlag *= false;
-                        }
-                        var heDepartment = req.body.heDepartment;
-                        if (typeof (heDepartment) == "string") {
-                            heDepartment = JSON.parse(heDepartment);
-                        }
-
-
-                        var contactList = req.body.contactList;
-                        if (typeof (contactList) == "string") {
-                            contactList = JSON.parse(contactList);
-                        }
-
-
-                        var branchList = req.body.branchList;
-                        if (typeof (branchList) == "string") {
-                            branchList = JSON.parse(branchList);
-                        }
-
-                        if (!branchList) {
-                            branchList = {};
-                        }
-
-                        var jobTitle = req.body.jobTitle;
-                        if (typeof (jobTitle) == "string") {
-                            jobTitle = JSON.parse(jobTitle);
-                        }
-
-                        if (!jobTitle) {
-                            jobTitle = {};
-                        }
-
-                        if (req.body.jdTemplateFlag != 1) {
-                            if (!req.body.jobCode) {
-                                error.jobCode = 'Invalid jobCode';
+                        var requirementWhatmateSave = function () {
+                            if (!req.body.heMasterId) {
+                                error.heMasterId = 'Invalid tenant';
                                 validationFlag *= false;
                             }
-                        }
-                        if (!req.body.positions) {
-                            error.positions = 'Positions is not specified';
-                            validationFlag *= false;
-                        }
-                        var jobType = req.body.jobType;
-                        if (typeof (jobType) == "string") {
-                            jobType = JSON.parse(jobType);
-                        }
-                        if (!req.body.jobType) {
-                            error.jobType = 'Invalid jobType';
-                            validationFlag *= false;
-                        }
-                        var educationSpecialization = req.body.educationSpecialization;
-                        if (typeof (educationSpecialization) == "string") {
-                            educationSpecialization = JSON.parse(educationSpecialization);
-                        }
-                        if (!educationSpecialization) {
-                            educationSpecialization = [];
-                        }
-                        var primarySkills = req.body.primarySkills;
-                        if (typeof (primarySkills) == "string") {
-                            primarySkills = JSON.parse(primarySkills);
-                        }
-                        if (!primarySkills) {
-                            primarySkills = [];
-                        }
-                        var secondarySkills = req.body.secondarySkills;
-                        if (typeof (secondarySkills) == "string") {
-                            secondarySkills = JSON.parse(secondarySkills);
-                        }
-                        if (!secondarySkills) {
-                            secondarySkills = [];
-                        }
-                        var members = req.body.members;
-                        if (typeof (members) == "string") {
-                            members = JSON.parse(members);
-                        }
-                        if (!members) {
-                            members = [];
-                        }
-                        var currency = req.body.currency;
-                        if (typeof (currency) == "string") {
-                            currency = JSON.parse(currency);
-                        }
-                        if (!currency) {
-                            currency = {};
-                        }
-                        var scale = req.body.scale;
-                        if (typeof (scale) == "string") {
-                            scale = JSON.parse(scale);
-                        }
-                        if (!scale) {
-                            scale = {};
-                        }
-                        var duration = req.body.duration;
-                        if (typeof (duration) == "string") {
-                            duration = JSON.parse(duration);
-                        }
-                        if (!duration) {
-                            duration = {};
-                        }
-                        var locations = req.body.locations;
-                        if (typeof (locations) == "string") {
-                            locations = JSON.parse(locations);
-                        }
-                        if (!locations) {
-                            locations = [];
-                        }
-                        var memberInterviewRound = req.body.memberInterviewRound;
-                        if (typeof (memberInterviewRound) == "string") {
-                            memberInterviewRound = JSON.parse(memberInterviewRound);
-                        }
-                        if (!memberInterviewRound) {
-                            memberInterviewRound = [];
-                        }
-                        var attachmentList = req.body.attachmentList;
-                        if (typeof (attachmentList) == "string") {
-                            attachmentList = JSON.parse(attachmentList);
-                        }
-                        if (!attachmentList) {
-                            attachmentList = [];
-                        }
+                            var heDepartment = req.body.heDepartment;
+                            if (typeof (heDepartment) == "string") {
+                                heDepartment = JSON.parse(heDepartment);
+                            }
 
-                        var functionalAreas = req.body.functionalAreas;
-                        if (typeof (functionalAreas) == "string") {
-                            functionalAreas = JSON.parse(functionalAreas);
-                        }
-                        if (!functionalAreas) {
-                            functionalAreas = [];
-                        }
 
-                        if (!validationFlag) {
-                            response.error = error;
-                            response.message = 'Please check the errors';
-                            res.status(400).json(response);
-                            console.log(response);
-                        }
-                        else {
-                            req.body.jdTemplateFlag = (req.body.jdTemplateFlag) ? req.body.jdTemplateFlag : 0;
-                            req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
-                            req.body.jdTemplateTitle = (req.body.jdTemplateTitle) ? req.body.jdTemplateTitle : "";
-                            req.body.jobDescription = (req.body.jobDescription) ? req.body.jobDescription : "";
-                            req.body.expFrom = (req.body.expFrom) ? req.body.expFrom : 0;
-                            req.body.expTo = (req.body.expTo) ? req.body.expTo : 0;
-                            req.body.targetDate = (req.body.targetDate) ? req.body.targetDate : null;
-                            req.body.keywords = (req.body.keywords) ? req.body.keywords : "";
-                            req.body.minSalary = (req.body.minSalary) ? req.body.minSalary : 0;
-                            req.body.maxSalary = (req.body.maxSalary) ? req.body.maxSalary : 0;
-                            req.body.notes = (req.body.notes) ? req.body.notes : "";
-                            req.body.senderNotes = (req.body.senderNotes) ? req.body.senderNotes : "";
-                            req.body.approverNotes = (req.body.approverNotes) ? req.body.approverNotes : "";
-                            req.body.positionsFilled = (req.body.positionsFilled) ? req.body.positionsFilled : 0;
-                            req.body.receiverNotes = (req.body.receiverNotes) ? req.body.receiverNotes : "";
-                            req.body.changeLog = (req.body.changeLog) ? req.body.changeLog : "";
-                            req.body.groupId = (req.body.groupId) ? req.body.groupId : 0;
-                            req.body.learnMessageId = (req.body.learnMessageId) ? req.body.learnMessageId : 0;
-                            req.body.accessUserType = (req.body.accessUserType) ? req.body.accessUserType : 0;
-                            req.body.approverCount = (req.body.approverCount) ? req.body.approverCount : 0;
-                            req.body.receiverCount = (req.body.receiverCount) ? req.body.receiverCount : 0;
-                            req.body.status = req.body.status ? req.body.status : 1;   // new requirement default status to pending
-                            req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : 'Pending';
-                            req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
-                            req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
-                            req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
-                            req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
-                            req.body.postJobCareerPortal = (req.body.postJobCareerPortal) ? req.body.postJobCareerPortal : 0;
+                            var contactList = req.body.contactList;
+                            if (typeof (contactList) == "string") {
+                                contactList = JSON.parse(contactList);
+                            }
 
-                            branchList = [branchList];
 
-                            var procParams = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.body.heMasterId),
-                                req.st.db.escape(req.body.jdTemplateTitle),
-                                req.st.db.escape(req.body.parentId),
-                                req.st.db.escape(req.body.purpose),
-                                req.st.db.escape(JSON.stringify(heDepartment)),
-                                req.st.db.escape(JSON.stringify(contactList)),
-                                req.st.db.escape(JSON.stringify(branchList)),
-                                req.st.db.escape(JSON.stringify(jobTitle)),
-                                req.st.db.escape(req.body.jobCode),
-                                req.st.db.escape(req.body.positions),
-                                req.st.db.escape(JSON.stringify(jobType)),
-                                req.st.db.escape(req.body.jobDescription),
-                                req.st.db.escape(req.body.expFrom),
-                                req.st.db.escape(req.body.expTo),
-                                req.st.db.escape(req.body.targetDate),
-                                req.st.db.escape(JSON.stringify(primarySkills)),
-                                req.st.db.escape(JSON.stringify(secondarySkills)),
-                                req.st.db.escape(JSON.stringify(educationSpecialization)),
-                                req.st.db.escape(req.body.keywords),
-                                req.st.db.escape(JSON.stringify(currency)),
-                                req.st.db.escape(req.body.minSalary),
-                                req.st.db.escape(req.body.maxSalary),
-                                req.st.db.escape(JSON.stringify(scale)),
-                                req.st.db.escape(JSON.stringify(duration)),
-                                req.st.db.escape(req.body.notes),
-                                req.st.db.escape(req.body.senderNotes),
-                                req.st.db.escape(req.body.approverNotes),
-                                req.st.db.escape(req.body.positionsFilled),
-                                req.st.db.escape(req.body.receiverNotes),
-                                req.st.db.escape(req.body.changeLog),
-                                req.st.db.escape(req.body.groupId),
-                                req.st.db.escape(req.body.learnMessageId),
-                                req.st.db.escape(req.body.accessUserType),
-                                req.st.db.escape(req.body.approverCount),
-                                req.st.db.escape(req.body.receiverCount),
-                                req.st.db.escape(JSON.stringify(members)),      // members json with contains roles for diff members
-                                req.st.db.escape(JSON.stringify(locations)),        // newly added location
-                                req.st.db.escape(JSON.stringify(memberInterviewRound)),
-                                req.st.db.escape(JSON.stringify(attachmentList)),
-                                req.st.db.escape(req.body.status),
-                                req.st.db.escape(req.body.statusTitle),
-                                req.st.db.escape(req.body.expectedJoining),
-                                req.st.db.escape(req.body.jdTemplateFlag),
-                                req.st.db.escape(req.body.jdTemplateId),
-                                req.st.db.escape(DBSecretKey),
-                                req.st.db.escape(req.body.jdAttachment),
-                                req.st.db.escape(JSON.stringify(req.body.industry || [])),
-                                req.st.db.escape(req.body.timestamp),
-                                req.st.db.escape(req.body.currentTimeStamp),
-                                req.st.db.escape(JSON.stringify(functionalAreas)),
-                                req.st.db.escape(req.body.postJobCareerPortal),
-                                req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
-                                req.st.db.escape(req.body.statusNotes || "")
-                            ];
+                            var branchList = req.body.branchList;
+                            if (typeof (branchList) == "string") {
+                                branchList = JSON.parse(branchList);
+                            }
 
-                            var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
-                            console.log(procQuery);
+                            if (!branchList) {
+                                branchList = {};
+                            }
 
-                            req.db.query(procQuery, function (err, results) {
-                                console.log(err);
+                            var jobTitle = req.body.jobTitle;
+                            if (typeof (jobTitle) == "string") {
+                                jobTitle = JSON.parse(jobTitle);
+                            }
 
-                                if (!err && results && results[0]) {
-                                    // senderGroupId = results[0][0].senderId;
-                                    // notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                                    //     senderName: results[0][0].senderName
-                                    // });
+                            if (!jobTitle) {
+                                jobTitle = {};
+                            }
 
-                                    // for (var i = 0; i < results[1].length; i++) {
-                                    //     if (notificationTemplaterRes.parsedTpl) {
-                                    //         notification.publish(
-                                    //             results[1][i].receiverId,
-                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    //             (results[0][0].groupName) ? (results[0][0].groupName) : '',
-                                    //             results[0][0].senderId,
-                                    //             notificationTemplaterRes.parsedTpl,
-                                    //             31,
-                                    //             0, (results[1][i].iphoneId) ? (results[1][i].iphoneId) : '',
-                                    //             (results[1][i].GCM_Id) ? (results[1][i].GCM_Id) : '',
-                                    //             0,
-                                    //             0,
-                                    //             0,
-                                    //             0,
-                                    //             1,
-                                    //             moment().format("YYYY-MM-DD HH:mm:ss"),
-                                    //             '',
-                                    //             0,
-                                    //             0,
-                                    //             null,
-                                    //             '',
-                                    //             /** Data object property to be sent with notification **/
-                                    //             {
-                                    //                 messageList: {
-                                    //                     messageId: results[1][i].messageId,
-                                    //                     message: results[1][i].message,
-                                    //                     messageLink: results[1][i].messageLink,
-                                    //                     createdDate: results[1][i].createdDate,
-                                    //                     messageType: results[1][i].messageType,
-                                    //                     messageStatus: results[1][i].messageStatus,
-                                    //                     priority: results[1][i].priority,
-                                    //                     senderName: results[1][i].senderName,
-                                    //                     senderId: results[1][i].senderId,
-                                    //                     receiverId: results[1][i].receiverId,
-                                    //                     groupId: results[1][i].senderId,
-                                    //                     groupType: 2,
-                                    //                     transId: results[1][i].transId,
-                                    //                     formId: results[1][i].formId,
-                                    //                     currentStatus: results[1][i].currentStatus,
-                                    //                     currentTransId: results[1][i].currentTransId,
-                                    //                     parentId: results[1][i].parentId,
-                                    //                     accessUserType: results[1][i].accessUserType,
-                                    //                     heUserId: results[1][i].heUserId,
-                                    //                     formData: (results[1] && results[1][i] && results[1][i].formDataJSON) ? JSON.parse(results[1][i].formDataJSON) : {}
+                            if (req.body.jdTemplateFlag != 1) {
+                                if (!req.body.jobCode) {
+                                    error.jobCode = 'Invalid jobCode';
+                                    validationFlag *= false;
+                                }
+                            }
+                            if (!req.body.positions) {
+                                error.positions = 'Positions is not specified';
+                                validationFlag *= false;
+                            }
+                            var jobType = req.body.jobType;
+                            if (typeof (jobType) == "string") {
+                                jobType = JSON.parse(jobType);
+                            }
+                            if (!req.body.jobType) {
+                                error.jobType = 'Invalid jobType';
+                                validationFlag *= false;
+                            }
+                            var educationSpecialization = req.body.educationSpecialization;
+                            if (typeof (educationSpecialization) == "string") {
+                                educationSpecialization = JSON.parse(educationSpecialization);
+                            }
+                            if (!educationSpecialization) {
+                                educationSpecialization = [];
+                            }
+                            var primarySkills = req.body.primarySkills;
+                            if (typeof (primarySkills) == "string") {
+                                primarySkills = JSON.parse(primarySkills);
+                            }
+                            if (!primarySkills) {
+                                primarySkills = [];
+                            }
+                            var secondarySkills = req.body.secondarySkills;
+                            if (typeof (secondarySkills) == "string") {
+                                secondarySkills = JSON.parse(secondarySkills);
+                            }
+                            if (!secondarySkills) {
+                                secondarySkills = [];
+                            }
+                            var members = req.body.members;
+                            if (typeof (members) == "string") {
+                                members = JSON.parse(members);
+                            }
+                            if (!members) {
+                                members = [];
+                            }
+                            var currency = req.body.currency;
+                            if (typeof (currency) == "string") {
+                                currency = JSON.parse(currency);
+                            }
+                            if (!currency) {
+                                currency = {};
+                            }
+                            var scale = req.body.scale;
+                            if (typeof (scale) == "string") {
+                                scale = JSON.parse(scale);
+                            }
+                            if (!scale) {
+                                scale = {};
+                            }
+                            var duration = req.body.duration;
+                            if (typeof (duration) == "string") {
+                                duration = JSON.parse(duration);
+                            }
+                            if (!duration) {
+                                duration = {};
+                            }
+                            var locations = req.body.locations;
+                            if (typeof (locations) == "string") {
+                                locations = JSON.parse(locations);
+                            }
+                            if (!locations) {
+                                locations = [];
+                            }
+                            var memberInterviewRound = req.body.memberInterviewRound;
+                            if (typeof (memberInterviewRound) == "string") {
+                                memberInterviewRound = JSON.parse(memberInterviewRound);
+                            }
+                            if (!memberInterviewRound) {
+                                memberInterviewRound = [];
+                            }
+                            var attachmentList = req.body.attachmentList;
+                            if (typeof (attachmentList) == "string") {
+                                attachmentList = JSON.parse(attachmentList);
+                            }
+                            if (!attachmentList) {
+                                attachmentList = [];
+                            }
 
-                                    //                 }
-                                    //             },
-                                    //             null,
-                                    //             tokenResult[0].isWhatMate,
-                                    //             results[1][i].secretKey);
-                                    //         console.log('postNotification : notification for compose_message is sent successfully');
-                                    //     }
-                                    //     else {
-                                    //         console.log('Error in parsing notification compose_message template - ',
-                                    //             notificationTemplaterRes.error);
-                                    //         console.log('postNotification : notification for compose_message is not sent successfully');
-                                    //     }
-                                    // }
+                            var functionalAreas = req.body.functionalAreas;
+                            if (typeof (functionalAreas) == "string") {
+                                functionalAreas = JSON.parse(functionalAreas);
+                            }
+                            if (!functionalAreas) {
+                                functionalAreas = [];
+                            }
 
-                                    notifyMessages.getMessagesNeedToNotify();
-                                    response.status = true;
-                                    if (req.body.jdTemplateFlag == 1) {
-                                        response.message = "Requirement template saved successfully";
-                                    }
-                                    else {
-                                        response.message = "Requirement saved successfully";
-                                    }
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                req.body.jdTemplateFlag = (req.body.jdTemplateFlag) ? req.body.jdTemplateFlag : 0;
+                                req.body.parentId = (req.body.parentId) ? req.body.parentId : 0;
+                                req.body.jdTemplateTitle = (req.body.jdTemplateTitle) ? req.body.jdTemplateTitle : "";
+                                req.body.jobDescription = (req.body.jobDescription) ? req.body.jobDescription : "";
+                                req.body.expFrom = (req.body.expFrom) ? req.body.expFrom : 0;
+                                req.body.expTo = (req.body.expTo) ? req.body.expTo : 0;
+                                req.body.targetDate = (req.body.targetDate) ? req.body.targetDate : null;
+                                req.body.keywords = (req.body.keywords) ? req.body.keywords : "";
+                                req.body.minSalary = (req.body.minSalary) ? req.body.minSalary : 0;
+                                req.body.maxSalary = (req.body.maxSalary) ? req.body.maxSalary : 0;
+                                req.body.notes = (req.body.notes) ? req.body.notes : "";
+                                req.body.senderNotes = (req.body.senderNotes) ? req.body.senderNotes : "";
+                                req.body.approverNotes = (req.body.approverNotes) ? req.body.approverNotes : "";
+                                req.body.positionsFilled = (req.body.positionsFilled) ? req.body.positionsFilled : 0;
+                                req.body.receiverNotes = (req.body.receiverNotes) ? req.body.receiverNotes : "";
+                                req.body.changeLog = (req.body.changeLog) ? req.body.changeLog : "";
+                                req.body.groupId = (req.body.groupId) ? req.body.groupId : 0;
+                                req.body.learnMessageId = (req.body.learnMessageId) ? req.body.learnMessageId : 0;
+                                req.body.accessUserType = (req.body.accessUserType) ? req.body.accessUserType : 0;
+                                req.body.approverCount = (req.body.approverCount) ? req.body.approverCount : 0;
+                                req.body.receiverCount = (req.body.receiverCount) ? req.body.receiverCount : 0;
+                                req.body.status = req.body.status ? req.body.status : 1;   // new requirement default status to pending
+                                req.body.statusTitle = req.body.statusTitle ? req.body.statusTitle : 'Pending';
+                                req.body.expectedJoining = (req.body.expectedJoining) ? req.body.expectedJoining : 0;
+                                req.body.jdTemplateId = (req.body.jdTemplateId) ? req.body.jdTemplateId : 0;
+                                req.body.jdAttachment = (req.body.jdAttachment) ? req.body.jdAttachment : '';
+                                req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
+                                req.body.postJobCareerPortal = (req.body.postJobCareerPortal) ? req.body.postJobCareerPortal : 0;
 
-                                    response.error = null;
-                                    response.data = {
-                                        messageList: {
-                                            messageId: results[0][0].messageId,
-                                            message: results[0][0].message,
-                                            messageLink: results[0][0].messageLink,
-                                            createdDate: results[0][0].createdDate,
-                                            messageType: results[0][0].messageType,
-                                            messageStatus: results[0][0].messageStatus,
-                                            priority: results[0][0].priority,
-                                            senderName: results[0][0].senderName,
-                                            senderId: results[0][0].senderId,
-                                            receiverId: results[0][0].receiverId,
-                                            transId: results[0][0].transId,
-                                            formId: results[0][0].formId,
-                                            groupId: req.body.groupId,
-                                            currentStatus: results[0][0].currentStatus,
-                                            currentTransId: results[0][0].currentTransId,
-                                            localMessageId: req.body.localMessageId,
-                                            parentId: results[0][0].parentId,
-                                            accessUserType: results[0][0].accessUserType,
-                                            heUserId: results[0][0].heUserId,
-                                            formData: (results[0] && results[0][0] && results[0][0].formDataJSON) ? JSON.parse(results[0][0].formDataJSON) : {}
-                                        },
-                                        requirementList: results[2]
-                                    };
-                                    if (isWeb == 0) {
+                                branchList = [branchList];
+
+                                var procParams = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.body.heMasterId),
+                                    req.st.db.escape(req.body.jdTemplateTitle),
+                                    req.st.db.escape(req.body.parentId),
+                                    req.st.db.escape(req.body.purpose),
+                                    req.st.db.escape(JSON.stringify(heDepartment)),
+                                    req.st.db.escape(JSON.stringify(contactList)),
+                                    req.st.db.escape(JSON.stringify(branchList)),
+                                    req.st.db.escape(JSON.stringify(jobTitle)),
+                                    req.st.db.escape(req.body.jobCode),
+                                    req.st.db.escape(req.body.positions),
+                                    req.st.db.escape(JSON.stringify(jobType)),
+                                    req.st.db.escape(req.body.jobDescription),
+                                    req.st.db.escape(req.body.expFrom),
+                                    req.st.db.escape(req.body.expTo),
+                                    req.st.db.escape(req.body.targetDate),
+                                    req.st.db.escape(JSON.stringify(primarySkills)),
+                                    req.st.db.escape(JSON.stringify(secondarySkills)),
+                                    req.st.db.escape(JSON.stringify(educationSpecialization)),
+                                    req.st.db.escape(req.body.keywords),
+                                    req.st.db.escape(JSON.stringify(currency)),
+                                    req.st.db.escape(req.body.minSalary),
+                                    req.st.db.escape(req.body.maxSalary),
+                                    req.st.db.escape(JSON.stringify(scale)),
+                                    req.st.db.escape(JSON.stringify(duration)),
+                                    req.st.db.escape(req.body.notes),
+                                    req.st.db.escape(req.body.senderNotes),
+                                    req.st.db.escape(req.body.approverNotes),
+                                    req.st.db.escape(req.body.positionsFilled),
+                                    req.st.db.escape(req.body.receiverNotes),
+                                    req.st.db.escape(req.body.changeLog),
+                                    req.st.db.escape(req.body.groupId),
+                                    req.st.db.escape(req.body.learnMessageId),
+                                    req.st.db.escape(req.body.accessUserType),
+                                    req.st.db.escape(req.body.approverCount),
+                                    req.st.db.escape(req.body.receiverCount),
+                                    req.st.db.escape(JSON.stringify(members)),      // members json with contains roles for diff members
+                                    req.st.db.escape(JSON.stringify(locations)),        // newly added location
+                                    req.st.db.escape(JSON.stringify(memberInterviewRound)),
+                                    req.st.db.escape(JSON.stringify(attachmentList)),
+                                    req.st.db.escape(req.body.status),
+                                    req.st.db.escape(req.body.statusTitle),
+                                    req.st.db.escape(req.body.expectedJoining),
+                                    req.st.db.escape(req.body.jdTemplateFlag),
+                                    req.st.db.escape(req.body.jdTemplateId),
+                                    req.st.db.escape(DBSecretKey),
+                                    req.st.db.escape(req.body.jdAttachment),
+                                    req.st.db.escape(JSON.stringify(req.body.industry || [])),
+                                    req.st.db.escape(req.body.timestamp),
+                                    req.st.db.escape(req.body.currentTimeStamp),
+                                    req.st.db.escape(JSON.stringify(functionalAreas)),
+                                    req.st.db.escape(req.body.postJobCareerPortal),
+                                    req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
+                                    req.st.db.escape(req.body.statusNotes || "")
+                                ];
+
+                                var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
+                                console.log(procQuery);
+
+                                req.db.query(procQuery, function (err, results) {
+                                    console.log(err);
+
+                                    if (!err && results && results[0]) {
+
+                                        notifyMessages.getMessagesNeedToNotify();
+                                        response.status = true;
+                                        if (req.body.jdTemplateFlag == 1) {
+                                            response.message = "Requirement template saved successfully";
+                                        }
+                                        else {
+                                            response.message = "Requirement saved successfully";
+                                        }
+
+                                        response.error = null;
+                                        response.data = {
+                                            messageList: {
+                                                messageId: results[0][0].messageId,
+                                                message: results[0][0].message,
+                                                messageLink: results[0][0].messageLink,
+                                                createdDate: results[0][0].createdDate,
+                                                messageType: results[0][0].messageType,
+                                                messageStatus: results[0][0].messageStatus,
+                                                priority: results[0][0].priority,
+                                                senderName: results[0][0].senderName,
+                                                senderId: results[0][0].senderId,
+                                                receiverId: results[0][0].receiverId,
+                                                transId: results[0][0].transId,
+                                                formId: results[0][0].formId,
+                                                groupId: req.body.groupId,
+                                                currentStatus: results[0][0].currentStatus,
+                                                currentTransId: results[0][0].currentTransId,
+                                                localMessageId: req.body.localMessageId,
+                                                parentId: results[0][0].parentId,
+                                                accessUserType: results[0][0].accessUserType,
+                                                heUserId: results[0][0].heUserId,
+                                                formData: (results[0] && results[0][0] && results[0][0].formDataJSON) ? JSON.parse(results[0][0].formDataJSON) : {}
+                                            },
+                                            requirementList: results[2]
+                                        };
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
                                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
                                         });
-                                    }
+                                }
                                     else {
-                                        res.status(200).json(response);
-                                    }
-                                }
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while saving requirement template";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
+                                        response.status = false;
+                                        response.message = "Error while saving requirement template";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
 
-                                }
-                            });
+                                    }
+                                });
+                            }
+                        }
+
+                        if (req.query.isTallint) {
+                            req.body.hcUserId = req.query.HCUserId;
+
+                            if (!req.body.hcUserId) {
+                                error.hcUserId = 'Invalid hcUserId';
+                                validationFlag *= false;
+                            }
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                // pass api type to below function
+                                req.query.type = 4;   // dashboard api
+
+                                fetchAPiUrl(req, function (err, urlData) {
+                                    if (!err && urlData && urlData.apiPath) {
+
+                                        // use this after getting url from tallint
+                                        var url = urlData.apiPath;
+                                        request({
+                                            url: url,
+                                            method: urlData.method,
+                                            json: true,   // <--Very important!!!
+                                            body: req.body
+                                        }, function (err, resp, result) {   // result contains tallint response data
+                                            console.log("error", err);
+                                            try {
+                                                if (!err && result && result.reqdata) {
+                                                    //save in whatmate if data is saved in tallint
+                                                    requirementWhatmateSave();
+                                                }
+                                                else {
+                                                    // return error to front end
+                                                    response.status = false;
+                                                    response.message = "Data Not saved in tallint";
+                                                    response.error = err;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                }
+                                            }
+                                            catch (ex) {
+                                                console.log(ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    } else if (!err) {
+                                        response.status = true;
+                                        response.message = "Tallint api not configured";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(error_response);
+                                    } else {
+                                        response.status = false;
+                                        response.message = "Error while getting data";
+                                        response.error = err;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                })
+                            }
+                        }
+                        else {
+                            // call whatmate api here
+                            requirementWhatmateSave();
                         }
                     });
                 }
@@ -2084,7 +2092,6 @@ jobCtrl.saveRequirement = function (req, res, next) {
             else {
                 res.status(401).json(response);
             }
-
         });
     }
 };
@@ -2381,7 +2388,7 @@ jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
                             result[19][0].industry = (result[19] && result[19][0]) && JSON.parse(result[19][0].industry) ? JSON.parse(result[19][0].industry) : [];
                             result[19][0].attachmentList = (result[19] && result[19][0]) && result[19][0].attachmentList && JSON.parse(result[19][0].attachmentList) ? JSON.parse(result[19][0].attachmentList) : [];
                             result[19][0].functionalAreas = (result[19] && result[19][0] && result[19][0].functionalAreas && JSON.parse(result[19][0].functionalAreas)) ? JSON.parse(result[19][0].functionalAreas) : [];
-                            result[19][0].jobLocation = (result[19] && result[19][0] && result[19][0].jobLocation &&  JSON.parse(result[19][0].jobLocation)) ? JSON.parse(result[19][0].jobLocation) : [];
+                            result[19][0].jobLocation = (result[19] && result[19][0] && result[19][0].jobLocation && JSON.parse(result[19][0].jobLocation)) ? JSON.parse(result[19][0].jobLocation) : [];
                         }
 
                         if (result[18] && result[18][0]) {
@@ -2436,9 +2443,9 @@ jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
                             interviewRoundList: [],
                             status: [],
                             requirementList: [],
-                            jdTemplateList : [],
-                            followUpNotes : [],
-                            requirementCompleteDetails : {}
+                            jdTemplateList: [],
+                            followUpNotes: [],
+                            requirementCompleteDetails: {}
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {

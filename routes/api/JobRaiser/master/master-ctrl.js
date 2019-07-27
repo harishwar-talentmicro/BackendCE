@@ -19,8 +19,47 @@ var DBSecretKey = CONFIG.DB.secretKey;
 
 var masterCtrl = {};
 var error = {};
+var logger = require('../error-logger/error-log.js');
+var request = require('request');
+
+// whatmate-tallint integration function
+var fetchAPiUrl = function (req, callback) {
+
+    var inputs = [
+        req.st.db.escape(req.query.token),
+        req.st.db.escape(req.query.heMasterId),
+        req.st.db.escape(req.query.type)
+    ];
+
+    var procQuery = 'call wm_tallint_get_apiUrlData(' + inputs.join(',') + ')';
+    console.log(procQuery);
+    req.db.query(procQuery, function (err, result) {
+        if (!err && result && result[0] && result[0][0]) {
+            callback(err, result[0][0]);
+        }
+        else if (!err) {
+            callback(err, result[0][0]);
+        }
+        else {
+            callback(err, null);
+        }
+    });
+}
 
 masterCtrl.getReqMasterData = function (req, res, next) {
+
+
+    var error_logger = {
+        details: 'dataMigration.tallint_manpower_dashboard'
+    }
+
+    var error_response = {
+        status: false,
+        message: "Some error occurred!",
+        error: null,
+        data: null
+    }
+
     var response = {
         status: false,
         message: "Invalid token",
@@ -45,88 +84,186 @@ masterCtrl.getReqMasterData = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.query.purpose || 1)
-                ];
 
-                var procQuery = 'CALL wm_get_jobtype_curr_scale_duration( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    console.log(req.query.isWeb);
+                if (req.query.isTallint) {
 
-                    var isWeb = req.query.isWeb;
-                    if (!err && result) {
-                        response.status = true;
-                        response.message = "Master data loaded successfully";
-                        response.error = null;
-                        var intRoundList = [];
-                        if (isWeb) {
-                            intRoundList = result[8] ? result[8] : [];
-                        }
-                        else {
-                            intRoundList = result[13] ? result[13] : [];
-                        }
+                    // if (!req.query.HCUserId) {
+                    //     error.HCUserId = 'Invalid HCUserId';
+                    //     validationFlag *= false;
+                    // }
 
-                        response.data = {
-                            heDepartment: (result && result[0]) ? result[0] : [],
-                            jobType: (result && result[1]) ? result[1] : [],
-                            currency: (result && result[2]) ? result[2] : [],
-                            scale: (result && result[3]) ? result[3] : [],
-                            duration: (result && result[4]) ? result[4] : [],
-                            country: (result && result[5]) ? result[5] : [],
-                            jobTitle: (result && result[6]) ? result[6] : [],
-                            roleList: result[7] ? result[7] : [],
-                            interviewRoundList: intRoundList,
-                            status: result[9] ? result[9] : [],
-                            requirementList: result[10] ? result[10] : [],
-                            portalList: result[11] ? result[11] : [],
-                            reasons: result[12] ? result[12] : [],
-                            teamMembers: result[14] ? result[14] : [],
-                            industry: result[15] ? result[15] : [],
-                            functionalAreas: result[16] ? result[16] : []
-
-                        };
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
-                    }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {
-                            heDepartment: [],
-                            jobType: [],
-                            currency: [],
-                            scale: [],
-                            duration: [],
-                            country: [],
-                            jobTitle: [],
-                            roleList: [],
-                            interviewRoundList: [],
-                            status: [],
-                            requirementList: []
-                        };
-                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                            res.status(200).json(response);
-                        });
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while loading master data";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        // pass api type to below function
+                        req.query.type = 2;   // dashboard api
+
+                        fetchAPiUrl(req, function (err, urlData) {
+                            if (!err && urlData && urlData.apiPath) {
+
+                                // use this after getting url from tallint
+                                var url = urlData.apiPath;
+                                request({
+                                    url: url,
+                                    method: urlData.method,
+                                    json: true,   // <--Very important!!!
+                                    // body: dbResponse
+                                }, function (err, resp, result) {   // result contains tallint response data
+                                    console.log("error", err);
+                                    try {
+                                        if (!err && result) {
+
+                                            response.status = true;
+                                            response.message = "Tallint master data loaded successfully";
+                                            response.error = null;
+                                            response.data = result.data;
+
+                                            // response.data = {
+                                            //     heDepartment: (result && result[0]) ? result[0] : [],
+                                            //     jobType: (result && result[1]) ? result[1] : [],
+                                            //     currency: (result && result[2]) ? result[2] : [],
+                                            //     scale: (result && result[3]) ? result[3] : [],
+                                            //     duration: (result && result[4]) ? result[4] : [],
+                                            //     country: (result && result[5]) ? result[5] : [],
+                                            //     jobTitle: (result && result[6]) ? result[6] : [],
+                                            //     roleList: result[7] ? result[7] : [],
+                                            //     interviewRoundList: intRoundList,
+                                            //     status: result[9] ? result[9] : [],
+                                            //     requirementList: result[10] ? result[10] : [],
+                                            //     portalList: result[11] ? result[11] : [],
+                                            //     reasons: result[12] ? result[12] : [],
+                                            //     teamMembers: result[14] ? result[14] : [],
+                                            //     industry: result[15] ? result[15] : [],
+                                            //     functionalAreas: result[16] ? result[16] : []
+
+                                            // };
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+                                        }
+                                        else if (!err) {
+                                            response.status = true;
+                                            response.message = "no results found";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(200).json(response);
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Error while getting data";
+                                            response.error = null;
+                                            response.data = null;
+                                            res.status(500).json(response);
+                                        }
+
+                                    } catch (ex) {
+                                        console.log(ex);
+                                        error_logger.error = ex;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+
+                                })
+                            } else {
+                                response.status = false;
+                                response.message = "Error while getting data";
+                                response.error = err;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        })
                     }
-                });
+                } else {
+
+                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.query.purpose || 1)
+                    ];
+
+                    var procQuery = 'CALL wm_get_jobtype_curr_scale_duration( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+                        console.log(req.query.isWeb);
+
+                        var isWeb = req.query.isWeb;
+                        if (!err && result) {
+                            response.status = true;
+                            response.message = "Master data loaded successfully";
+                            response.error = null;
+                            var intRoundList = [];
+                            if (isWeb) {
+                                intRoundList = result[8] ? result[8] : [];
+                            }
+                            else {
+                                intRoundList = result[13] ? result[13] : [];
+                            }
+
+                            response.data = {
+                                heDepartment: (result && result[0]) ? result[0] : [],
+                                jobType: (result && result[1]) ? result[1] : [],
+                                currency: (result && result[2]) ? result[2] : [],
+                                scale: (result && result[3]) ? result[3] : [],
+                                duration: (result && result[4]) ? result[4] : [],
+                                country: (result && result[5]) ? result[5] : [],
+                                jobTitle: (result && result[6]) ? result[6] : [],
+                                roleList: result[7] ? result[7] : [],
+                                interviewRoundList: intRoundList,
+                                status: result[9] ? result[9] : [],
+                                requirementList: result[10] ? result[10] : [],
+                                portalList: result[11] ? result[11] : [],
+                                reasons: result[12] ? result[12] : [],
+                                teamMembers: result[14] ? result[14] : [],
+                                industry: result[15] ? result[15] : [],
+                                functionalAreas: result[16] ? result[16] : []
+
+                            };
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No results found";
+                            response.error = null;
+                            response.data = {
+                                heDepartment: [],
+                                jobType: [],
+                                currency: [],
+                                scale: [],
+                                duration: [],
+                                country: [],
+                                jobTitle: [],
+                                roleList: [],
+                                interviewRoundList: [],
+                                status: [],
+                                requirementList: []
+                            };
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while loading master data";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
             }
             else {
                 res.status(401).json(response);
@@ -551,78 +688,168 @@ masterCtrl.getbranchList = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heDepartmentId)
-
-
-                ];
-                var procQuery = 'CALL WM_get_branches( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, results) {
-                    console.log(err);
-                    var isWeb = req.query.isWeb;
-                    if (!err && results) {
-                        response.status = true;
-                        response.message = "branchList loaded successfully";
-                        response.error = null;
-                        var output = [];
-                        for (var i = 0; i < results[3].length; i++) {
-                            results[3][i].contactList = results[3][i].contactList ? JSON.parse(results[3][i].contactList) : [];
-                        };
-
-                        response.data = {
-                            branchList: results[0] ? results[0] : [],
-                            detailedBranchList: results[1] ? results[1] : [],
-                            wBranchList: results[2] ? results[2] : [],
-                            branch_contacts: results[3] ? results[3] : []
-                        };
-
-                        if (req.query.isWeb == 1) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
-                        }
-                        else {
-                            res.status(200).json(response);
-                        }
+                if (req.query.isTallint) {
+                    if (!req.query.HCUserId) {
+                        error.HCUserId = 'Invalid HCUserId';
+                        validationFlag *= false;
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "Branches does not exist";
-                        response.error = null;
-                        response.data = {
-                            branchList: [],
-                            detailedBranchList: [],
-                            wBranchList: [],
-                            branch_contacts: []
-                        };
-                        if (req.query.isWeb == 1) {
-                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                            zlib.gzip(buf, function (_, result) {
-                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                res.status(200).json(response);
-                            });
-                        }
-                        else {
-                            res.status(200).json(response);
-                        }
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while getting branchlist";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        // pass api type to below function
+                        req.query.type = 5;   // dashboard api
+
+                        fetchAPiUrl(req, function (err, urlData) {
+                            if (!err && urlData && urlData.apiPath) {
+
+                                // use this after getting url from tallint
+                                var url = urlData.apiPath;
+                                request({
+                                    url: url,
+                                    method: urlData.method,
+                                    json: true,   // <--Very important!!!
+                                    // body: dbResponse
+                                }, function (err, resp, result) {   // result contains tallint response data
+                                    console.log("error", err);
+                                    try {
+                                        if (!err && result) {
+                                            response.status = true;
+                                            response.message = "Data loaded successfully";
+                                            response.error = null;
+                                            response.data = result;
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                try {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                }
+                                                catch (ex) {
+                                                    console.log(ex);
+                                                    error_logger.error = ex;
+                                                    logger(req, error_logger);
+                                                    res.status(500).json(error_response);
+                                                }
+                                            });
+                                        }
+                                        else if (!err) {
+                                            response.status = true;
+                                            response.message = "no results found";
+                                            response.error = null;
+                                            response.data = {
+                                                branchList: [],
+                                                detailedBranchList: [],
+                                                wBranchList: [],
+                                                branch_contacts: []
+                                            };
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                try {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                }
+                                                catch (ex) {
+                                                    console.log(ex);
+                                                    error_logger.error = ex;
+                                                    logger(req, error_logger);
+                                                    res.status(500).json(error_response);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Error while getting data";
+                                            response.error = err;
+                                            response.data = null;
+                                            res.status(500).json(response);
+                                        }
+                                    }
+                                    catch (ex) {
+                                        console.log(ex);
+                                        error_logger.error = ex;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+                                });
+                            } else {
+                                response.status = false;
+                                response.message = "Tallint url not configured";
+                                response.error = err;
+                                response.data = null;
+                                res.status(500).json(response);
+                            }
+                        })
                     }
+                }
+                else {
+                    req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                    req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                });
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heDepartmentId)
 
+
+                    ];
+                    var procQuery = 'CALL WM_get_branches( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, results) {
+                        console.log(err);
+                        var isWeb = req.query.isWeb;
+                        if (!err && results) {
+                            response.status = true;
+                            response.message = "branchList loaded successfully";
+                            response.error = null;
+                            var output = [];
+                            for (var i = 0; i < results[3].length; i++) {
+                                results[3][i].contactList = results[3][i].contactList ? JSON.parse(results[3][i].contactList) : [];
+                            };
+
+                            response.data = {
+                                branchList: results[0] ? results[0] : [],
+                                detailedBranchList: results[1] ? results[1] : [],
+                                wBranchList: results[2] ? results[2] : [],
+                                branch_contacts: results[3] ? results[3] : []
+                            };
+
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "Branches does not exist";
+                            response.error = null;
+                            response.data = {
+                                branchList: [],
+                                detailedBranchList: [],
+                                wBranchList: [],
+                                branch_contacts: []
+                            };
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting branchlist";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+
+                    });
+                }
             }
             else {
                 res.status(401).json(response);
@@ -891,7 +1118,8 @@ masterCtrl.savetemplate = function (req, res, next) {
                             req.st.db.escape(req.body.interviewerFlag || 0),
                             req.st.db.escape(req.body.resumeFileName || ""),
                             req.st.db.escape(req.body.attachResumeFlag || 0),
-                            req.st.db.escape(JSON.stringify(req.body.trackerTemplate || {}))
+                            req.st.db.escape(JSON.stringify(req.body.trackerTemplate || {})),
+                            req.st.db.escape(req.body.isSingleMail || 0)
                         ];
                         var procQuery = 'CALL WM_save_1010_mailTemplate( ' + inputs.join(',') + ')';
                         console.log(procQuery);
@@ -1488,7 +1716,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                if (req.query.isWeb) {
+                if (req.query.isWeb == 1) {
                     if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                         var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
 
@@ -1496,6 +1724,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                         zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                             req.body = JSON.parse(resultDecrypt.toString('utf-8'));
 
+                            var validationFlag = true;
 
                             if (!validationFlag) {
                                 response.error = error;
@@ -1560,21 +1789,11 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                             requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
                                             stageList: results[3] && results[3][0] ? results[3] : []
                                         };
-
-                                        if (req.query.isWeb == 0) {
-                                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                            // zlib.gzip(buf, function (_, result) {
-                                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
-                                            //});
-                                        }
-                                        else {
-                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                            zlib.gzip(buf, function (_, result) {
-                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                                res.status(200).json(response);
-                                            });
-                                        }
+                                        });
 
                                     }
                                     else if (!err) {
@@ -1586,21 +1805,11 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                             stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
 
                                         };
-                                        if (req.query.isWeb == 0) {
-                                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                            // zlib.gzip(buf, function (_, result) {
-                                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
-                                            // });
-                                        }
-                                        else {
-                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                            zlib.gzip(buf, function (_, result) {
-                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                                res.status(200).json(response);
-                                            });
-                                        }
-
+                                        });
                                     }
                                     else {
                                         response.status = false;
@@ -1622,117 +1831,305 @@ masterCtrl.getRequirementView = function (req, res, next) {
                     }
                 }
                 else {
-                    if (!validationFlag) {
-                        response.error = error;
-                        response.message = 'Please check the errors';
-                        res.status(400).json(response);
-                        console.log(response);
+
+                    if (req.query.isTallint) {
+                        var validationFlag = true;
+
+                        if (!req.query.HCUserId) {
+                            error.HCUserId = 'Invalid HCUserId';
+                            validationFlag *= false;
+                        }
+
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            // pass api type to below function
+                            req.query.type = 6;   // requirement view
+                            console.log("Tallint here")
+                            fetchAPiUrl(req, function (err, urlData) {
+                                console.log(err);
+                                if (!err && urlData && urlData.apiPath) {
+
+                                    // use this after getting url from tallint
+                                    var url = urlData.apiPath + 'status=' + req.query.status + '&startpage=' + req.query.startPage + '&limit=' + req.query.limit;
+                                    console.log(url);
+                                    request({
+                                        url: url,
+                                        method: urlData.method,
+                                        json: true,   // <--Very important!!!
+                                        // body: req.body
+                                    }, function (err, resp, result) {   // result contains tallint response data
+                                        console.log("error", err);
+                                        try {
+                                            if (!err && result && result.data) {
+                                                var requirementView = [];
+                                                if (result.data && result.data.requirementList && result.data.requirementList.length) {
+                                                    var reqList = result.data.requirementList;
+                                                    for (var i = 0; i < reqList.length; i++) {
+                                                        var obj = {};
+                                                        obj.parentId = reqList[i].ReqId;
+                                                        obj.heDepartmentId = reqList[i].hedepartmentId ? reqList[i].hedepartmentId : 0;
+                                                        obj.positions = reqList[i].positions ? reqList[i].positions : 0;
+                                                        obj.positionsFilled = reqList[i].positionsFilled ? reqList[i].positionsFilled : 0;
+                                                        obj.departmentTitle = reqList[i].heDepartmentTitle ? reqList[i].heDepartmentTitle : "";
+                                                        obj.jobCode = reqList[i].jobCode ? reqList[i].jobCode : "";
+                                                        obj.jobtitleId = reqList[i].jobtitleId ? reqList[i].jobtitleId : 0;
+                                                        obj.title = reqList[i].jobTitle ? reqList[i].jobTitle : "";
+                                                        obj.jobtypeid = reqList[i].jobtypeid ? reqList[i].jobtypeid : 0;
+                                                        obj.jobType = reqList[i].jobType ? reqList[i].jobType : "";
+                                                        obj.jobDescription = reqList[i].jobDescription ? reqList[i].jobDescription : "";
+                                                        obj.keywords = reqList[i].keywords ? reqList[i].keywords : "";
+                                                        obj.creatorName = reqList[i].creatorName ? reqList[i].creatorName : "";
+                                                        obj.createdDate = reqList[i].createdDate ? moment(reqList[i].createdDate).format("YYYY-MM-DD HH:mm:ss") : null;
+
+                                                        var stageDetail = [];
+                                                        stageDetail.push({
+                                                            stageId: reqList[i].screeningStageId ? reqList[i].screeningStageId : 0,
+                                                            title: reqList[i].screeningStage ? reqList[i].screeningStage : "",
+                                                            applicant: reqList[i].screeningCount ? reqList[i].screeningCount : 0,
+                                                            colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                        }, {
+                                                                stageId: reqList[i].shortlistStageId ? reqList[i].shortlistStageId : 0,
+                                                                title: reqList[i].shortlistStage ? reqList[i].shortlistStage : "",
+                                                                applicant: reqList[i].shortlistCount ? reqList[i].shortlistCount : 0,
+                                                                colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            }, {
+                                                                stageId: reqList[i].interviewStageId ? reqList[i].interviewStageId : 0,
+                                                                title: reqList[i].interviewStage ? reqList[i].interviewStage : "",
+                                                                applicant: reqList[i].interviewCount ? reqList[i].interviewCount : 0,
+                                                                colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            }, {
+                                                                stageId: reqList[i].joinedStageId ? reqList[i].joinedStageId : 0,
+                                                                title: reqList[i].joinedStage ? reqList[i].joinedStage : "",
+                                                                applicant: reqList[i].joinedCount ? reqList[i].joinedCount : 0,
+                                                                colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            }, {
+                                                                stageId: reqList[i].offerStageId ? reqList[i].offerStageId : 0,
+                                                                title: reqList[i].offerStage ? reqList[i].offerStage : "",
+                                                                applicant: reqList[i].offerCount ? reqList[i].offerCount : 0,
+                                                                colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            })
+                                                        obj.stageDetail = stageDetail;
+                                                        requirementView.push(obj);
+                                                    }
+
+                                                    requirementView = requirementView;
+                                                }
+                                                else {
+                                                    requirementView = [];
+                                                }
+
+                                                var stageList = [];
+                                                if (result.data && result.data.stageList && result.data.stageList.length) {
+                                                    var stageListTemp = result.data.stageList;
+                                                    for (var i = 0; i < stageListTemp.length; i++) {
+                                                        stageList.push({
+                                                            stageId: stageListTemp[i].stageLevel ? stageListTemp[i].stageLevel : 0,
+                                                            stageTitle: stageListTemp[i].stageTitle ? stageListTemp[i].stageTitle : "",
+                                                            stageTypeId: stageListTemp[i].stageTypeId ? stageListTemp[i].stageTypeId : stageListTemp[i].stageLevel
+                                                        });
+
+                                                        var statusList = [];
+                                                        var statusListTemp = stageListTemp[i].statusList ? stageListTemp[i].statusList : [];
+                                                        for (var j = 0; j < statusListTemp.length; j++) {
+
+                                                            if (statusListTemp[j].statusId) {
+                                                                statusList.push({
+                                                                    statusId: statusListTemp[j].statusId ? statusListTemp[j].statusId : 0,
+                                                                    statusName: statusListTemp[j].statusName ? statusListTemp[j].statusName : ""
+                                                                })
+                                                            }
+                                                        }
+                                                        stageList.push(statusList);
+                                                    }
+                                                }
+
+                                                var reqCount = 0;
+                                                if (result.data && result.data.count) {
+                                                    reqCount = result.data.count
+                                                }
+
+
+                                                response.status = true;
+                                                response.message = "Data loaded successfully";
+                                                response.error = null;
+                                                response.data = {
+                                                    requirementView: requirementView,
+                                                    requirementCount: reqCount,
+                                                    stageList: stageList
+                                                };
+
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    try {
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    }
+                                                    catch (ex) {
+                                                        console.log(ex);
+                                                        error_logger.error = ex;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                });
+
+                                            }
+                                            else if (!err) {
+                                                response.status = true;
+                                                response.message = "no results found";
+                                                response.error = null;
+                                                response.data = {
+                                                    requirementView: [],
+                                                    requirementCount: 0,
+                                                    stageList: []
+                                                };
+                                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                zlib.gzip(buf, function (_, result) {
+                                                    try {
+                                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                        res.status(200).json(response);
+                                                    }
+                                                    catch (ex) {
+                                                        console.log(ex);
+                                                        error_logger.error = ex;
+                                                        logger(req, error_logger);
+                                                        res.status(500).json(error_response);
+                                                    }
+                                                });
+
+                                            }
+                                            else {
+                                                response.status = false;
+                                                response.message = "Error while getting data";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(500).json(response);
+                                            }
+                                        }
+                                        catch (ex) {
+                                            console.log(ex);
+                                            error_logger.error = ex;
+                                            logger(req, error_logger);
+                                            res.status(500).json(error_response);
+                                        }
+                                    });
+                                } else if (!err) {
+                                    response.status = false;
+                                    response.message = "Tallint api not configured";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                } else {
+                                    response.status = false;
+                                    response.message = "Error while getting data";
+                                    response.error = err;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            })
+                        }
+
                     }
                     else {
-                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                        req.query.status = (req.query.status) ? req.query.status : 0;
-                        req.query.type = (req.query.type) ? req.query.type : 0;
 
-                        var inputs = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.status),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(req.query.type),
-                            req.st.db.escape(req.query.startPage || 0),
-                            req.st.db.escape(req.query.limit || 0),
-                            req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
-                            req.st.db.escape(req.query.search || ""),
-                            req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
-                            req.st.db.escape(req.query.isWeb || 0),
-                            req.st.db.escape(req.body.departmentTitle || ""),
-                            req.st.db.escape(req.body.branchName || ""),
-                            req.st.db.escape(req.body.jobCode || ""),
-                            req.st.db.escape(req.body.jobTitle || ""),
-                            req.st.db.escape(req.body.positions || 0),
-                            req.st.db.escape(req.body.positionsFilled || 0),
-                            req.st.db.escape(req.body.requirementTeam || ""),
-                            req.st.db.escape(req.body.notes || ""),
-                            req.st.db.escape(req.body.offeredCTC || 0),
-                            req.st.db.escape(req.body.joiningDate || null),
-                            req.st.db.escape(req.body.jobType || 0),
-                            req.st.db.escape(req.body.creatorName || ""),
-                            req.st.db.escape(req.body.createdDate || null)
-                        ];
+                        if (!validationFlag) {
+                            response.error = error;
+                            response.message = 'Please check the errors';
+                            res.status(400).json(response);
+                            console.log(response);
+                        }
+                        else {
+                            req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                            req.query.status = (req.query.status) ? req.query.status : 0;
+                            req.query.type = (req.query.type) ? req.query.type : 0;
 
-                        var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, results) {
-                            console.log(err);
+                            var inputs = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.status),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(req.query.type),
+                                req.st.db.escape(req.query.startPage || 0),
+                                req.st.db.escape(req.query.limit || 0),
+                                req.st.db.escape(JSON.stringify(req.body.heDepartmentId || [])),
+                                req.st.db.escape(req.query.search || ""),
+                                req.st.db.escape(JSON.stringify(req.body.webStatusFilter || [])),
+                                req.st.db.escape(req.query.isWeb || 0),
+                                req.st.db.escape(req.body.departmentTitle || ""),
+                                req.st.db.escape(req.body.branchName || ""),
+                                req.st.db.escape(req.body.jobCode || ""),
+                                req.st.db.escape(req.body.jobTitle || ""),
+                                req.st.db.escape(req.body.positions || 0),
+                                req.st.db.escape(req.body.positionsFilled || 0),
+                                req.st.db.escape(req.body.requirementTeam || ""),
+                                req.st.db.escape(req.body.notes || ""),
+                                req.st.db.escape(req.body.offeredCTC || 0),
+                                req.st.db.escape(req.body.joiningDate || null),
+                                req.st.db.escape(req.body.jobType || 0),
+                                req.st.db.escape(req.body.creatorName || ""),
+                                req.st.db.escape(req.body.createdDate || null)
+                            ];
 
-                            if (!err && results && (results[0] || results[1])) {
-                                response.status = true;
-                                response.message = " Requirement View loaded sucessfully";
-                                response.error = null;
-                                var output = [];
-                                for (var i = 0; i < results[0].length; i++) {
-                                    results[0][i].branchList = results[0][i].branchList && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
-                                        results[0][i].contactList = results[0][i].contactList && JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
-                                        results[0][i].stageDetail = results[0][i].stageDetail && JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
-                                        results[0][i].followUpNotes = results[0][i].followUpNotes && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
+                            var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, results) {
+                                console.log(err);
+
+                                if (!err && results && (results[0] || results[1])) {
+                                    response.status = true;
+                                    response.message = " Requirement View loaded sucessfully";
+                                    response.error = null;
+                                    var output = [];
+                                    for (var i = 0; i < results[0].length; i++) {
+                                        results[0][i].branchList = results[0][i].branchList && JSON.parse(results[0][i].branchList) ? JSON.parse(results[0][i].branchList) : [],
+                                            results[0][i].contactList = results[0][i].contactList && JSON.parse(results[0][i].contactList) ? JSON.parse(results[0][i].contactList) : [],
+                                            results[0][i].stageDetail = results[0][i].stageDetail && JSON.parse(results[0][i].stageDetail) ? JSON.parse(results[0][i].stageDetail) : [],
+                                            results[0][i].followUpNotes = results[0][i].followUpNotes && JSON.parse(results[0][i].followUpNotes) ? JSON.parse(results[0][i].followUpNotes) : []
+                                    }
+
+                                    for (var i = 0; i < results[3].length; i++) {
+                                        results[3][i].status = results[3] && results[3][i] && JSON.parse(results[3][i].status) ? JSON.parse(results[3][i].status) : [];
+                                    }
+
+                                    response.data = {
+                                        requirementView: results[0] ? results[0] : [],
+                                        requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
+                                        stageList: results[3] && results[3][0] ? results[3] : []
+                                    };
+
+                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    zlib.gzip(buf, function (_, result) {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    });
+
                                 }
-
-                                for (var i = 0; i < results[3].length; i++) {
-                                    results[3][i].status = results[3] && results[3][i] && JSON.parse(results[3][i].status) ? JSON.parse(results[3][i].status) : [];
-                                }
-
-                                response.data = {
-                                    requirementView: results[0] ? results[0] : [],
-                                    requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
-                                    stageList: results[3] && results[3][0] ? results[3] : []
-                                };
-
-                                if (req.query.isWeb == 0) {
-                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    // zlib.gzip(buf, function (_, result) {
-                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                    //});
-                                }
-                                else {
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = " Requirement View is empty";
+                                    response.error = null;
+                                    response.data = {
+                                        requirementView: [],
+                                        stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
+                                    };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
                                         response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
                                     });
                                 }
-
-                            }
-                            else if (!err) {
-                                response.status = true;
-                                response.message = " Requirement View is empty";
-                                response.error = null;
-                                response.data = {
-                                    requirementView: [],
-                                    stageList: (results && results[2] && results[2][0]) && results[2][0].stageList ? JSON.parse(results[2][0].stageList) : []
-                                };
-                                if (req.query.isWeb == 0) {
-                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    // zlib.gzip(buf, function (_, result) {
-                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                    res.status(200).json(response);
-                                    // });
-                                }
                                 else {
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                        res.status(200).json(response);
-                                    });
+                                    response.status = false;
+                                    response.message = "Error while loading Requirement View";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
                                 }
-                            }
-                            else {
-                                response.status = false;
-                                response.message = "Error while loading Requirement View";
-                                response.error = null;
-                                response.data = null;
-                                res.status(500).json(response);
-                            }
-                        });
+                            });
+                        }
                     }
                 }
             }

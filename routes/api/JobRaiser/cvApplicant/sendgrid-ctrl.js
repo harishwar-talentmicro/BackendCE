@@ -505,8 +505,8 @@ sendgridCtrl.saveSendMail = function (req, res, next) {
                                 req.st.db.escape(req.body.attachResume || 0),
                                 req.st.db.escape(req.body.interviewerFlag || 0),
                                 req.st.db.escape(req.body.resumeFileName || ''),
-                                req.st.db.escape(req.body.attachResumeFlag || 0)
-
+                                req.st.db.escape(req.body.attachResumeFlag || 0),
+                                req.st.db.escape(req.body.isSingleMail || 0)
                             ];
                             var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                             console.log(saveTemplateQuery);
@@ -1139,7 +1139,8 @@ sendgridCtrl.jobSeekerMailer = function (req, res, next) {
                                             req.st.db.escape(req.body.interviewerFlag || 0),
                                             req.st.db.escape(req.body.resumeFileName || ''),
                                             req.st.db.escape(req.body.attachResumeFlag || 0),
-                                            req.st.db.escape(JSON.stringify(trackerTemplate))
+                                            req.st.db.escape(JSON.stringify(trackerTemplate)),
+                                            req.st.db.escape(req.body.isSingleMail || 0)
                                         ];
                                         var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                                         console.log(saveTemplateQuery);
@@ -2291,7 +2292,8 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                             req.st.db.escape(req.body.interviewerFlag || 0),
                                             req.st.db.escape(req.body.resumeFileName || ''),
                                             req.st.db.escape(req.body.attachResumeFlag || 0),
-                                            req.st.db.escape(JSON.stringify(trackerTemplate))
+                                            req.st.db.escape(JSON.stringify(trackerTemplate)),
+                                            req.st.db.escape(req.body.isSingleMail || 0)
 
                                         ];
                                         var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
@@ -3578,7 +3580,8 @@ sendgridCtrl.submissionMailer = function (req, res, next) {
                                         req.st.db.escape(req.body.interviewerFlag || 0),
                                         req.st.db.escape(req.body.resumeFileName || ''),
                                         req.st.db.escape(req.body.attachResumeFlag || 0),
-                                        req.st.db.escape(JSON.stringify(trackerTemplate))
+                                        req.st.db.escape(JSON.stringify(trackerTemplate)),
+                                        req.st.db.escape(req.body.isSingleMail || 0)
 
                                     ];
                                     var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
@@ -4434,8 +4437,8 @@ sendgridCtrl.clientMailer = function (req, res, next) {
                                             req.st.db.escape(req.body.interviewerFlag || 0),
                                             req.st.db.escape(req.body.resumeFileName || ''),
                                             req.st.db.escape(req.body.attachResumeFlag || 0),
-                                            req.st.db.escape(JSON.stringify(trackerTemplate))
-
+                                            req.st.db.escape(JSON.stringify(trackerTemplate)),
+                                            req.st.db.escape(req.body.isSingleMail || 0)
                                         ];
                                         var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                                         console.log(saveTemplateQuery);
@@ -5905,8 +5908,8 @@ sendgridCtrl.interviewMailer = function (req, res, next) {
                                             req.st.db.escape(req.body.interviewerFlag || 0),
                                             req.st.db.escape(req.body.resumeFileName || ''),
                                             req.st.db.escape(req.body.attachResumeFlag || 0),
-                                            req.st.db.escape(JSON.stringify(trackerTemplate))
-
+                                            req.st.db.escape(JSON.stringify(trackerTemplate)),
+                                            req.st.db.escape(req.body.isSingleMail || 0)
                                         ];
                                         var saveTemplateQuery = 'CALL WM_save_1010_mailTemplate( ' + templateInputs.join(',') + ')';
                                         console.log(saveTemplateQuery);
@@ -6124,6 +6127,10 @@ sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
                                 else {
                                     req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
                                     req.body.templateId = req.body.templateId ? req.body.templateId : 0;
+
+                                    if(typeof(req.body.toMailId) == 'object'){
+                                        req.body.toMailId = JSON.stringify(req.body.toMailId);
+                                    }
 
                                     var inputs = [
                                         req.st.db.escape(req.query.token),
