@@ -128,7 +128,8 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                                                     req.st.db.escape(JSON.stringify(req.body.memberInterviewRound || [])),
                                                     req.st.db.escape(req.body.status || 1),
                                                     req.st.db.escape(req.body.statusTitle),
-                                                    req.st.db.escape(req.body.statusNotes || "")
+                                                    req.st.db.escape(req.body.statusNotes || ""),
+                                                    req.st.db.escape(req.body.isMailTeamMembers || 0)
                                                 ];
 
                                                 var procQuery = 'CALL pace_save_requirementGroup( ' + procParams.join(',') + ')';
@@ -166,109 +167,6 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                                                                     res.status(500).json(error_response);
                                                                 }
                                                             });
-                                                            var reqId = 0;
-                                                            var templateId = requirementResult[3][0].templateId ? requirementResult[3][0].templateId : 0;
-                                                            var reqgroupId = requirementResult[3][0].reqgroupId ? requirementResult[3][0].reqgroupId : 0;
-
-                                                            var inputParams = [
-                                                                req.st.db.escape(req.query.token),
-                                                                req.st.db.escape(req.query.heMasterId),
-                                                                req.st.db.escape(reqId),
-                                                                req.st.db.escape(templateId),
-                                                                req.st.db.escape(reqgroupId)
-                                                            ]
-
-
-                                                            var query = 'CALL wm_get_requiremnetTeam_mail( ' + inputParams.join(',') + ')';
-
-                                                            req.db.query(query, function (err, result) {
-                                                                try {
-                                                                    console.log(result)
-                                                                    if (result && result[0] && result[0][0]) {
-                                                                        for (i = 0; i < result[0].length; i++) {
-                                                                            // var cc=result[0][i].cc;
-                                                                            // var bcc=result[0][i].bcc;
-
-                                                                            if (typeof (result[0] && result[0][i] && result[0][i].cc) == 'json') {
-                                                                                result[0][i].cc = JSON.stringify(result[0][i].cc);
-                                                                            }
-
-
-                                                                            if (typeof (result[0] && result[0][i] && result[0][i].bcc) == 'json') {
-                                                                                result[0][i].bcc = JSON.stringify(result[0][i].bcc);
-                                                                            }
-
-                                                                            var emailId = result[0][i].emailId;
-                                                                            var fromEmailId = result[0][i].fromMailId;
-                                                                            var bodydata = result[0][i].mailbody ? result[0][i].mailbody : "";
-                                                                            var subject = result[0][i].subject;
-                                                                            var firstname = result[0][i].firstname ? result[0][i].firstname : "";
-                                                                            var lastname = result[0][i].lastname ? result[0][i].lastname : "";
-                                                                            var jobcode = result[0][i].jobcode;
-                                                                            var jobtitle = result[0][i].jobtitle;
-                                                                            var shortSignature = result[0][i].shortSignature;
-                                                                            var displayName = result[0][i].displayName;
-
-
-                                                                            if (bodydata != "") {
-                                                                                bodydata = bodydata.replace("[FullName]", (firstname + ' ' + lastname));
-                                                                                bodydata = bodydata.replace("[FirstName]", firstname);
-                                                                                bodydata = bodydata.replace("[Code]", jobcode);
-                                                                                bodydata = bodydata.replace("[Title]", jobtitle);
-                                                                                bodydata = bodydata.replace("[displayName]", displayName);
-                                                                                bodydata = bodydata.replace("[shortSignature]", shortSignature);
-
-                                                                            }
-                                                                            if (result[0][i].cc != "") {
-                                                                                result[0][i].cc = result[0][i].cc.replace("[", "");
-                                                                                result[0][i].cc = result[0][i].cc.replace("]", "");
-                                                                                result[0][i].cc = result[0][i].cc.replace(/["]/g, "");
-                                                                            }
-                                                                            if (result[0][i].bcc != "") {
-                                                                                result[0][i].bcc = result[0][i].bcc.replace("[", "");
-                                                                                result[0][i].bcc = result[0][i].bcc.replace("]", "");
-                                                                                result[0][i].bcc = result[0][i].bcc.replace(/["]/g, "");
-                                                                            }
-
-                                                                            var mailOptions = {
-                                                                                from: fromEmailId,
-                                                                                to: emailId,
-                                                                                cc: result[0][i].cc,
-                                                                                bcc: result[0][i].bcc,
-                                                                                subject: result[0][i].subject,
-                                                                                html: bodydata// html body
-                                                                            };
-                                                                            sendgrid.send(mailOptions, function (err, results) {
-                                                                                try {
-                                                                                    if (err) {
-                                                                                        console.log("mail not sent", err);
-
-                                                                                    }
-                                                                                    else {
-                                                                                        console.log('Mail sent successfully');
-
-                                                                                    }
-                                                                                }
-                                                                                catch (ex) {
-                                                                                    console.log(ex);
-                                                                                    error_logger.error = ex;
-                                                                                    logger(req, error_logger);
-                                                                                    res.status(500).json(error_response);
-                                                                                }
-                                                                            });
-
-                                                                        }
-
-                                                                    }
-                                                                }
-                                                                catch (ex) {
-                                                                    console.log(ex);
-                                                                    error_logger.error = ex;
-                                                                    logger(req, error_logger);
-                                                                    res.status(500).json(error_response);
-                                                                }
-                                                            });
-
                                                         }
 
                                                         else if (!err && requirementResult && requirementResult[0] && requirementResult[0][0] && requirementResult[0][0]._error) {

@@ -1593,7 +1593,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(JSON.stringify(functionalAreas)),
                                 req.st.db.escape(req.body.postJobCareerPortal || 0),
                                 req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
-                                req.st.db.escape(req.body.statusNotes || "")
+                                req.st.db.escape(req.body.statusNotes || ""),
+                                req.st.db.escape(req.body.isMailTeamMembers || 0)
                             ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1951,7 +1952,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     req.st.db.escape(JSON.stringify(functionalAreas)),
                                     req.st.db.escape(req.body.postJobCareerPortal),
                                     req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
-                                    req.st.db.escape(req.body.statusNotes || "")
+                                    req.st.db.escape(req.body.statusNotes || ""),
+                                    req.st.db.escape(req.body.isMailTeamMembers || 0)
                                 ];
 
                                 var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -2002,7 +2004,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
                                         });
-                                }
+                                    }
                                     else {
                                         response.status = false;
                                         response.message = "Error while saving requirement template";
