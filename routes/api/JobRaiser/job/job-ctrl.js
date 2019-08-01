@@ -1622,57 +1622,61 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     }
 
                                     response.error = null;
-                                    for (i = 0; i < results[5].length; i++) {
-                                        if (typeof (results[5] && results[5][i] && results[5][i].cc) == 'string') {
-                                            results[5][i].cc = JSON.parse(results[5][i].cc);
-                                        }
-                                        if (typeof (results[5] && results[5][i] && results[5][i].bcc) == 'string') {
-                                            results[5][i].bcc = JSON.parse(results[5][i].bcc);
-                                        }
 
-                                        var firstname = results[5][i].firstname ? results[5][i].firstname : "";
-                                        var lastname = results[5][i].lastname ? results[5][i].lastname : "";
-                                        var jobcode = results[5][i].JobCode;
-                                        var jobtitle = results[5][i].JobTitle;
-                                        var shortSignature = results[5][i].shortSignature;
-                                        var displayName = results[5][i].displayName;
-
-                                        var tags = results[5][i].tags ? JSON.parse(results[5][i].tags) : {};
-
-                                        if (tags && tags.requirement && tags.requirement.length) {
-                                            function escapeRegExp(string) {
-                                                return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                                    if (req.body.isMailTeamMembers == 1) {
+                                        for (i = 0; i < results[5].length; i++) {
+                                            if (typeof (results[5] && results[5][i] && results[5][i].cc) == 'string') {
+                                                results[5][i].cc = JSON.parse(results[5][i].cc);
+                                            }
+                                            if (typeof (results[5] && results[5][i] && results[5][i].bcc) == 'string') {
+                                                results[5][i].bcc = JSON.parse(results[5][i].bcc);
                                             }
 
-                                            function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
-                                                return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
-                                            }
+                                            var firstname = results[5][i].firstname ? results[5][i].firstname : "";
+                                            var lastname = results[5][i].lastname ? results[5][i].lastname : "";
+                                            var jobcode = results[5][i].JobCode;
+                                            var jobtitle = results[5][i].JobTitle;
+                                            var shortSignature = results[5][i].shortSignature;
+                                            var displayName = results[5][i].displayName;
 
-                                            for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
-                                                // 
-                                                if ((results[5][i][tags.requirement[tagIndex].tagName] && results[5][i][tags.requirement[tagIndex].tagName] != null && results[5][i][tags.requirement[tagIndex].tagName] != 'null' && results[5][i][tags.requirement[tagIndex].tagName] != '') || results[5][i][tags.requirement[tagIndex].tagName] >= 0) {
+                                            var tags = results[5][i].tags ? JSON.parse(results[5][i].tags) : {};
 
-                                                    results[5][i].mailbody = replaceAll(results[5][i].mailbody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+                                            if (tags && tags.requirement && tags.requirement.length) {
+                                                function escapeRegExp(string) {
+                                                    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                                                }
 
-                                                    results[5][i].subject = replaceAll(results[5][i].subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+                                                function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
+                                                    return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
+                                                }
 
-                                                    // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+                                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                                    // 
+                                                    if ((results[5][i][tags.requirement[tagIndex].tagName] && results[5][i][tags.requirement[tagIndex].tagName] != null && results[5][i][tags.requirement[tagIndex].tagName] != 'null' && results[5][i][tags.requirement[tagIndex].tagName] != '') || results[5][i][tags.requirement[tagIndex].tagName] >= 0) {
 
+                                                        results[5][i].mailbody = replaceAll(results[5][i].mailbody, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+
+                                                        results[5][i].subject = replaceAll(results[5][i].subject, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+
+                                                        // smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', results[5][i][tags.requirement[tagIndex].tagName]);
+
+                                                    }
                                                 }
                                             }
-                                        }
-                                        console.log("Requirement mail data after replace", results[5]);
 
-                                        if (results[5][i].mailbody != "") {
-                                            results[5][i].mailbody = results[5][i].mailbody.replace("[FullName]", (firstname + ' ' + lastname));
-                                            results[5][i].mailbody = results[5][i].mailbody.replace("[FirstName]", firstname);
-                                            results[5][i].mailbody = results[5][i].mailbody.replace("[Code]", jobcode);
-                                            results[5][i].mailbody = results[5][i].mailbody.replace("[Title]", jobtitle);
-                                            results[5][i].mailbody = results[5][i].mailbody.replace("[displayName]", displayName);
-                                            results[5][i].mailbody = results[5][i].mailbody.replace("[shortSignature]", shortSignature);
+
+                                            if (results[5][i].mailbody != "") {
+                                                results[5][i].mailbody = results[5][i].mailbody.replace("[FullName]", (firstname + ' ' + lastname));
+                                                results[5][i].mailbody = results[5][i].mailbody.replace("[FirstName]", firstname);
+                                                results[5][i].mailbody = results[5][i].mailbody.replace("[Code]", jobcode);
+                                                results[5][i].mailbody = results[5][i].mailbody.replace("[Title]", jobtitle);
+                                                results[5][i].mailbody = results[5][i].mailbody.replace("[displayName]", displayName);
+                                                results[5][i].mailbody = results[5][i].mailbody.replace("[shortSignature]", shortSignature);
+                                            }
                                         }
+                                    } else {
+                                        results[5] = []
                                     }
-
 
                                     response.data = {
                                         messageList: {
