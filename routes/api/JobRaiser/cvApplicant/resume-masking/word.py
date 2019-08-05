@@ -65,6 +65,7 @@ try:
     footer = section.footer
     last_paragraph = footer.paragraphs[0]
     footer_paragraph = last_paragraph.insert_paragraph_before()
+    footer_paragraph = last_paragraph.insert_paragraph_before()
     footer_text = footer_paragraph.add_run()
     footer_text.add_text(sys.argv[6])
 
