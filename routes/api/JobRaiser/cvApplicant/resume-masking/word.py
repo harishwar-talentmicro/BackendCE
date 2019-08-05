@@ -53,7 +53,7 @@ try:
     #     encoded_string = base64.b64encode(image_file.read())
     section = doc.sections[0]
     header = section.header
-    first_paragraph = header.paragraphs[0]
+    first_paragraph = header.paragraphs[0] # contains a empty paragraph access it and edit next
     image_paragraph = first_paragraph.insert_paragraph_before()
     header_image = image_paragraph.add_run()
     header_image.add_picture(
@@ -61,6 +61,12 @@ try:
     text_paragraph = first_paragraph.insert_paragraph_before()
     header_text = text_paragraph.add_run()
     header_text.add_text(sys.argv[5])
+
+    footer = section.footer
+    last_paragraph = footer.paragraphs[0]
+    footer_paragraph = last_paragraph.insert_paragraph_before()
+    footer_text = footer_paragraph.add_run()
+    footer_text.add_text(sys.argv[6])
 
    # paragraph.add_picture('download.png', width=Inches(1.25))
     try:
