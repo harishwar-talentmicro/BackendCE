@@ -22,7 +22,7 @@ var convertDocToDocx = function (orgCVPath, callback) {
             let formData = {
                 attachment: fs.createReadStream(path.resolve(__dirname, orgCVPath))
             };
-            
+
             request.post({
                 url: "http://23.236.49.140:1002/api/service_attachment_pace",
                 formData: formData
@@ -104,16 +104,19 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
                         convertDocToDocx(orgCVPath, function (err, conres) {
                             try {
                                 if (!err && conres) {
+                                    console.log("conres",conres);
                                     resolve(conres);  // converted to docx is sent to masking
                                 } else {
+                                    console.log("convertDocToDocx error");
                                     resolve(orgCVPath);
                                 }
                             } catch (ex) {
-                                console.log(ex);
+                                console.log("convertDocToDocx exception",ex);
                                 resolve(orgCVPath);
                             }
                         })
                     } else {
+                        console.log("convertDocToDocx org docx file");
                         resolve(orgCVPath);
                     }
 
