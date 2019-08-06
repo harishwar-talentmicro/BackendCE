@@ -4,7 +4,42 @@ var resumeMaskingCtrl = {};
 var path = require('path');
 var uuid = require('node-uuid');
 var request = require('request');
+var http = require('https');
+
 var error = {};
+
+
+var convertDocToDocx = function (orgCVPath, callback) {
+    let cvpath = "https://storage.googleapis.com/ezeone/" + orgCVPath;
+    http.get(cvpath, function (fileResponse) {
+        var bufs = [];
+        fileResponse.on('data', function (d) { bufs.push(d); });
+        fileResponse.on('end', function () {
+            var buf = Buffer.concat(bufs);
+            fs.writeFileSync(path.resolve(__dirname, orgCVPath), buf);
+            console.log('file written');
+
+            let formData = {
+                attachment: fs.createReadStream(path.resolve(__dirname, orgCVPath))
+            };
+            
+            request.post({
+                url: "http://23.236.49.140:1002/api/service_attachment_pace",
+                formData: formData
+            }, function (err, httpRes, body) {
+                console.log("service attachment error",err);
+                if (!err) {
+                    let convDoc = JSON.parse(body).data.a_url;
+                    callback(null, convDoc);
+                    fs.unlinkSync(path.resolve(__dirname, orgCVPath));
+                } else {
+                    callback(err, null);
+                }
+            });
+        });
+    });
+}
+
 // var resume_masking = function (original_path, new_path, header, footer, required_data) {
 resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
 
@@ -61,71 +96,97 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
                 var clientCVMaskEmail = Result[0][0].clientCVMaskEmail;
                 var logoFile = Result[0][0].logoFile;
 
-                var uniqueId = uuid.v4();
+                // if doc file then first convert it to docx and update the database
 
-                var uniqueId = uniqueId + "." + orgCVPath.split('.')[1];
-
-                if (logoFile != "") {
-                    logoFile = 'https://storage.googleapis.com/ezeone/' + logoFile;
-                }
-
-                console.log(path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail);
-
-                var spawn_process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail]);
-                // fs.readFile(path.resolve(__dirname, "word.py"), function (err, res) {
-                //     console.log(err, res);
-                // })
-                // var process = spawn('python', [path.resolve(__dirname, "test.py")]);
-
-                spawn_process.stdout.on('data', function (data) {
-                    console.log(data.toString());
-                    if (data.toString().indexOf('File is not a zip file') > -1) {
-                        response.status = true;
-                        response.message = "Error while masking";
-                        res.status(500).json(response);
-                        return;
+                new Promise(function (resolve, reject) {
+                    console.log('Inside promise');
+                    if (orgCVPath.split('.')[orgCVPath.split('.').length - 1] == 'doc') {
+                        convertDocToDocx(orgCVPath, function (err, conres) {
+                            try {
+                                if (!err && conres) {
+                                    resolve(conres);  // converted to docx is sent to masking
+                                } else {
+                                    resolve(orgCVPath);
+                                }
+                            } catch (ex) {
+                                console.log(ex);
+                                resolve(orgCVPath);
+                            }
+                        })
+                    } else {
+                        resolve(orgCVPath);
                     }
-                    else if (data.toString().indexOf('masked successfully') > -1) {
-                        try {
 
-                            var update = [
-                                req.st.db.escape(req.query.token),
-                                req.st.db.escape(req.query.heMasterId),
-                                req.st.db.escape(req.body.applicantId),
-                                req.st.db.escape(req.body.reqAppId || 0),
-                                req.st.db.escape(uniqueId)
-                            ];
+                }).then(function (resp) {
+                    orgCVPath = resp;
+                    var uniqueId = uuid.v4();
 
-                            var procQuery = 'CALL pace_resumeMaskingUpdate( ' + update.join(',') + ')';
-                            console.log(procQuery);
-                            req.db.query(procQuery, function (err, Result) {
-                                console.log(err);
+                    var uniqueId = uniqueId + "." + orgCVPath.split('.')[1];
 
-                                console.log('output: ' + data.toString());
+                    if (logoFile != "") {
+                        logoFile = 'https://storage.googleapis.com/ezeone/' + logoFile;
+                    }
+
+                    console.log(path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail);
+
+                    var spawn_process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail]);
+                    // fs.readFile(path.resolve(__dirname, "word.py"), function (err, res) {
+                    //     console.log(err, res);
+                    // })
+                    // var process = spawn('python', [path.resolve(__dirname, "test.py")]);
+
+                    spawn_process.stdout.on('data', function (data) {
+                        console.log(data.toString());
+                        if (data.toString().indexOf('File is not a zip file') > -1) {
+                            response.status = true;
+                            response.message = "Error while masking";
+                            res.status(500).json(response);
+                            return;
+                        }
+                        else if (data.toString().indexOf('masked successfully') > -1) {
+                            try {
+
+                                var update = [
+                                    req.st.db.escape(req.query.token),
+                                    req.st.db.escape(req.query.heMasterId),
+                                    req.st.db.escape(req.body.applicantId),
+                                    req.st.db.escape(req.body.reqAppId || 0),
+                                    req.st.db.escape(uniqueId),
+                                    req.st.db.escape(orgCVPath)
+                                ];
+
+                                var procQuery = 'CALL pace_resumeMaskingUpdate( ' + update.join(',') + ')';
+                                console.log(procQuery);
+                                req.db.query(procQuery, function (err, Result) {
+                                    console.log(err);
+
+                                    console.log('output: ' + data.toString());
+                                    response.status = true;
+                                    response.message = "Success";
+                                    response.error = null;
+                                    response.data = {
+                                        clientCVPath: uniqueId,
+                                        orgCVPath : orgCVPath,
+                                        mes: data.toString()
+                                    };
+                                    console.log(response);
+                                    res.status(200).json(response);
+
+                                    // res.send(200)
+                                });
+                            } catch (ex) {
+                                console.log(ex);
                                 response.status = true;
-                                response.message = "Success";
-                                response.error = null;
-                                response.data = {
-                                    clientCVPath: uniqueId,
-                                    mes: data.toString()
-                                };
-                                console.log(response);
-                                res.status(200).json(response);
-
-                                // res.send(200)
-                            });
-                        } catch (ex) {
-                            console.log(ex);
+                                response.message = "Error while masking";
+                                res.status(500).json(response);
+                            }
+                        }
+                        else {
                             response.status = true;
                             response.message = "Error while masking";
                             res.status(500).json(response);
                         }
-                    }
-                    else {
-                        response.status = true;
-                        response.message = "Error while masking";
-                        res.status(500).json(response);
-                    }
+                    })
                 })
             } catch (ex) {
                 console.log(ex);
@@ -234,9 +295,6 @@ resumeMaskingCtrl.resume_maskinghttps = function (req, res, next) {
             }
         });
     }
-
-
 };
-
 
 module.exports = resumeMaskingCtrl;
