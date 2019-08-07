@@ -99,7 +99,7 @@ var removeExtraChars = function (params) {
         params = params.replace(/Not Specified/i, '');
         params = params.replace(/[ ]{2}/g, ' ');
         params = params.replace(/&amp;/g, '&');
-        params = params.replace(/<!--[a-zA-Z0-9=|-|'|" \\|\/|_;&():#\.]*-->/g, '');
+        params = params.replace(/<!--[a-zA-Z0-9=|-|'|" \\|\/|_;():#\.]*-->/g, '');
         params = params.replace(/[^\x00-\x7F]/g, "");
         params = params.replace(/&nbsp;/g, ' ');
         params = params.replace(/Other India \(\)/g, '');
@@ -116,7 +116,7 @@ var removeExtraChars = function (params) {
 
 var processIntegers = function (param) {
     if (param) {
-        param = param.replace(/[A-Za-z]/g, '');
+        param = param.replace(/[A-Za-z<>]/g, '');
         param = param.replace(/\+/g, '');
         param = param.replace(/\*/g, '');
         param = param.replace(/\-/g, '');
@@ -150,15 +150,23 @@ var removeUnicodeChars = function (param) {
     return param;
 }
 
+var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+var months_full = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 var dateConverter = function (param) {
     param = removeExtraChars(param);
     // params = params.replace('th', '');
     param = param.replace(',', '');
     var dateStr = param;
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    // var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var arr = dateStr.split(' ');
     if (arr && arr[1]) {
-        arr[1] = months.indexOf(arr[1]) + 1;
+        if (months.indexOf(arr[1]) > -1)
+            arr[1] = months.indexOf(arr[1]) + 1;
+        else if (months_full.indexOf(arr[1]) > -1)
+            arr[1] = months_full.indexOf(arr[1]) + 1;
+        else
+            return null;
         arr = arr.reverse();
         var result = arr.join('-');
         result = result.replace(/st/g, '');
@@ -825,7 +833,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
     };
     try {
 
-        var portalId = 2;   // monster
+        var portalId = req.body.portalId || 2;   // monster
         var cvSourceId = 2;
         // var validationFlag = true;
 
@@ -873,7 +881,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
         var tempMobile = document.getElementsByClassName('mob_container');
         if (tempMobile && tempMobile[0] && tempMobile[0].innerHTML) {
             var mobilenumber = tempMobile[0].innerHTML;
-            var regularExp = /(\d{7,10})/;
+            var regularExp = /(\d{7,15})/;
 
             if (regularExp.exec(mobilenumber) && regularExp.exec(mobilenumber)[0])
                 details.mobileNumber = removeExtraChars(regularExp.exec(mobilenumber)[0].trim());
@@ -1299,6 +1307,9 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                     FileData: req.body.attachment
                 };
 
+                if (req.body.requirements)
+                    details.requirements = [parseInt(req.body.requirements)];
+
                 if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1) {
                     request({
                         headers: {
@@ -1351,7 +1362,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                             };
                             res.status(500).json(response);
                         }
-                        console.log(response);
+                        // console.log(response);
                         console.log(error);
                     });
                 }
@@ -1432,7 +1443,6 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     if (document.getElementsByClassName('tuple')[i].getAttribute('class').indexOf('viewed') == -1) {
                         var name = document.getElementsByClassName('tuple')[i].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
                         name = removeExtraChars(name);
-                        console.log(name);
                         var first_name = "";
                         var last_name = "";
 
@@ -1516,16 +1526,13 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                         applicants.push({ firstName: first_name, lastName: last_name, portalId: 1, index: i, lastModifiedDate: lastModifiedDate, uid: uniqueId, current_location: current_location, current_employer: current_employer, job_title: job_title, previous_employer: previous_employer, skills: skills, education: education });
                     }
                 }
-            console.log(JSON.stringify(applicants));
         }
 
         else {
-            console.log(document.getElementsByClassName('userChk')[0].checked);
             if (document.getElementsByClassName('tuple'))
                 for (var i = 0; i < selected_candidates.length; i++) {
 
                     var name = document.getElementsByClassName('tuple')[selected_candidates[i]].getElementsByClassName('tupCmtWrap')[0].getElementsByClassName('tupData')[0].getElementsByClassName('tupLeft')[0].getElementsByClassName('clFx')[0].getElementsByClassName('userName name')[0].innerHTML;
-                    console.log(name);
                     var first_name = "";
                     var last_name = "";
 
@@ -1737,31 +1744,31 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             details.profilePic = tempProfilePic[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src');
             // console.log(document.getElementsByClassName('left-container')[0].getElementsByClassName('imgRound user-pic')[0].getAttribute('src'));
             details.profilePic = removeExtraChars(details.profilePic);
-            console.log(details.profilePic);
+            //console.log(details.profilePic);
         }
 
         var tempExperience = document.getElementsByClassName('exp-sal-loc-box');
         if (tempExperience && tempExperience[0] && tempExperience[0].getElementsByClassName('expInfo') && tempExperience[0].getElementsByClassName('expInfo')[0] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>") && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1] && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr') && tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0]) {
-            console.log('Entered exp');
+            //console.log('Entered exp');
             details.experience = tempExperience[0].getElementsByClassName('expInfo')[0].innerHTML.split("</em>")[1].split('yr')[0].trim();
-            console.log(details.experience);
+            //console.log(details.experience);
             if (!(parseInt(details.experience) >= 0)) {
                 details.experience = 0;
             }
             details.experience = removeExtraChars(details.experience);
-            if (typeof details.experience == 'string') {
+            if (typeof details.experience == 'string' && parseInt(details.experience) != NaN) {
                 details.experience = parseInt(details.experience);
             }
         }
 
         var tempDesignation = document.getElementsByClassName('bkt4 cDesig');
         if (tempDesignation && tempDesignation[0] && tempDesignation[0].innerHTML) {
-            console.log("Entered designation");
+            //console.log("Entered designation");
             var designation = tempDesignation[0].innerHTML.replace(/<em class="hlite">/g, '');
             designation = designation.replace(/<em class="b-hlite">/g, '');
             designation = decodeURI(designation.replace(/<\/em>/g, ''));
             details.jobTitle = removeExtraChars(designation.trim());
-            console.log(details.jobTitle);
+            //console.log(details.jobTitle);
         }
 
         //employer
@@ -1773,7 +1780,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
         var tempSkills = document.getElementsByClassName('right-container');
         if (tempSkills && tempSkills[0] && tempSkills[0].getElementsByClassName('itSkill hKwd') && tempSkills[0].getElementsByClassName('itSkill hKwd')[0] && tempSkills[0].getElementsByClassName('itSkill hKwd')[0].innerHTML) {
-            console.log("Entered skill");
+            //console.log("Entered skill");
             details.primarySkills = tempSkills[0].getElementsByClassName('itSkill hKwd')[0].innerHTML.replace(/<span id=".*/g, '');
             details.primarySkills = details.primarySkills.replace(/<em class="b-hlite">/g, '');
             details.primarySkills = details.primarySkills.replace(/<em class="hlite">/g, '');
@@ -1791,16 +1798,17 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     details.primarySkills.splice(spliceIndexes[ind], 1);
                 }
             }
-            // console.log(details.primarySkills);
+            // //console.log(details.primarySkills);
         }
 
         // presentSalaryCurr
         var salaryDetails = document.getElementsByClassName('salInfo');
         if (salaryDetails && salaryDetails[0] && salaryDetails[0].innerHTML) {
-            console.log("Entered salary");
+            //console.log("Entered salary");
             var amount = salaryDetails[0].innerHTML.replace('<em class="iconRup"></em>', '').trim().split(' ');
             if (amount && amount[0]) {
-                details.presentSalary = processIntegers(removeExtraChars(amount[0]));
+                if (parseInt(processIntegers(removeExtraChars(amount[0]))) != NaN)
+                    details.presentSalary = processIntegers(removeExtraChars(amount[0]));
                 if (amount[1] && amount[1].indexOf('Lac') > -1) {
                     if (!isTallint)
                         details.presentSalaryScale = { scale: "Lakhs", scaleId: 4 }
@@ -1837,7 +1845,8 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                     var spliceIndexes = [];
                     for (var i = 0; i < details.prefLocations.length; i++) {
                         if (removeExtraChars(details.prefLocations[i].trim()) != '')
-                            details.prefLocations[i] = removeExtraChars(details.prefLocations[i].trim());
+                            // details.prefLocations[i] = removeExtraChars(details.prefLocations[i].trim());
+                            details.prefLocations[i] = removeExtraChars(details.prefLocations[i].trim()).replace(/[<>]*/, '');
                         else
                             spliceIndexes.push(i);
                     }
@@ -2078,7 +2087,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             details.token = req.body.tallintToken;
             if (req.body.attachment) {
                 var attachment1 = req.body.attachment.split(',');
-                console.log(attachment1);
+                //console.log(attachment1);
                 if (attachment1.length && attachment1[0] && attachment1[1]) {
 
                     details.resume_document = attachment1[1];
@@ -2111,6 +2120,10 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
                 }
             }
             delete (details.resumeText);
+
+            if (req.body.requirements)
+                details.requirements = [parseInt(req.body.requirements)];
+
 
             if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1 && !req.body.isIntranet) {
                 request({
@@ -2229,7 +2242,7 @@ portalimporter.checkApplicantExistsFromShinePortal = function (req, res, next) {
     var selected_candidates = req.body.selected_candidates;
     var is_select_all = req.body.is_select_all;
     var search_results = document.getElementsByClassName('cls_loop_chng search_result2');
-    console.log('search_results', search_results.length)
+    //console.log('search_results', search_results.length)
     if (is_select_all == 1) {
 
         if (search_results)
@@ -2237,7 +2250,7 @@ portalimporter.checkApplicantExistsFromShinePortal = function (req, res, next) {
                 if (search_results[i]) {
                     var tempname = search_results[i].getElementsByClassName('cls_circle_name');
                     if (tempname && tempname[0] && tempname[0].innerHTML) {
-                        console.log('name', name);
+                        //console.log('name', name);
                         var name = tempname[0].innerHTML.trim();
                         var first_name = "";
                         var last_name = "";
@@ -2263,7 +2276,7 @@ portalimporter.checkApplicantExistsFromShinePortal = function (req, res, next) {
                 }
 
             }
-        console.log('applicants', applicants);
+        //console.log('applicants', applicants);
     }
 
     else {
@@ -2274,7 +2287,7 @@ portalimporter.checkApplicantExistsFromShinePortal = function (req, res, next) {
                 if (selected_candidates[i] >= 0) {
                     var tempname = search_results[selected_candidates[i]].getElementsByClassName('cls_circle_name');
                     if (tempname && tempname[0] && tempname[0].innerHTML) {
-                        console.log('name', name);
+                        //console.log('name', name);
                         var name = tempname[0].innerHTML.trim();
                         var first_name = "";
                         var last_name = "";
@@ -2296,7 +2309,7 @@ portalimporter.checkApplicantExistsFromShinePortal = function (req, res, next) {
                     applicants.push({ firstName: first_name, lastName: last_name, portalId: 4, index: selected_candidates[i] });
                 }
             }
-            console.log('applicants', applicants);
+            //console.log('applicants', applicants);
 
         }
     }
@@ -2353,7 +2366,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
     document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML
 
 
-    console.log('search_results', search_results.length)
+    //console.log('search_results', search_results.length)
     if (is_select_all == 1) {
 
         if (search_results)
@@ -2362,7 +2375,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
                     var tempname = search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML;
 
                     if (tempname && tempname[0] && tempname[0].innerHTML) {
-                        console.log('name', name);
+                        //console.log('name', name);
                         var name = tempname[0].innerHTML.trim();
                         var first_name = "";
                         var last_name = "";
@@ -2386,7 +2399,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
                 }
             }
 
-        console.log('applicants', applicants);
+        //console.log('applicants', applicants);
     }
 
     else {
@@ -2398,7 +2411,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
                     var tempname = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML;
 
                     if (search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML) {
-                        console.log('name', name);
+                        //console.log('name', name);
                         var name = tempname[0].innerHTML.trim();
                         var first_name = "";
                         var last_name = "";
@@ -2422,7 +2435,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
 
                 }
             }
-            console.log('applicants', applicants);
+            //console.log('applicants', applicants);
 
         }
 
@@ -2493,9 +2506,9 @@ portalimporter.saveApplicantsFromShine = function (req, res, next) {
 
             var emailid = tempEmailId[0].innerHTML.trim();
             var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
-            console.log(emailid);
-            // console.log("using match all",matchAll(emailid,regularExp).toArray());
-            console.log('match all here', regularExp.exec(emailid));
+            //console.log(emailid);
+            // //console.log("using match all",matchAll(emailid,regularExp).toArray());
+            //console.log('match all here', regularExp.exec(emailid));
             // res.status(200).json(regularExp.exec(emailid)[0]);
             if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
                 details.emailId = regularExp.exec(emailid)[0].trim();
@@ -2685,7 +2698,7 @@ portalimporter.saveApplicantsFromTimesjobs = function (req, res, next) {
     if (tempDetails && tempDetails[0] && tempDetails[0].getElementsByTagName('a') && tempDetails[0].getElementsByTagName('a')[1] && tempDetails[0].getElementsByTagName('a')[1].innerHTML) {
         var emailid = tempDetails[0].getElementsByTagName('a')[1].innerHTML.trim();
         var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
-        console.log('match all here', regularExp.exec(emailid));
+        //console.log('match all here', regularExp.exec(emailid));
         if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
             details.emailId = removeExtraChars(regularExp.exec(emailid)[0].trim());
 
@@ -2720,7 +2733,7 @@ portalimporter.saveApplicantsFromTimesjobs = function (req, res, next) {
     var tempExp = document.getElementsByClassName('candidate-info lft');
     if (tempExp && tempExp[0] && tempExp[0].getElementsByTagName('li') && tempExp[0].getElementsByTagName('li')[1] && tempExp[0].getElementsByTagName('li')[1].innerHTML) {
         details.experience = removeExtraChars(document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[1].innerHTML.trim()).split('Year')[0].trim();
-        console.log(details.experience);
+        //console.log(details.experience);
     }
 
 
@@ -2983,7 +2996,7 @@ portalimporter.checkApplicantExistsFromTotalJobsPortal = function (req, res, nex
                 }
             }
 
-            console.log("applicants", applicants);
+            //console.log("applicants", applicants);
         }
 
         else {
@@ -3066,8 +3079,8 @@ portalimporter.checkApplicantExistsFromTotalJobsPortal = function (req, res, nex
                     json: true,
                     body: { applicants: applicants }
                 }, function (error, resp, body) {
-                    console.log("body", body);
-                    console.log("error", error);
+                    //console.log("body", body);
+                    //console.log("error", error);
                     if (!error && body) {
                         response.status = true;
                         response.message = "Response from tallint DB";
@@ -3313,7 +3326,7 @@ portalimporter.saveApplicantsFromTotalJobs = function (req, res, next) {
                             };
                             res.status(500).json(response);
                         }
-                        console.log(response);
+                        //console.log(response);
                         console.log(error);
                     });
                 }
@@ -3446,7 +3459,7 @@ portalimporter.checkApplicantExistsFromReed = function (req, res, next) {
             }
         }
 
-        console.log("applicants", applicants);
+        //console.log("applicants", applicants);
 
 
         var isTallint = req.body.isTallint || 0;
@@ -3465,8 +3478,8 @@ portalimporter.checkApplicantExistsFromReed = function (req, res, next) {
                     json: true,
                     body: { applicants: applicants }
                 }, function (error, resp, body) {
-                    console.log("body", body);
-                    console.log("error", error);
+                    //console.log("body", body);
+                    //console.log("error", error);
                     if (!error && body) {
                         response.status = true;
                         response.message = "Response from tallint DB";
@@ -3604,7 +3617,7 @@ portalimporter.saveApplicantsFromReed = function (req, res, next) {
 
         var uniqueID = document.getElementById('downloadOriginalCV');
         if (uniqueID && uniqueID.getAttribute('data-download-link') && uniqueID.getAttribute('data-download-link').split('candidateId=') && uniqueID.getAttribute('data-download-link').split('candidateId=')[1] && uniqueID.getAttribute('data-download-link').split('candidateId=')[1].split('&') && uniqueID.getAttribute('data-download-link').split('candidateId=')[1].split('&')[0]) {
-            console.log("entered uid --------------------------");
+            //console.log("entered uid --------------------------");
             details.uid = uniqueID.getAttribute('data-download-link').split('candidateId=')[1].split('&')[0];
         }
 
@@ -3671,7 +3684,7 @@ portalimporter.saveApplicantsFromReed = function (req, res, next) {
                 };
 
                 if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1) {
-                    console.log('============================', details.uid);
+                    //console.log('============================', details.uid);
                     request({
                         headers: {
                             Authorization: 'Bearer ' + req.body.tallintToken
@@ -3723,7 +3736,7 @@ portalimporter.saveApplicantsFromReed = function (req, res, next) {
                             };
                             res.status(500).json(response);
                         }
-                        console.log(response);
+                        //console.log(response);
                         console.log(error);
                     });
                 }
@@ -3750,7 +3763,7 @@ portalimporter.saveApplicantsFromReed = function (req, res, next) {
                 }
             }
             else if (req.body.isIntranet) {
-                console.log('============================', details.uid);
+                //console.log('============================', details.uid);
                 response.status = true;
                 response.message = "XML Parsed";
                 response.error = false;
@@ -3770,6 +3783,1217 @@ portalimporter.saveApplicantsFromReed = function (req, res, next) {
         res.status(500).send("Error occured");
     }
 };
+
+var jobStreetDuplicationParsing = function (element, index, portalId) {
+    if (element) {
+        var lastModifiedDate = undefined;
+        var uniqueID = undefined;
+
+        try {
+
+            if (element.getElementsByTagName('input')) {
+                if (element.getElementsByTagName('input') && element.getElementsByTagName('input')[1] && element.getElementsByTagName('input')[1].value) {
+                    uniqueID = element.getElementsByTagName('input')[1].value;
+                }
+            }
+
+            var last_modified_element = element.getElementsByTagName('table');
+            if (last_modified_element && last_modified_element[0] && last_modified_element[0].getElementsByTagName('tr')) {
+                for (let x = 0; x < last_modified_element[0].getElementsByTagName('tr').length; x++) {
+                    if (last_modified_element[0].getElementsByTagName('tr')[x] && last_modified_element[0].getElementsByTagName('tr')[x].innerHTML) {
+                        if (last_modified_element[0].getElementsByTagName('tr')[x].innerHTML.indexOf('Last Modified') > -1) {
+                            lastModifiedDate = dateConverter(removeExtraChars(last_modified_element[0].getElementsByTagName('tr')[x].innerHTML.split(':')[1]));
+                        }
+                    }
+                }
+            }
+            return { uid: uniqueID, lastModifiedDate: lastModifiedDate, portalId: portalId, index: index }
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+    }
+}
+
+portalimporter.checkApplicantExistsFromJobStreetPortal = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    try {
+
+        // var validationFlag = true;
+        var portalId = 7;
+
+        const { JSDOM } = jsdom;
+        var xml_string = req.body.xml_string;
+
+        var document = new JSDOM(xml_string).window.document;
+        var applicants = [];
+        var selected_candidates = req.body.selected_candidates;
+
+        var length1 = 0;
+        var length2 = 0;
+        if (document.getElementById('cdetail') && document.getElementById('cdetail').getElementsByTagName('tbody') && document.getElementById('cdetail').getElementsByTagName('tbody')[0]) {
+            if (document.getElementById('cdetail').getElementsByTagName('tbody')[0].getElementsByClassName('TR1'))
+                length1 = document.getElementById('cdetail').getElementsByTagName('tbody')[0].getElementsByClassName('TR1').length
+            if (document.getElementById('cdetail').getElementsByTagName('tbody')[0].getElementsByClassName('TR2'))
+                length2 = document.getElementById('cdetail').getElementsByTagName('tbody')[0].getElementsByClassName('TR2').length
+        }
+
+        if (req.body.is_select_all == 1) {
+            //console.log("req.body.is_select_all", req.body.is_select_all);
+            for (var i = 0; i < length1 + length2; i++) {
+                var element = document.getElementById('resultRow' + i);
+
+                let applicant = jobStreetDuplicationParsing(element, i, req.body.portalId || portalId);
+
+                // applicants.push({ portalId: 7, index: i, lastModifiedDate: lastModifiedDate, uid: uniqueID });
+                applicants.push(applicant);
+            }
+
+            //console.log("applicants", applicants);
+        }
+
+        else {
+            //console.log("else part");
+            for (var i = 0; i < selected_candidates.length; i++) {
+                var element = document.getElementById('resultRow' + selected_candidates[i]);
+
+                let applicant = jobStreetDuplicationParsing(element, selected_candidates[i], req.body.portalId || portalId);
+
+                applicants.push(applicant);
+            }
+        }
+
+        var isTallint = req.body.isTallint || 0;
+        var isIntranet = req.body.isIntranet || 0;
+
+        // for tallint
+        if (isTallint && !isIntranet) {
+            // var token = req.query.token;
+            // var heMasterId = req.query.heMasterId;
+            var portalId = 2;
+            //console.log("tallint api hit");
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: { applicants: applicants }
+                }, function (error, resp, body) {
+                    //console.log("body", body);
+                    console.log("error", error);
+                    if (!error && body) {
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: body
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: error
+                        };
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+
+        }
+
+        else if (isTallint && isIntranet) {
+            response.status = true;
+            response.message = "Parsed XML Successfully";
+            response.error = null;
+            response.data = applicants;
+            res.status(200).json(response);
+        }
+
+        else {
+            checkPortalApplicants(portalId, applicants, req, res);
+        }
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({});
+    }
+};
+
+
+portalimporter.saveApplicantsFromJobStreet = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occurred",
+        data: null,
+        error: null
+    };
+    try {
+
+        var portalId = req.body.portalId || 7;   // job street
+        if (typeof portalId == "string") {
+            portalId = parseInt(portalId);
+        }
+        var cvSourceId = 2;
+        // var validationFlag = true;
+
+        var details = {};
+        const { JSDOM } = jsdom;
+
+        var document = new JSDOM(req.body.xml_string).window.document;
+        // console.log('req.files.document',req.body.document);
+
+        if (document.getElementsByClassName('colLeft main-heading space-gap_front')[0]) {
+            temp_name = removeExtraChars(document.getElementsByClassName('colLeft main-heading space-gap_front')[0].innerHTML);
+            if (temp_name.split(' ')) {
+                temp_name = temp_name.split(' ');
+                details.lastName = temp_name.splice(temp_name.length - 1, 1)[0];
+                if (temp_name[0]) {
+                    details.firstName = temp_name.join(' ');
+                }
+            }
+        }
+        if (document.getElementsByClassName('section-right-inner')[0] && document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('new-pageRow')) {
+            for (var x = 0; x < document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('new-pageRow').length; x++) {
+                if (document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('new-pageRow')[x].getElementsByClassName('icon-phone icon').length > 0) {
+                    details.mobileNumber = removeExtraChars(document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('new-pageRow')[x].getElementsByClassName('colMiddle resume-summary-heading')[0].innerHTML);
+                }
+                if (document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('new-pageRow')[x].getElementsByClassName('icon-envelope').length > 0) {
+                    details.emailId = removeExtraChars(document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('new-pageRow')[x].getElementsByClassName('colMiddle resume-summary-heading')[0].innerHTML);
+                }
+            }
+        }
+        if (document.getElementsByClassName('colLeft resume-summary-heading')) {
+            for (var x = 0; x < document.getElementsByClassName('colLeft resume-summary-heading').length; x++) {
+
+                if (document.getElementsByClassName('colLeft resume-summary-heading')[x].getElementsByClassName('col-left resume-label')[0].innerHTML.indexOf('Experience') > -1) {
+                    details.experience = parseInt(removeExtraChars(document.getElementsByClassName('colLeft resume-summary-heading')[x].getElementsByClassName('col-middle')[0].innerHTML).replace(' years', ''));
+                }
+                if (document.getElementsByClassName('col-left resume-label')[x].innerHTML.indexOf('Nationality') > -1) {
+                    details.nationality = removeExtraChars(document.getElementsByClassName('colLeft resume-summary-heading')[x].getElementsByClassName('col-middle')[0].innerHTML);
+                }
+            }
+        }
+        if (document.getElementsByClassName('colLeft position-title-heading space-gap_front')[0] && document.getElementsByClassName('colLeft position-title-heading space-gap_front')[0].innerHTML) {
+            details.jobTitle = removeExtraChars(document.getElementsByClassName('colLeft position-title-heading space-gap_front')[0].innerHTML.split(' at ')[0]);
+            details.employer = removeExtraChars(document.getElementsByClassName('colLeft position-title-heading space-gap_front')[0].innerHTML.split(' at ')[1]);
+        }
+        if (document.getElementsByClassName('section-right-inner')[0] && document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('pageRow')[0] && document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('pageRow')[0].getElementsByClassName('icon-marker-dot').length) {
+            details.presentLocation = removeExtraChars(document.getElementsByClassName('section-right-inner')[0].getElementsByClassName('pageRow')[0].getElementsByClassName('colMiddle resume-summary-heading')[0].innerHTML);
+        }
+        // if (document.getElementsByClassName('resume-section-top-inner')[i]) {
+        //     if (document.getElementsByClassName('col-middle')[0]) {
+        //         details.experience = document.getElementsByClassName('col-middle')[0].innerHTML;
+        //     }
+        //     if (document.getElementsByClassName('col-middle')[i + 1]) {
+        //         details.previous = document.getElementsByClassName('col-middle')[i + 1].innerHTML.split('<br>')[i];
+        //     }
+        //     if (document.getElementsByClassName('pageRow')[i]) {
+        //         details.edu = document.getElementsByClassName('col-middle space-gap_front_2')[i].innerHTML.trim();
+        //     }
+        // }
+
+        try {
+            var tempGenderAddress = document.getElementsByClassName('resume-detail');
+            if (tempGenderAddress[tempGenderAddress.length - 1] && tempGenderAddress[tempGenderAddress.length - 1].innerHTML && tempGenderAddress[tempGenderAddress.length - 1].innerHTML.indexOf('icon-user') > -1 && tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-left').length) {
+
+                for (var i = 0; i < tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-left').length; i++) {
+                    if (tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-left')[i] && tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-left')[i].innerHTML && tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-left')[i].innerHTML.indexOf('Gender') > -1) {
+                        if (tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-middle')[i] && tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-middle')[i].innerHTML) {
+                            details.gender = removeExtraChars(tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-middle')[i].innerHTML);
+                            if (req.body.isTallint) {
+                                if (details.gender.toLowerCase() == 'male') {
+                                    details.gender = "M";
+                                }
+                                else if (details.gender.toLowerCase() == 'female') {
+                                    details.gender = "F";
+                                }
+                            }
+                        }
+                    }
+                    if (tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-middle')[i] && tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-left')[i].innerHTML.indexOf('Address') > -1) {
+                        details.address = removeExtraChars(tempGenderAddress[tempGenderAddress.length - 1].getElementsByClassName('resume-detail-item-about-me-middle')[i].innerHTML);
+                    }
+                }
+            }
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+
+        var uniqueID;
+        var lastModifiedDate;
+        try {
+            var lu_uid_element = document.getElementsByClassName('resume-update')[0];
+
+            if (lu_uid_element && lu_uid_element.getElementsByClassName('right')[0] && lu_uid_element.getElementsByClassName('right')[0].innerHTML) {
+                details.lastModifiedDate = dateConverter(removeExtraChars(lu_uid_element.getElementsByClassName('right')[0].innerHTML).split(':')[1].trim());
+            }
+
+            if (req.body.xml_string && req.body.xml_string.split('strOpenCaID')[1] && req.body.xml_string.split('strOpenCaID')[1].split(';')[0]) {
+                details.uid = req.body.xml_string.split('strOpenCaID = ')[1].split(';')[0].trim().replace(/"/g, '');
+            }
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+
+
+        //console.log("req.body.isTallint", req.body.isTallint);
+        //console.log("req.body.isIntranet", req.body.isIntranet);
+        if (typeof req.body.isTallint == "string") {
+            req.body.isTallint = parseInt(req.body.isTallint);
+        }
+        if (typeof req.body.isIntranet == "string") {
+            req.body.isIntranet = parseInt(req.body.isIntranet);
+        }
+        var isTallint = req.body.isTallint;
+        // for tallint
+        if (isTallint) {
+            delete (details.resumeText);
+            if (req.body.attachment) {
+                var attachment1 = req.body.attachment.split(',');
+                if (attachment1.length && attachment1[0] && attachment1[1]) {
+                    details.resume_document = attachment1[1];
+                    var filetype = '';
+                    if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
+                        filetype = "png";
+                    }
+                    else if (attachment1[0].indexOf('jpeg') > 0) {
+                        filetype = "jpeg";
+                    }
+                    else if (attachment1[0].indexOf('jpg') > 0) {
+                        filetype = "jpg"
+                    }
+                    else if (attachment1[0].indexOf('doc') > 0) {
+                        filetype = "docx"
+                    }
+                    else if (attachment1[0].indexOf('docx') > 0) {
+                        filetype = "docx"
+                    }
+                    else if (attachment1[0].indexOf('rtf') > 0) {
+                        filetype = "rtf"
+                    }
+                    else if (attachment1[0].indexOf('pdf') > 0) {
+                        filetype = "pdf"
+                    }
+                    else if (attachment1[0].indexOf('application/msword') > -1) {
+                        filetype = "docx"
+                    }
+                    var req_file_name = req.body.file_name;
+                    var doc_extension;
+                    if (req_file_name && req_file_name != '') {
+                        doc_extension = req_file_name.split('.');
+                        doc_extension = doc_extension[doc_extension.length - 1];
+                    }
+                    details.resume_extension = '.' + (doc_extension || filetype || 'docx');
+                }
+            }
+
+            details.portalId = portalId;
+            if (!req.body.isIntranet) {
+                var token = req.query.token;
+                var heMasterId = req.query.heMasterId;
+                // var portalId = 2;
+                // var formData = {
+                //     applicants: applicants
+                // };
+
+                var a = {
+                    FirstName: details.firstName,
+                    EmailID: details.emailId,
+                    MobileNo: details.mobileNumber,
+                    FileData: req.body.attachment
+                };
+
+                if (req.body.requirements)
+                    details.requirements = [parseInt(req.body.requirements)];
+
+                if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1) {
+                    request({
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    }, function (error, resp, body) {
+
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                resonseOfTallint: body,
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                }
+                            };
+                            if (body.Code != 'ERR0001') {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                res.status(500).json(response);
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                resonseOfTallint: error,
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                }
+                            };
+                            res.status(500).json(response);
+                        }
+                        //console.log(response);
+                        console.log(error);
+                    });
+                }
+
+
+                else {
+                    response.status = false;
+                    response.message = "Tallint error! Api url not found";
+                    response.error = null;
+                    response.data = {
+                        resonseOfTallint: error,
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        }
+                    };
+                    res.status(500).json(response);
+                }
+            }
+            else if (req.body.isIntranet) {
+                //console.log(req.body.isTallint, req.body.isIntranet);
+                response.status = true;
+                response.message = "XML Parsed";
+                response.error = false;
+                response.data = details;
+                res.status(200).json(response);
+            }
+        }
+
+        else {
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
+    }
+    catch (ex) {
+        console.log("ex", ex);
+        res.status(500).send("Error occured");
+    }
+};
+
+var bestJobsDuplicationParsing = function (element, index, portalId) {
+    if (element) {
+        var lastModifiedDate = undefined;
+        var uniqueID = undefined;
+
+        try {
+
+            if (element.getElementsByTagName('a')) {
+                if (element.getElementsByTagName('a')[0] && element.getElementsByTagName('a')[0].id) {
+                    uniqueID = element.getElementsByTagName('a')[0].id;
+                    if (uniqueID && typeof uniqueID != "string") {
+                        uniqueID = uniqueID.toString();
+                    }
+                }
+            }
+
+            var last_modified_element = element.getElementsByClassName('fecha')[0];
+            if (last_modified_element && last_modified_element.getElementsByTagName('p')[0]) {
+                var tempLastModifiedDate = removeExtraChars(last_modified_element.getElementsByTagName('p')[0].innerHTML.split('Updated ')[1]);
+                var today = new Date();
+                if (tempLastModifiedDate.indexOf('Today') > -1) {
+                    lastModifiedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                }
+                else if (tempLastModifiedDate.indexOf('Yesterday') > -1) {
+                    today.setDate(today.getDate() - 1);
+                    lastModifiedDate = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate());
+                }
+                else {
+                    if (tempLastModifiedDate.split(' ').length == 2) {
+                        tempLastModifiedDate = tempLastModifiedDate + ' ' + '2019';
+                    }
+                    lastModifiedDate = dateConverter(tempLastModifiedDate);
+                }
+            }
+            return { uid: uniqueID, lastModifiedDate: lastModifiedDate, portalId: portalId, index: index }
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+    }
+}
+
+portalimporter.checkApplicantExistsFromBestJobsPortal = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    try {
+
+        // var validationFlag = true;
+        var portalId = 14;
+
+        const { JSDOM } = jsdom;
+        var xml_string = req.body.xml_string;
+
+        var document = new JSDOM(xml_string).window.document;
+        var applicants = [];
+        var selected_candidates = req.body.selected_candidates;
+
+        var length1 = 0;
+        var length2 = 0;
+
+        if (req.body.is_select_all == 1) {
+            //console.log("req.body.is_select_all", req.body.is_select_all);
+            for (var i = 0; i < document.getElementsByClassName('cm-12 box box_c cp devclick').length; i++) {
+                var element = document.getElementsByClassName('cm-12 box box_c cp devclick')[i];
+
+                let applicant = bestJobsDuplicationParsing(element, i, 14);
+
+                // applicants.push({ portalId: 7, index: i, lastModifiedDate: lastModifiedDate, uid: uniqueID });
+                applicants.push(applicant);
+            }
+
+            //console.log("applicants", applicants);
+        }
+
+        else {
+            //console.log("else part");
+            for (var i = 0; i < selected_candidates.length; i++) {
+                var element = document.getElementsByClassName('cm-12 box box_c cp devclick')[selected_candidates[i]];
+
+                let applicant = bestJobsDuplicationParsing(element, selected_candidates[i], 14);
+
+                applicants.push(applicant);
+            }
+        }
+
+        var isTallint = req.body.isTallint || 0;
+        var isIntranet = req.body.isIntranet || 0;
+
+        // for tallint
+        if (isTallint && !isIntranet) {
+            // var token = req.query.token;
+            // var heMasterId = req.query.heMasterId;
+            var portalId = 2;
+            //console.log("tallint api hit");
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: { applicants: applicants }
+                }, function (error, resp, body) {
+                    //console.log("body", body);
+                    console.log("error", error);
+                    if (!error && body) {
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: body
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: error
+                        };
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+
+        }
+
+        else if (isTallint && isIntranet) {
+            response.status = true;
+            response.message = "Parsed XML Successfully";
+            response.error = null;
+            response.data = applicants;
+            res.status(200).json(response);
+        }
+
+        else {
+            checkPortalApplicants(portalId, applicants, req, res);
+        }
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({});
+    }
+};
+
+portalimporter.saveApplicantsFromBestJobs = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occurred",
+        data: null,
+        error: null
+    };
+    try {
+
+        var portalId = 14;   // best jobs
+        var cvSourceId = 2;
+        // var validationFlag = true;
+
+        var details = {};
+        const { JSDOM } = jsdom;
+
+        var document = new JSDOM(req.body.xml_string).window.document;
+        // console.log('req.files.document',req.body.document);
+
+        if (document.getElementById('headerCvDetail') && document.getElementById('headerCvDetail').getElementsByTagName('strong')[0] && document.getElementById('headerCvDetail').getElementsByTagName('strong')[0].innerHTML && document.getElementById('headerCvDetail').getElementsByTagName('strong')[0].innerHTML.split('of')[1]) {
+            var tempName = removeExtraChars(document.getElementById('headerCvDetail').getElementsByTagName('strong')[0].innerHTML.split('of ')[1]);
+            if (tempName) {
+                var tempArr = tempName.split(' ');
+
+                details.lastName = tempArr.splice(tempArr.length - 1, 1)[0];
+                details.firstName = tempArr.join(' ');
+            }
+        }
+
+        for (var i = 0; i < document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li').length; i++) {
+            if (document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li')[i].getElementsByClassName('icon email').length) {
+                details.emailId = removeExtraChars(document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li')[i].innerHTML.split('</span>')[1]);
+            }
+            if (document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li')[i].getElementsByClassName('fl fw_n mt3').length) {
+                if (!details.mobileNumber) {
+                    details.mobileNumber = removeExtraChars(document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li')[i].getElementsByClassName('fl fw_n mt3')[0].innerHTML);
+                }
+            }
+            if (document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li')[i].getElementsByClassName('icon pais').length) {
+                details.presentLocation = removeExtraChars(document.getElementsByClassName('cm-3 box_p_icon')[0].getElementsByTagName('ul')[1].getElementsByTagName('li')[i].innerHTML.split('</span>')[1]);
+            }
+        }
+        for (var i = 0; i < document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li').length; i++) {
+            if (document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li')[i].innerHTML.indexOf('Last modification date') > -1) {
+                //console.log(document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li')[i].getElementsByTagName('span')[0].innerHTML);
+            }
+        }
+
+        var uniqueID;
+        var lastModifiedDate;
+        try {
+            if (document.getElementsByClassName('infomodificaciones')[0] && document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li').length) {
+                for (var i = 0; i < document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li').length; i++) {
+                    if (document.getElementsByClassName('infomodificaciones')[0] && document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li')[i] && document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li')[i].innerHTML && document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li')[i].innerHTML.indexOf('Last modification date') > -1) {
+                        var tempLastModifiedDate = removeExtraChars(document.getElementsByClassName('infomodificaciones')[0].getElementsByTagName('li')[i].getElementsByTagName('span')[0].innerHTML);
+                        if (tempLastModifiedDate) {
+                            tempLastModifiedDate = tempLastModifiedDate.replace(',', '');
+                            tempLastModifiedDate = tempLastModifiedDate.split(' ');
+                            if (months.indexOf(tempLastModifiedDate[0]) > -1)
+                                tempLastModifiedDate[0] = months.indexOf(tempLastModifiedDate[0]) + 1;
+                            else if (months_full.indexOf(tempLastModifiedDate[0]) > -1)
+                                tempLastModifiedDate[0] = months_full.indexOf(tempLastModifiedDate[0]) + 1;
+
+                            tempLastModifiedDate = convertDateArrToDate(tempLastModifiedDate, 1);
+                            details.lastModifiedDate = tempLastModifiedDate;
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+
+        var xml_string = req.body.xml_string;
+        if (xml_string && xml_string.split("idcv: '")[1] && xml_string.split("idcv: '")[1].split("',")[0]) {
+            details.uid = xml_string.split("idcv: '")[1].split("',")[0];
+        }
+
+        //console.log("req.body.isTallint", req.body.isTallint);
+        //console.log("req.body.isIntranet", req.body.isIntranet);
+        if (typeof req.body.isTallint == "string") {
+            req.body.isTallint = parseInt(req.body.isTallint);
+        }
+        if (typeof req.body.isIntranet == "string") {
+            req.body.isIntranet = parseInt(req.body.isIntranet);
+        }
+        var isTallint = req.body.isTallint;
+        // for tallint
+        if (isTallint) {
+            delete (details.resumeText);
+            if (req.body.attachment) {
+                var attachment1 = req.body.attachment.split(',');
+                if (attachment1.length && attachment1[0] && attachment1[1]) {
+                    details.resume_document = attachment1[1];
+                    var filetype = '';
+                    if (document.getElementById('cvCandidatePdf')) {
+                        if (document.getElementById('cvCandidatePdf').getElementsByClassName('icon doc_hdv')[0]) {
+                            filetype = "docx";
+                        }
+                        else {
+                            filetype = "pdf";
+                        }
+                    }
+                    // if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
+                    //     filetype = "png";
+                    // }
+                    // else if (attachment1[0].indexOf('jpeg') > 0) {
+                    //     filetype = "jpeg";
+                    // }
+                    // else if (attachment1[0].indexOf('jpg') > 0) {
+                    //     filetype = "jpg"
+                    // }
+                    // else if (attachment1[0].indexOf('doc') > 0) {
+                    //     filetype = "docx"
+                    // }
+                    // else if (attachment1[0].indexOf('docx') > 0) {
+                    //     filetype = "docx"
+                    // }
+                    // else if (attachment1[0].indexOf('rtf') > 0) {
+                    //     filetype = "rtf"
+                    // }
+                    // else if (attachment1[0].indexOf('pdf') > 0) {
+                    //     filetype = "pdf"
+                    // }
+                    // else if (attachment1[0].indexOf('application/msword') > -1) {
+                    //     filetype = "docx"
+                    // }
+                    details.resume_extension = '.' + filetype || 'docx';
+                }
+            }
+
+            details.portalId = portalId;
+            if (!req.body.isIntranet) {
+                var token = req.query.token;
+                var heMasterId = req.query.heMasterId;
+                // var portalId = 2;
+                // var formData = {
+                //     applicants: applicants
+                // };
+
+                var a = {
+                    FirstName: details.firstName,
+                    EmailID: details.emailId,
+                    MobileNo: details.mobileNumber,
+                    FileData: req.body.attachment
+                };
+
+                if (req.body.requirements)
+                    details.requirements = [parseInt(req.body.requirements)];
+
+                if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1) {
+                    request({
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    }, function (error, resp, body) {
+
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                resonseOfTallint: body,
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                }
+                            };
+                            if (body.Code != 'ERR0001') {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                res.status(500).json(response);
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                resonseOfTallint: error,
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                }
+                            };
+                            res.status(500).json(response);
+                        }
+                        //console.log(response);
+                        console.log(error);
+                    });
+                }
+
+
+                else {
+                    response.status = false;
+                    response.message = "Tallint error! Api url not found";
+                    response.error = null;
+                    response.data = {
+                        resonseOfTallint: error,
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        }
+                    };
+                    res.status(500).json(response);
+                }
+            }
+            else if (req.body.isIntranet) {
+                //console.log(req.body.isTallint, req.body.isIntranet);
+                response.status = true;
+                response.message = "XML Parsed";
+                response.error = false;
+                response.data = details;
+                res.status(200).json(response);
+            }
+        }
+
+        else {
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
+    }
+    catch (ex) {
+        console.log("ex", ex);
+        res.status(500).send("Error occured");
+    }
+};
+
+
+var jobSearchDuplicationParsing = function (element, index, portalId) {
+    if (element) {
+        var lastModifiedDate = undefined;
+        var uniqueID = undefined;
+
+        try {
+            if (element.FirstName) {
+                firstName = element.FirstName;
+            }
+
+            if (element.LastName) {
+                lastName = element.LastName;
+            }
+
+            if (element.Details && element.Details.EmailAddress) {
+                emailId = element.Details.EmailAddress;
+            }
+
+            if (element.Details && element.Details.MobilePhoneNumber) {
+                mobileNumber = element.Details.MobilePhoneNumber;
+            }
+
+            if (element.CandidateId) {
+                uniqueID = element.CandidateId;
+                if (uniqueID && typeof uniqueID != "string") {
+                    uniqueID = uniqueID.toString();
+                }
+            }
+
+            var last_modified_element = element.UpdatedOn;
+            if (last_modified_element) {
+                var temp_last_modified = new Date(last_modified_element);
+                if (temp_last_modified && temp_last_modified.getDate() && temp_last_modified.getMonth() && temp_last_modified.getFullYear()) {
+                    lastModifiedDate = temp_last_modified.getFullYear() + '-' + (temp_last_modified.getMonth() + 1) + '-' + temp_last_modified.getDate();
+                }
+            }
+            return { firstName: firstName, lastName: lastName, emailId: emailId, mobileNumber: mobileNumber, uid: uniqueID, lastModifiedDate: lastModifiedDate, portalId: portalId, index: index }
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+    }
+}
+
+
+portalimporter.checkApplicantExistsFromJobSearchPortal = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    try {
+
+        var portalId = 15;
+
+        const { JSDOM } = jsdom;
+        var xml_string = req.body.xml_string;
+
+        var candidate_details = JSON.parse(xml_string);
+        var applicants = [];
+        var selected_candidates = req.body.selected_candidates;
+
+        if (req.body.is_select_all == 1) {
+            //console.log("req.body.is_select_all", req.body.is_select_all);
+            for (var i = 0; i < candidate_details.length; i++) {
+                var element = candidate_details[i];
+
+                let applicant = jobSearchDuplicationParsing(element, i, 15);
+
+                // applicants.push({ portalId: 7, index: i, lastModifiedDate: lastModifiedDate, uid: uniqueID });
+                applicants.push(applicant);
+            }
+
+            //console.log("applicants", applicants);
+        }
+
+        else {
+            //console.log("else part");
+            for (var i = 0; i < selected_candidates.length; i++) {
+                var element = candidate_details[selected_candidates[i]];
+
+                let applicant = jobSearchDuplicationParsing(element, selected_candidates[i], 15);
+
+                applicants.push(applicant);
+            }
+        }
+
+        var isTallint = req.body.isTallint || 0;
+        var isIntranet = req.body.isIntranet || 0;
+
+        // for tallint
+        if (isTallint && !isIntranet) {
+            // var token = req.query.token;
+            // var heMasterId = req.query.heMasterId;
+            var portalId = 2;
+            //console.log("tallint api hit");
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: { applicants: applicants }
+                }, function (error, resp, body) {
+                    //console.log("body", body);
+                    console.log("error", error);
+                    if (!error && body) {
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: body
+                        };
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error from tallint DB";
+                        response.error = null;
+                        response.data = {
+                            ourjson: applicants,
+                            resonseOfTallint: error
+                        };
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+
+        }
+
+        else if (isTallint && isIntranet) {
+            response.status = true;
+            response.message = "Parsed XML Successfully";
+            response.error = null;
+            response.data = applicants;
+            res.status(200).json(response);
+        }
+
+        else {
+            checkPortalApplicants(portalId, applicants, req, res);
+        }
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({});
+    }
+};
+
+portalimporter.saveApplicantsFromJobSearch = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occurred",
+        data: null,
+        error: null
+    };
+    try {
+
+        var portalId = 15;   // JobSearch
+        var cvSourceId = 2;
+        // var validationFlag = true;
+
+        var details = {};
+        const { JSDOM } = jsdom;
+
+        var document; // = req.body.xml_string || JSON.parse(req.body.xml_string).window.document;
+
+        if (typeof req.body.xml_string == "string") {
+            document = JSON.parse(req.body.xml_string);
+        }
+        else {
+            document = req.body.xml_string;
+        }
+
+        try {
+            if (document.FirstName) {
+                details.firstName = document.FirstName;
+            }
+
+            if (document.LastName) {
+                details.lastName = document.LastName;
+            }
+
+            if (document.Details && document.Details.EmailAddress) {
+                details.emailId = document.Details.EmailAddress;
+            }
+
+            if (document.Details && document.Details.MobilePhoneNumber) {
+                details.mobileNumber = document.Details.MobilePhoneNumber;
+            }
+
+            if (document.CandidateId) {
+                details.uid = document.CandidateId;
+            }
+
+            var last_modified_element = document.UpdatedOn;
+            if (last_modified_element) {
+                var temp_last_modified = new Date(last_modified_element);
+                if (temp_last_modified && temp_last_modified.getDate() && temp_last_modified.getMonth() && temp_last_modified.getFullYear()) {
+                    details.lastModifiedDate = temp_last_modified.getFullYear() + '-' + (temp_last_modified.getMonth() + 1) + '-' + temp_last_modified.getDate();
+                }
+            }
+        }
+
+        catch (err) {
+            console.log(err);
+        }
+
+        if (typeof req.body.isTallint == "string") {
+            req.body.isTallint = parseInt(req.body.isTallint);
+        }
+        if (typeof req.body.isIntranet == "string") {
+            req.body.isIntranet = parseInt(req.body.isIntranet);
+        }
+        var isTallint = req.body.isTallint;
+        // for tallint
+        if (isTallint) {
+            delete (details.resumeText);
+            if (req.body.attachment) {
+                var attachment1 = req.body.attachment.split(',');
+                if (attachment1.length && attachment1[0] && attachment1[1]) {
+                    details.resume_document = attachment1[1];
+                    var filetype = '';
+                    if (document.Resume && document.Resume.FileType) {
+                        filetype = document.Resume.FileType;
+                    }
+                    details.resume_extension = '.' + filetype || 'docx';
+                }
+            }
+
+            details.portalId = portalId;
+            if (!req.body.isIntranet) {
+                var token = req.query.token;
+                var heMasterId = req.query.heMasterId;
+                // var portalId = 2;
+                // var formData = {
+                //     applicants: applicants
+                // };
+
+                if (req.body.requirements)
+                    details.requirements = [parseInt(req.body.requirements)];
+
+                if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1) {
+                    request({
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    }, function (error, resp, body) {
+
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                resonseOfTallint: body,
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                }
+                            };
+                            if (body.Code != 'ERR0001') {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                res.status(500).json(response);
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                resonseOfTallint: error,
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                }
+                            };
+                            res.status(500).json(response);
+                        }
+                        //console.log(response);
+                        console.log(error);
+                    });
+                }
+
+
+                else {
+                    response.status = false;
+                    response.message = "Tallint error! Api url not found";
+                    response.error = null;
+                    response.data = {
+                        resonseOfTallint: error,
+                        ourjson: {
+                            headers: {
+                                Authorization: 'Bearer ' + req.body.tallintToken
+                            },
+                            url: req.body.tallint_url,
+                            method: "POST",
+                            json: true,
+                            body: details
+                        }
+                    };
+                    res.status(500).json(response);
+                }
+            }
+            else if (req.body.isIntranet) {
+                //console.log(req.body.isTallint, req.body.isIntranet);
+                response.status = true;
+                response.message = "XML Parsed";
+                response.error = false;
+                response.data = details;
+                res.status(200).json(response);
+            }
+        }
+
+        else {
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
+    }
+    catch (ex) {
+        console.log("ex", ex);
+        res.status(500).send({ message: "Error occured" });
+    }
+};
+
 
 
 module.exports = portalimporter;
