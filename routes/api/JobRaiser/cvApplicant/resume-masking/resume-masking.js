@@ -95,7 +95,10 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
                 var clientCVMaskMobileNo = Result[0][0].clientCVMaskMobileNo;
                 var clientCVMaskEmail = Result[0][0].clientCVMaskEmail;
                 var logoFile = Result[0][0].logoFile;
-
+                var logoAligment = Result[0][0].logoAligment ? Result[0][0].logoAligment.toUpperCase() : 'LEFT';
+                var clientCVHeaderAligment = Result[0][0].clientCVHeaderAligment ? Result[0][0].clientCVHeaderAligment.toUpperCase() : 'LEFT';
+                var clientCVFooterAligment = Result[0][0].clientCVFooterAligment ? Result[0][0].clientCVFooterAligment.toUpperCase() : 'LEFT';
+            
                 // if doc file then first convert it to docx and update the database
 
                 new Promise(function (resolve, reject) {
@@ -130,9 +133,9 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
                         logoFile = 'https://storage.googleapis.com/ezeone/' + logoFile;
                     }
 
-                    console.log(path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail);
+                    console.log(path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail,logoAligment,clientCVHeaderAligment,clientCVFooterAligment);
 
-                    var spawn_process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail]);
+                    var spawn_process = spawn('python', [path.resolve(__dirname, "word.py"), 'https://storage.googleapis.com/ezeone/', orgCVPath, uniqueId, logoFile, clientCVHeader, clientCVFooter, clientCVMaskMobileNo, clientCVMaskEmail,logoAligment,clientCVHeaderAligment,clientCVFooterAligment]);
                     // fs.readFile(path.resolve(__dirname, "word.py"), function (err, res) {
                     //     console.log(err, res);
                     // })

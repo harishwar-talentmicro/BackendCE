@@ -2,6 +2,7 @@ try:
     import re
     from docx import Document
     from docx.shared import Inches
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
     import requests
     from io import BytesIO
     from io import StringIO
@@ -51,14 +52,31 @@ try:
     # doc.save('result2.docx')
     # with open("yourfile.ext", "rb") as image_file:
     #     encoded_string = base64.b64encode(image_file.read())
+
     section = doc.sections[0]
     header = section.header
     first_paragraph = header.paragraphs[0] # contains a empty paragraph access it and edit next
     image_paragraph = first_paragraph.insert_paragraph_before()
+    
+    if sys.argv[9] == 'RIGHT':
+        image_paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
+    elif sys.argv[9] == 'LEFT':
+        image_paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT 
+    else:
+        image_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER 
+    
     header_image = image_paragraph.add_run()
     header_image.add_picture(
         BytesIO(requests.get(sys.argv[4]).content), width=Inches(1.5))
     text_paragraph = first_paragraph.insert_paragraph_before()
+
+    if  sys.argv[10] == 'RIGHT':
+        text_paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT 
+    elif sys.argv[10] == 'LEFT':
+        text_paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT 
+    else:
+        text_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER 
+
     header_text = text_paragraph.add_run()
     header_text.add_text(sys.argv[5])
 
