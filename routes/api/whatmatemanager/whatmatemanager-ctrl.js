@@ -506,6 +506,7 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             var res1 = {};
                             res1.formName = dashboard[i].formName ? dashboard[i].formName : '';
                             res1.formId = dashboard[i].formId ? dashboard[i].formId : 0;
+                            res1.isExpenseClaim = dashboard[i].isExpenseClaim ? dashboard[i].isExpenseClaim : 0;
                             res1.statusList = JSON.parse(dashboard[i].statusList) ? JSON.parse(dashboard[i].statusList) : [];
                             output.push(res1);
                         }
@@ -537,7 +538,24 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                         };
                         res.status(200).json(response);
                     }
-                  
+                    else if(!err && result && result[1] && result[1][0]){
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            userManager : result[1][0].userManager,
+                            masterConfiguration : result[1][0].masterConfiguration,
+                            attendanceRequest : result[1][0].attendanceRequest,
+                            adoptionReport : result[1][0].adoptionReport,
+                            empDocuments : result[1][0].empDocuments,
+                            eventManager : result[1][0].eventManager,
+                            HRPayrollDocs : result[1][0].HRPayrollDocs,
+                            sales : result[1][0].sales,
+                            formList : [],
+                           accessableFormList : result[2] && result[2][0] && result[2][0].formList ? JSON.parse(result[2][0].formList) : null
+                        };
+                        res.status(200).json(response);
+                    }
                     else if(!err ){
                         response.status = true;
                         response.message = "No data found";

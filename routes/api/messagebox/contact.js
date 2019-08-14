@@ -785,7 +785,6 @@ router.post('/addressBook',function(req, res, next){
     var error = {};
 
     var mobileCount = 0;
-    var mobileData = contactList[mobileCount];
     var message;
     var attachmentObject = '';
     var senderGroupId;
@@ -820,12 +819,16 @@ router.post('/addressBook',function(req, res, next){
                 zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                     var contactList = req.body.contactList;
+
                     if(typeof(contactList) == "string") {
                         contactList = JSON.parse(contactList);
                     }
                     if(!contactList){
                         contactList = [];
                     }
+
+                    var mobileData = contactList[mobileCount];
+
                     if (!validationFlag){
                         response.error = error;
                         response.message = 'Please check the errors';

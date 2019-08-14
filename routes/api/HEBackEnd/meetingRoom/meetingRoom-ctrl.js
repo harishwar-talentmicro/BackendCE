@@ -1,106 +1,134 @@
 /**
  * Created by Jana1 on 01-08-2017.
  */
+var logger = require('../../error-logger/error-log.js');  // for logging errors
 
 
 var meetingRoomCtrl = {};
 var error = {};
 
-meetingRoomCtrl.saveMeetingRoom = function(req,res,next){
-    var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
-    };
-    var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
-    if (!req.body.title)
-    {
-        error.title = 'Invalid title';
-        validationFlag *= false;
+meetingRoomCtrl.saveMeetingRoom = function (req, res, next) {
+
+    var error_response = {
+        status: false,
+        message: "Some error occured",
+        error: null,
+        data: null
     }
 
-    if (!req.query.APIKey)
-    {
-        error.APIKey = 'Invalid APIKey';
-        validationFlag *= false;
+    var error_logger = {
+        details: 'meetingRoom/meetingRoom-Ctrl : meetingRoom.saveMeetingRoom',
     }
 
-    if (!validationFlag){
-        response.error = error;
-        response.message = 'Please check the errors';
-        res.status(400).json(response);
-        console.log(response);
-    }
-    else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+    try {
+        var response = {
+            status: false,
+            message: "Invalid token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.body.title) {
+            error.title = 'Invalid title';
+            validationFlag *= false;
+        }
 
-                req.body.roomId = req.body.roomId ? req.body.roomId : 0;
-                req.body.image = req.body.image ? req.body.image : "";
+        if (!req.query.APIKey) {
+            error.APIKey = 'Invalid APIKey';
+            validationFlag *= false;
+        }
 
-                var procParams = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.APIKey),
-                    req.st.db.escape(req.body.roomId),
-                    req.st.db.escape(req.body.title),
-                    req.st.db.escape(req.body.pax),
-                    req.st.db.escape(req.body.image),
-                    req.st.db.escape(req.body.workLocationId)
-                ];
-                /**
-                 * Calling procedure to save form template
-                 * @type {string}
-                 */
-                var procQuery = 'CALL HE_save_meetingRooms( ' + procParams.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery,function(err,meetingRoomResult){
-                    if(!err && meetingRoomResult && meetingRoomResult[0] && meetingRoomResult[0][0].roomId){
-                        response.status = true;
-                        response.message = "Meeting room saved successfully";
-                        response.error = null;
-                        response.data = {
-                          roomId : meetingRoomResult[0][0].roomId,
-                          title : req.body.title,
-                          pax : req.body.pax,
-                          workLocationId : req.body.workLocationId,
-                          image : (req.body.image) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.body.image) : ""
-                        };
-                        res.status(200).json(response);
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+
+                        req.body.roomId = req.body.roomId ? req.body.roomId : 0;
+                        req.body.image = req.body.image ? req.body.image : "";
+
+                        var procParams = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.APIKey),
+                            req.st.db.escape(req.body.roomId),
+                            req.st.db.escape(req.body.title),
+                            req.st.db.escape(req.body.pax),
+                            req.st.db.escape(req.body.image),
+                            req.st.db.escape(req.body.workLocationId)
+                        ];
+                        /**
+                         * Calling procedure to save form template
+                         * @type {string}
+                         */
+                        var procQuery = 'CALL HE_save_meetingRooms( ' + procParams.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, meetingRoomResult) {
+                            try {
+                                if (!err && meetingRoomResult && meetingRoomResult[0] && meetingRoomResult[0][0].roomId) {
+                                    response.status = true;
+                                    response.message = "Meeting room saved successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        roomId: meetingRoomResult[0][0].roomId,
+                                        title: req.body.title,
+                                        pax: req.body.pax,
+                                        workLocationId: req.body.workLocationId,
+                                        image: (req.body.image) ? (req.CONFIG.CONSTANT.GS_URL + req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.body.image) : ""
+                                    };
+                                    res.status(200).json(response);
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "Meeting room saved successfully";
+                                    response.error = null;
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    error_logger.error = err;
+                                    error_logger.proc_call = procQuery;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            } catch (ex) {
+                                error_logger.error = ex;
+                                error_logger.proc_call = procQuery;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
+                        });
                     }
-                    else if(!err){
-                        response.status = true;
-                        response.message = "Meeting room saved successfully";
-                        response.error = null;
-                        res.status(200).json(response);
+                    else {
+                        res.status(401).json(response);
                     }
-                    else{
-                        response.status = false;
-                        response.message = "Error while saving meeting room";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
-                    }
-                });
-            }
-            else{
-                res.status(401).json(response);
-            }
-        });
+                } catch (ex) {
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    } catch (ex) {
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
     }
-
 };
 
-meetingRoomCtrl.getMeetingRoomList = function(req,res,next){
+meetingRoomCtrl.getMeetingRoomList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Error while loading currency",
-        data : null,
-        error : null
+        status: false,
+        message: "Error while loading currency",
+        data: null,
+        error: null
     };
 
     var validationFlag = true;
@@ -109,21 +137,20 @@ meetingRoomCtrl.getMeetingRoomList = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.APIKey)
-    {
+    if (!req.query.APIKey) {
         error.APIKey = 'Invalid APIKey';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -135,13 +162,13 @@ meetingRoomCtrl.getMeetingRoomList = function(req,res,next){
                  */
                 var procQuery = 'CALL he_get_meetingRoom( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,meetingRoomResult){
-                    if(!err && meetingRoomResult && meetingRoomResult[0] && meetingRoomResult[0][0]){
+                req.db.query(procQuery, function (err, meetingRoomResult) {
+                    if (!err && meetingRoomResult && meetingRoomResult[0] && meetingRoomResult[0][0]) {
                         response.status = true;
                         response.message = "Meeting room list loaded successfully";
                         response.error = null;
                         var output = [];
-                        for(var i = 0; i < meetingRoomResult[0].length; i++) {
+                        for (var i = 0; i < meetingRoomResult[0].length; i++) {
                             var res1 = {};
                             res1.roomId = meetingRoomResult[0][i].roomId;
                             res1.title = meetingRoomResult[0][i].title;
@@ -153,14 +180,14 @@ meetingRoomCtrl.getMeetingRoomList = function(req,res,next){
                         response.data = output;
                         res.status(200).json(response);
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No data found";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting meeting rooms";
                         response.error = null;
@@ -169,7 +196,7 @@ meetingRoomCtrl.getMeetingRoomList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });

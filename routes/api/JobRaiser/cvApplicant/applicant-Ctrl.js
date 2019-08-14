@@ -1316,14 +1316,16 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                             req.st.db.escape(req.body.cvUpdatedUserName || ""),
                             req.st.db.escape(req.body.reqCvCreatedUserName || ""),
                             req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
-                            req.st.db.escape(req.body.cvCreatedDate || null),
-                            req.st.db.escape(req.body.cvUpdatedDate || null),
-                            req.st.db.escape(req.body.reqCvCreatedDate || null),
-                            req.st.db.escape(req.body.reqCvUpdatedDate || null),
+                            req.st.db.escape(JSON.stringify(req.body.cvCreatedDate || {})),
+                            req.st.db.escape(JSON.stringify(req.body.cvUpdatedDate || {})),
+                            req.st.db.escape(JSON.stringify(req.body.reqCvCreatedDate || {})),
+                            req.st.db.escape(JSON.stringify(req.body.reqCvUpdatedDate || {})),
                             req.st.db.escape(req.body.emigrationCheck || ""),
-                            req.st.db.escape(req.body.DOB || null),
-                            req.st.db.escape(req.body.ppExpiryDate || null),
-                            req.st.db.escape(req.body.ppIssueDate || null)
+                            req.st.db.escape(JSON.stringify(req.body.DOB || {})),
+                            req.st.db.escape(JSON.stringify(req.body.ppExpiryDate || {})),
+                            req.st.db.escape(JSON.stringify(req.body.ppIssueDate || {})),
+                            req.st.db.escape(req.body.isExport || 0),
+                            req.st.db.escape(req.body.customRange || 0)
                         ];
 
                         var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';

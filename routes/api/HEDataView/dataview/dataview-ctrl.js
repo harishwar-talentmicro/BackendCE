@@ -2061,7 +2061,8 @@ LoginCtrl.getClaimDetails = function (req, res, next) {
                         }
 
                         response.data = {
-                            claimDetails: result[0] && result[0][0] ? result[0] : []
+                            claimDetails: result[0] && result[0][0] ? result[0] : [],
+                            enableRefNumber : result[1][0] ? result[1][0].enableRefNumber : 0
                         }
 
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2188,7 +2189,7 @@ LoginCtrl.updateExpenseClaimTransactionData = function (req, res, next) {
                             details: result[0] && result[0][0] ? result[0][0] : null
                         }
                         response.data.expenseList = result[1] && result[1][0] ? result[1] : []
-
+                        enableRefNumber : result[2][0] ? result[2][0].enableRefNumber : 0
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         // zlib.gzip(buf, function (_, result) {
                         //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
@@ -2267,7 +2268,11 @@ LoginCtrl.saveExpenseTypes = function (req, res, next) {
                     req.st.db.escape(req.body.GLCode || ""),
                     req.st.db.escape(req.body.expenseTypeId || 0),
                     req.st.db.escape(req.body.minAmount || 0),
-                    req.st.db.escape(req.body.maxAmount || 0)
+                    req.st.db.escape(req.body.maxAmount || 0),
+                    req.st.db.escape(req.body.enableExpConveyance || 0),
+                    req.st.db.escape(req.body.enableExpVault || 0),
+                    req.st.db.escape(req.body.enableRefNumber || 0),
+                    req.st.db.escape(req.body.enableExpTime || 0)
                 ];
                 /**
                  * Calling procedure to get form template
@@ -2282,7 +2287,8 @@ LoginCtrl.saveExpenseTypes = function (req, res, next) {
                         response.error = null;
 
                         response.data = {
-                            expenseTypeList: result[0] && result[0][0] ? result[0] : []
+                            expenseTypeList: result[0] && result[0][0] ? result[0] : [],
+                            configData : result[1][0]
                         }
 
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2367,13 +2373,14 @@ LoginCtrl.getExpenseTypes = function (req, res, next) {
                 var procQuery = 'CALL wm_get_expenseTypesList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
                 req.db.query(procQuery, function (err, result) {
-                    if (!err && result && result[0]) {
+                    if (!err && result) {
                         response.status = true;
                         response.message = "Data loaded successfully";
                         response.error = null;
 
                         response.data = {
-                            expenseTypeList: result[0] && result[0][0] ? result[0] : []
+                            expenseTypeList: result[0] && result[0][0] ? result[0] : [],
+                            configData : result[1][0]
                         }
 
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

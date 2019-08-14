@@ -124,7 +124,9 @@ masterCtrl.expenseMasterData = function(req,res,next){
                                 currencyId : expenseMaster[2][0].currencyId ? expenseMaster[2][0].currencyId : 0,
                                 currencySymbol : expenseMaster[2][0].currencySymbol ? expenseMaster[2][0].currencySymbol : "",
                                 conversionRate : expenseMaster[2][0].conversionRate ? expenseMaster[2][0].conversionRate : 0
-                            }
+                            },
+                            enableExpConveyance : expenseMaster[3][0].enableExpConveyance,
+                            enableRefNumber : expenseMaster[3][0].enableRefNumber
                         }
                     }
                     else
@@ -136,7 +138,9 @@ masterCtrl.expenseMasterData = function(req,res,next){
                                 currencyId :  0,
                                 currencySymbol : "",
                                 conversionRate : 0
-                            }
+                            },
+                            enableExpConveyance : 0,
+                            enableExpVault : 0
                         }
                     }
 

@@ -137,7 +137,9 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
                             req.st.db.escape(req.body.createdTimeStamp),
-                            req.st.db.escape(req.body.isExpenseClaim || 0)
+                            req.st.db.escape(req.body.isExpenseClaim || 0),
+                            req.st.db.escape(req.body.isResubmit || 0),
+                            req.st.db.escape(req.body.resubmitNotes || "")
                    ];
 
                         var travelClaimFormId=1007;
@@ -151,7 +153,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                          * Calling procedure to save form template
                          * @type {string}
                          */
-                            var procQuery = 'CALL HE_save_travelClaim_new( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+                            var procQuery = 'CALL HE_save_travelClaim_new_v1( ' + procParams.join(',') +');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
                             console.log(procQuery);
                             req.db.query(procQuery,function(err,results){
                                 // console.log(results);
@@ -219,7 +221,8 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
                                     //         console.log('postNotification : notification for compose_message is sent successfully');
                                     //     }
                                     // }
-            
+                                    
+                                    /*
                                     // pdf generation starts
                                     if(results[2] && results[2][0] && results[3] && results[4] ){
                                         var reportData = {
@@ -265,6 +268,7 @@ travelClaimCtrl.saveTravelClaim = function(req,res,next){
             
             
                                     }
+                                    */
                                     // pdf generation ends
                                     notifyMessages.getMessagesNeedToNotify();
                                     response.status = true;
@@ -343,15 +347,19 @@ travelClaimCtrl.getTravelRequest = function(req,res,next){
                     response.status = true;
                     response.message = "Travel request loaded successfully";
                     response.error = null;
-                    if(!err && travelRequestResult[1][0]){
+                    if(!err && travelRequestResult && travelRequestResult[1][0]){
                         response.data = {
                             travelRequestList : travelRequestResult[0],
                             defaultUserCurrency : {
-                                currencyId : travelRequestResult[1][0].currencyId ? travelRequestResult[1][0].currencyId : 0,
-                                currencySymbol : travelRequestResult[1][0].currencySymbol ? travelRequestResult[1][0].currencySymbol : "",
-                                conversionRate : travelRequestResult[1][0].conversionRate ? travelRequestResult[1][0].conversionRate : 0
+                                currencyId : travelRequestResult[1] && travelRequestResult[1][0].currencyId ? travelRequestResult[1][0].currencyId : 0,
+                                currencySymbol : travelRequestResult[1] && travelRequestResult[1][0].currencySymbol ? travelRequestResult[1][0].currencySymbol : "",
+                                conversionRate : travelRequestResult[1] && travelRequestResult[1][0].conversionRate ? travelRequestResult[1][0].conversionRate : 0
                             },
-                            currencyList : travelRequestResult[2]
+                            currencyList : travelRequestResult[2],
+                            enableExpConveyance : travelRequestResult[3][0].enableExpConveyance ? travelRequestResult[3][0].enableExpConveyance : 0,
+                            enableRefNumber : travelRequestResult[3][0].enableRefNumber ? travelRequestResult[3][0].enableRefNumber : 0,
+                            hideExpTime : travelRequestResult[3][0].hideExpTime ? travelRequestResult[3][0].hideExpTime : 0,
+                            statusSegmentColor : travelRequestResult[4] && travelRequestResult[4][0]  && JSON.parse(travelRequestResult[4][0].statusSegmentColor) ? JSON.parse(travelRequestResult[4][0].statusSegmentColor) : []
                         }
                     }
                     else{
@@ -362,7 +370,12 @@ travelClaimCtrl.getTravelRequest = function(req,res,next){
                                 currencySymbol : "",
                                 conversionRate : 0
                             },
-                            currencyList : travelRequestResult[2]
+                            currencyList : travelRequestResult[2],
+                            enableExpConveyance : travelRequestResult[3][0].enableExpConveyance ? travelRequestResult[3][0].enableExpConveyance : 0,
+                            enableRefNumber : travelRequestResult[3][0].enableRefNumber ? travelRequestResult[3][0].enableRefNumber : 0,
+                            hideExpTime : travelRequestResult[3][0].hideExpTime ? travelRequestResult[3][0].hideExpTime : 0,
+                            statusSegmentColor : travelRequestResult[4] && travelRequestResult[4][0]  && JSON.parse(travelRequestResult[4][0].statusSegmentColor) ? JSON.parse(travelRequestResult[4][0].statusSegmentColor) : []
+
                         }
                     }
 

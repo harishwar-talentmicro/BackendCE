@@ -1689,6 +1689,8 @@ masterCtrl.saveMasterStageStatus = function (req, res, next) {
 };
 
 masterCtrl.getRequirementView = function (req, res, next) {
+    
+    var error = {};
     var response = {
         status: false,
         message: "Invalid token",
@@ -2035,7 +2037,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
 
                     }
                     else {
-
+                        var validationFlag = true;
                         if (!validationFlag) {
                             response.error = error;
                             response.message = 'Please check the errors';
@@ -2100,11 +2102,11 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                         stageList: results[3] && results[3][0] ? results[3] : []
                                     };
 
-                                    var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                    zlib.gzip(buf, function (_, result) {
-                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                    // zlib.gzip(buf, function (_, result) {
+                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                         res.status(200).json(response);
-                                    });
+                                    // });
 
                                 }
                                 else if (!err) {

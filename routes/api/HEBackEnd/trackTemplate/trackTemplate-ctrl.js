@@ -73,6 +73,7 @@ trackTemplateCtrl.saveTrackTemplate = function(req,res,next){
                 req.body.address = (req.body.address) ? req.body.address : '';
                 req.body.latitude = (req.body.latitude) ? req.body.latitude : 0;
                 req.body.longitude = (req.body.longitude) ? req.body.longitude : 0;
+                req.body.userId = (req.body.userId) ? req.body.userId : 0;
 
 
 
@@ -108,7 +109,8 @@ trackTemplateCtrl.saveTrackTemplate = function(req,res,next){
                     req.st.db.escape(req.body.address),
                     req.st.db.escape(req.body.latitude),
                     req.st.db.escape(req.body.longitude),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.userId)
                 ];
                 /**
                  * Calling procedure to save track template
@@ -244,7 +246,9 @@ trackTemplateCtrl.updateTrackTemplate = function(req,res,next){
                     req.st.db.escape(req.body.address),
                     req.st.db.escape(req.body.latitude),
                     req.st.db.escape(req.body.longitude),
-                    req.st.db.escape(req.query.APIKey)
+                    req.st.db.escape(req.query.APIKey),
+                    req.st.db.escape(req.body.userId)
+                    
 
 
                 ];
