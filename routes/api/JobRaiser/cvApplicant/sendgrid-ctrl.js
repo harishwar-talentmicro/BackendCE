@@ -1581,6 +1581,24 @@ sendgridCtrl.ScreeningMailerPreview = function (req, res, next) {
                                                         }
                                                     }
 
+                                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                                        // 
+                                                        if ((result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] != null && result[0][applicantIndex][tags.client[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.client[tagIndex].tagName] != '') || result[0][applicantIndex][tags.client[tagIndex].tagName] >= 0) {
+
+                                                            mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                            subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                            smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                            // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                            // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                                            // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                                        }
+                                                    }
+
 
                                                     applicantData.push(result[0][applicantIndex].EmailId);
                                                     JDAttachment.push(result[0][applicantIndex].JDAttachment);
@@ -1899,6 +1917,24 @@ sendgridCtrl.screeningMailer = function (req, res, next) {
                                                             }
                                                         }
 
+                                                        for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+                                                            // 
+                                                            if ((result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] != null && result[0][applicantIndex][tags.client[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.client[tagIndex].tagName] != '') || result[0][applicantIndex][tags.client[tagIndex].tagName] >= 0) {
+    
+                                                                mailBody = replaceAll(mailBody, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+    
+                                                                subject = replaceAll(subject, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+    
+                                                                smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+    
+                                                                // mailBody = mailBody.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+    
+                                                                // subject = subject.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+    
+                                                                // smsMsg = smsMsg.replace('[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+                                                            }
+                                                        }
+                                                        
                                                         mailbody_array.push(mailBody);
                                                         subject_array.push(subject);
                                                         smsMsg_array.push(smsMsg);
