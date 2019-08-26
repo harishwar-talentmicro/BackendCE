@@ -2,6 +2,7 @@ try:
     import re
     from docx import Document
     from docx.shared import Inches
+    from docx.shared import RGBColor
     from docx.enum.text import WD_ALIGN_PARAGRAPH
     import requests
     from io import BytesIO
@@ -86,6 +87,8 @@ try:
     footer_paragraph = last_paragraph.insert_paragraph_before()
     footer_text = footer_paragraph.add_run()
     footer_text.add_text(sys.argv[6])
+    footer_text = footer_text.font
+    footer_text.color.rgb = RGBColor(0,0,255)
 
    # paragraph.add_picture('download.png', width=Inches(1.25))
     try:
