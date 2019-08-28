@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var http = require('https');
 var request = require('request');
 var zlib = require('zlib');
+var path = require('path');
+
 var AES_256_encryption = require('../../../encryption/encryption.js');
 var encryption = new AES_256_encryption();
 
@@ -383,42 +385,86 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
     }
 }
 
+// var attachment = function (req, callback) {
+//     var aUrl = '', aFilename = '';
+//     if (req.files) {
+//         if (req.files.attachment) {
+//             console.log('tthree');
+//             var uniqueId = uuid.v4();
+//             var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+//             var mimeType = req.files.attachment.mimetype;
+//             if (mimeType) {
+//                 filetype = setFileType(mimeType);
+//             }
+//             aUrl = uniqueId + '.' + filetype;
+//             aFilename = req.files.attachment.originalname;
+//             console.log("aFilename", aFilename);
+//             // console.log("aFilenameaFilename", req.files.attachment);
+
+//             console.log("req.files.attachment.path", req.files.attachment.path);
+
+//             var readStream = fs.createReadStream(req.files.attachment.path);
+
+//             uploadDocumentToCloud(aUrl, readStream, function (err) {
+//                 if (!err) {
+//                     console.log('FnSaveServiceAttachment: attachment Uploaded successfully', aUrl);
+//                     callback(aUrl);
+//                 }
+//                 else {
+//                     callback("");
+//                 }
+//             });
+//         }
+//         else {
+//             callback(aUrl);
+//         }
+//     }
+//     else {
+//         callback(aUrl);
+//     }
+// };
+
+
 var attachment = function (req, callback) {
     var aUrl = '', aFilename = '';
-    if (req.files) {
-        if (req.files.attachment) {
-            console.log('tthree');
+
+    if (req.body.attachment) {
+        var attachment1 = req.body.attachment.split(',');
+        if (attachment1.length && attachment1[0] && attachment1[1]) {
+            var resume_document = attachment1[1];
+            var filetype = '';
+            filetype = setFileType(attachment1[0]);
             var uniqueId = uuid.v4();
-            var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
-            var mimeType = req.files.attachment.mimetype;
-            if (mimeType) {
-                filetype = setFileType(mimeType);
-            }
             aUrl = uniqueId + '.' + filetype;
-            aFilename = req.files.attachment.originalname;
+            aFilename = 'temp_name';
             console.log("aFilename", aFilename);
-            // console.log("aFilenameaFilename", req.files.attachment);
 
-            console.log("req.files.attachment.path", req.files.attachment.path);
+            var fileName = 'pace' + Date.now();
+            let buff = new Buffer(resume_document, 'base64');
+            fs.writeFileSync(path.resolve(__dirname, fileName), buff);
 
-            var readStream = fs.createReadStream(req.files.attachment.path);
+            var readStream = fs.createReadStream(path.resolve(__dirname, fileName));
 
             uploadDocumentToCloud(aUrl, readStream, function (err) {
                 if (!err) {
+                    fs.unlinkSync(path.resolve(__dirname, fileName));
                     console.log('FnSaveServiceAttachment: attachment Uploaded successfully', aUrl);
                     callback(aUrl);
                 }
                 else {
+                    console.log('Failed to upload file');
+                    fs.unlinkSync(path.resolve(__dirname, fileName));
                     callback("");
                 }
             });
+        } else {
+            console.log('no attachment');
+            callback("");
         }
-        else {
-            callback(aUrl);
-        }
-    }
-    else {
-        callback(aUrl);
+
+    } else {
+        console.log('no attachment');
+        callback("");
     }
 };
 
