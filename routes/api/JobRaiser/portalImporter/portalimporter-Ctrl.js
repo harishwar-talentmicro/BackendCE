@@ -181,6 +181,38 @@ var dateConverter = function (param) {
 }
 
 
+var setFileType = function (mimeType) {
+    var filetype = '';
+    if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
+        filetype = "png";
+    }
+    else if (mimeType.indexOf('jpeg') > 0) {
+        filetype = "jpeg";
+    }
+    else if (mimeType.indexOf('jpg') > 0) {
+        filetype = "jpg"
+    }
+    else if (mimeType.indexOf('doc') > 0) {
+        filetype = "docx"
+    }
+    else if (mimeType.indexOf('docx') > 0) {
+        filetype = "docx"
+    }
+    else if (mimeType.indexOf('rtf') > 0) {
+        filetype = "rtf"
+    }
+    else if (mimeType.indexOf('pdf') > 0) {
+        filetype = "pdf"
+    }
+    else if (mimeType.indexOf('application/msword') > -1) {
+        filetype = "docx"
+    }
+    else if (mimeType.indexOf('officedocument.wordprocessingml.document') > -1) {
+        filetype = "docx"
+    }
+    return filetype;
+}
+
 var checkPortalApplicants = function (portalId, applicants, req, res) {
     console.log("Entered check portal applicants");
     var response = {
@@ -360,30 +392,7 @@ var attachment = function (req, callback) {
             var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
             var mimeType = req.files.attachment.mimetype;
             if (mimeType) {
-                if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
-                    filetype = "png";
-                }
-                else if (mimeType.indexOf('jpeg') > 0) {
-                    filetype = "jpeg";
-                }
-                else if (mimeType.indexOf('jpg') > 0) {
-                    filetype = "jpg"
-                }
-                else if (mimeType.indexOf('doc') > 0) {
-                    filetype = "docx"
-                }
-                else if (mimeType.indexOf('docx') > 0) {
-                    filetype = "docx"
-                }
-                else if (mimeType.indexOf('rtf') > 0) {
-                    filetype = "rtf"
-                }
-                else if (mimeType.indexOf('pdf') > 0) {
-                    filetype = "pdf"
-                }
-                else if (mimeType.indexOf('application/msword') > -1) {
-                    filetype = "docx"
-                }
+                filetype = setFileType(mimeType);
             }
             aUrl = uniqueId + '.' + filetype;
             aFilename = req.files.attachment.originalname;
@@ -1263,30 +1272,7 @@ portalimporter.saveApplicantsFromMonster = function (req, res, next) {
                 if (attachment1.length && attachment1[0] && attachment1[1]) {
                     details.resume_document = attachment1[1];
                     var filetype = '';
-                    if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "png";
-                    }
-                    else if (attachment1[0].indexOf('jpeg') > 0) {
-                        filetype = "jpeg";
-                    }
-                    else if (attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "jpg"
-                    }
-                    else if (attachment1[0].indexOf('doc') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('docx') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('rtf') > 0) {
-                        filetype = "rtf"
-                    }
-                    else if (attachment1[0].indexOf('pdf') > 0) {
-                        filetype = "pdf"
-                    }
-                    else if (attachment1[0].indexOf('application/msword') > -1) {
-                        filetype = "docx"
-                    }
+                    filetype = setFileType(attachment1[0]);
                     details.resume_extension = '.' + filetype;
                 }
             }
@@ -2092,30 +2078,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
 
                     details.resume_document = attachment1[1];
                     var filetype = '';
-                    if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "png";
-                    }
-                    else if (attachment1[0].indexOf('jpeg') > 0) {
-                        filetype = "jpeg";
-                    }
-                    else if (attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "jpg"
-                    }
-                    else if (attachment1[0].indexOf('doc') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('docx') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('rtf') > 0) {
-                        filetype = "rtf"
-                    }
-                    else if (attachment1[0].indexOf('pdf') > 0) {
-                        filetype = "pdf"
-                    }
-                    else if (attachment1[0].indexOf('application/msword') > -1) {
-                        filetype = "docx"
-                    }
+                    filetype = setFileType(attachment1[0]);
                     details.resume_extension = '.' + filetype;
                 }
             }
@@ -3230,30 +3193,7 @@ portalimporter.saveApplicantsFromTotalJobs = function (req, res, next) {
                 if (attachment1.length && attachment1[0] && attachment1[1]) {
                     details.resume_document = attachment1[1];
                     var filetype = '';
-                    if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "png";
-                    }
-                    else if (attachment1[0].indexOf('jpeg') > 0) {
-                        filetype = "jpeg";
-                    }
-                    else if (attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "jpg"
-                    }
-                    else if (attachment1[0].indexOf('doc') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('docx') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('rtf') > 0) {
-                        filetype = "rtf"
-                    }
-                    else if (attachment1[0].indexOf('pdf') > 0) {
-                        filetype = "pdf"
-                    }
-                    else if (attachment1[0].indexOf('application/msword') > -1) {
-                        filetype = "docx"
-                    }
+                    filetype = setFileType(attachment1[0]);
                     details.resume_extension = '.' + filetype;
                 }
             }
@@ -3639,30 +3579,7 @@ portalimporter.saveApplicantsFromReed = function (req, res, next) {
                 if (attachment1.length && attachment1[0] && attachment1[1]) {
                     details.resume_document = attachment1[1];
                     var filetype = '';
-                    if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "png";
-                    }
-                    else if (attachment1[0].indexOf('jpeg') > 0) {
-                        filetype = "jpeg";
-                    }
-                    else if (attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "jpg"
-                    }
-                    else if (attachment1[0].indexOf('doc') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('docx') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('rtf') > 0) {
-                        filetype = "rtf"
-                    }
-                    else if (attachment1[0].indexOf('pdf') > 0) {
-                        filetype = "pdf"
-                    }
-                    else if (attachment1[0].indexOf('application/msword') > -1) {
-                        filetype = "docx"
-                    }
+                    filetype = setFileType(attachment1[0]);
                     details.resume_extension = '.' + filetype;
                 }
             }
@@ -4079,30 +3996,7 @@ portalimporter.saveApplicantsFromJobStreet = function (req, res, next) {
                 if (attachment1.length && attachment1[0] && attachment1[1]) {
                     details.resume_document = attachment1[1];
                     var filetype = '';
-                    if (attachment1[0].indexOf('png') > 0 || attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "png";
-                    }
-                    else if (attachment1[0].indexOf('jpeg') > 0) {
-                        filetype = "jpeg";
-                    }
-                    else if (attachment1[0].indexOf('jpg') > 0) {
-                        filetype = "jpg"
-                    }
-                    else if (attachment1[0].indexOf('doc') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('docx') > 0) {
-                        filetype = "docx"
-                    }
-                    else if (attachment1[0].indexOf('rtf') > 0) {
-                        filetype = "rtf"
-                    }
-                    else if (attachment1[0].indexOf('pdf') > 0) {
-                        filetype = "pdf"
-                    }
-                    else if (attachment1[0].indexOf('application/msword') > -1) {
-                        filetype = "docx"
-                    }
+                    filetype = setFileType(attachment1[0]);
                     var req_file_name = req.body.file_name;
                     var doc_extension;
                     if (req_file_name && req_file_name != '') {
