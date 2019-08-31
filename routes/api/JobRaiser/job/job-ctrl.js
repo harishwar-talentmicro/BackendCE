@@ -12,6 +12,7 @@ var notifyMessages = new notifyMessages();
 
 var fs = require('fs');
 var bodyParser = require('body-parser');
+var request = require('request');
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
@@ -21,6 +22,31 @@ var DBSecretKey = CONFIG.DB.secretKey;
 
 var jobCtrl = {};
 var error = {};
+
+// whatmate-tallint integration function
+var fetchAPiUrl = function (req, callback) {
+
+    var inputs = [
+        req.st.db.escape(req.query.token),
+        req.st.db.escape(req.query.heMasterId),
+        req.st.db.escape(req.query.type)
+    ];
+
+    var procQuery = 'call wm_tallint_get_apiUrlData(' + inputs.join(',') + ')';
+    console.log(procQuery);
+    req.db.query(procQuery, function (err, result) {
+        if (!err && result && result[0] && result[0][0]) {
+            callback(err, result[0][0]);
+        }
+        else if (!err) {
+            callback(err, result[0][0]);
+        }
+        else {
+            callback(err, null);
+        }
+    });
+}
+
 
 jobCtrl.saveJobDefaults = function (req, res, next) {
     var response = {
@@ -1359,7 +1385,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                if (isWeb) {
+                if (isWeb == 1) {
 
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                     zlib.unzip(decryptBuf, function (_, resultDecrypt) {
@@ -1734,7 +1760,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                     var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
                     zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                         req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
+                        console.log(req.body);
                         var requirementWhatmateSave = function () {
                             if (!req.body.heMasterId) {
                                 error.heMasterId = 'Invalid tenant';
@@ -1903,7 +1929,6 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.body.timestamp = (req.body.timestamp) ? req.body.timestamp : '';
                                 req.body.postJobCareerPortal = (req.body.postJobCareerPortal) ? req.body.postJobCareerPortal : 0;
 
-                                branchList = [branchList];
 
                                 var procParams = [
                                     req.st.db.escape(req.query.token),
@@ -1969,7 +1994,16 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.db.query(procQuery, function (err, results) {
                                     console.log(err);
 
-                                    if (!err && results && results[0]) {
+                                    if (!err && results && results[0] && results[0][0] && results[0][0].error) {
+                                        response.status = false;
+                                        response.message = "Jobcode already exists! Please Change Jobcode";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(200).json(response);
+
+                                    }
+
+                                    else if (!err && results && results[0]) {
 
                                         notifyMessages.getMessagesNeedToNotify();
                                         response.status = true;
@@ -2023,12 +2057,11 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 });
                             }
                         }
+                        // req.body.isTallint = 0; // Delete isTallint this line later
+                        if (req.body.isTallint == 1) {
 
-                        if (req.query.isTallint) {
-                            req.body.hcUserId = req.query.HCUserId;
-
-                            if (!req.body.hcUserId) {
-                                error.hcUserId = 'Invalid hcUserId';
+                            if (!req.body.HCUserId) {
+                                error.HCUserId = 'Invalid hcUserId';
                                 validationFlag *= false;
                             }
 
@@ -2047,6 +2080,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
 
                                         // use this after getting url from tallint
                                         var url = urlData.apiPath;
+                                        console.log("req.body",JSON.stringify(req.body));
+                                        req.body.hcUserId = req.body.HCUserId;
                                         request({
                                             url: url,
                                             method: urlData.method,
@@ -2054,8 +2089,9 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             body: req.body
                                         }, function (err, resp, result) {   // result contains tallint response data
                                             console.log("error", err);
+                                            console.log("result", result);
                                             try {
-                                                if (!err && result && result.reqdata) {
+                                                if (!err && result && result.reqdata && result.reqdata > 0) {
                                                     //save in whatmate if data is saved in tallint
                                                     requirementWhatmateSave();
                                                 }

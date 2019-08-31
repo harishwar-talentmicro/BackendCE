@@ -51,6 +51,7 @@ router.get('/generateJobCode',masterCtrl.jobCodeGeneration);
 router.get('/report',masterCtrl.getportalRequirementReport);
 
 router.get('/generateJobCodeMobile',masterCtrl.jobCodeGenerationMobile);
+router.get('/jobCodeValidation',masterCtrl.jobCodeValidation);
 
 module.exports = router;
 

@@ -19,34 +19,33 @@ var error = {};
 var CONFIG = require('../../../../ezeone-config.json');
 var DBSecretKey = CONFIG.DB.secretKey;
 var logger = require('../error-logger/error-log.js');
+var request = require('request');
 
 
 
-// var attachFile = return new Promise(function (resolve, reject) {
-//     console.log('attachement cvasdfasdfasdf asaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasdfasdf asdfasdfasdfadsfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf');
-//     if (cv != '') {
-//         cv = gs_url + storage_bucket + '/' + cv;
 
-//         http.get(cv, function (fileResponse) {
-//             var bufs = [];
+var fetchAPiUrl = function (req, callback) {
 
-//             fileResponse.on('data', function (d) { bufs.push(d); });
-//             fileResponse.on('end', function () {
-//                 var buf = Buffer.concat(bufs);
-//                 textract.fromBufferWithName(cv, buf, function (error, txt) {
-//                     text = txt;
-//                     resolve(text);
-//                 });
-//             });
-//         });
+    var inputs = [
+        req.st.db.escape(req.query.token),
+        req.st.db.escape(req.query.heMasterId),
+        req.st.db.escape(req.query.type)
+    ];
 
-//     }
-//     else {
-//         resolve('');
-//     }
-// })
-//var createPromise = defer.denodeify(attachFile);
-//var attachFilePromise = attachFile;
+    var procQuery = 'call wm_tallint_get_apiUrlData(' + inputs.join(',') + ')';
+    console.log(procQuery);
+    req.db.query(procQuery, function (err, result) {
+        if (!err && result && result[0] && result[0][0]) {
+            callback(err, result[0][0]);
+        }
+        else if (!err) {
+            callback(err, result[0][0]);
+        }
+        else {
+            callback(err, null);
+        }
+    });
+}
 
 // For saving resume or updating resume   * mandatory fields token,heMasterId,firstName,mobileNumber,emailId
 
@@ -488,7 +487,8 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                                             response.error = null;
                                                             response.data = {
                                                                 applicantId: result[0][0].applicantId,
-                                                                applicantDetails: result[1] && result[1][0] ? result[1][0] : {}
+                                                                applicantDetails: result[1] && result[1][0] ? result[1][0] : {},
+                                                                reqAppList: result[2] && result[2][0] ? result[2] : []
 
                                                             };
                                                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -564,9 +564,11 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                                                 faceSheet: (result[4] && result[4][0]) && JSON.parse(result[4][0].faceSheet) ? JSON.parse(result[4][0].faceSheet) : {},
                                                                 mailTransactions: result[5] && result[5][0] ? result[5] : [],
                                                                 followUpNotes: result[6] && result[6][0] ? result[6] : [],
-                                                                applicantTransaction: result[7] ? result[7] : []
+                                                                applicantTransaction: result[7] ? result[7] : [],
+                                                                reqAppList: result[8] && result[8][0] ? result[8] : []
                                                             };
                                                             response.duplicate = 1;
+                                                            console.log(JSON.stringify(response));
                                                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                             zlib.gzip(buf, function (_, result) {
                                                                 response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -585,6 +587,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                                 }
                                             })
                                                 .catch(function (ex) {
+                                                    console.log(ex);
                                                     error_logger.error = ex;
                                                     logger(req, error_logger);
                                                     res.status(500).json(error_response);
@@ -593,6 +596,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                                         }
                                     }
                                     catch (ex) {
+                                        console.log(ex);
                                         error_logger.error = ex;
                                         logger(req, error_logger);
                                         res.status(500).json(error_response);
@@ -610,6 +614,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
                         }
                     }
                     catch (ex) {
+                        console.log(ex);
                         error_logger.error = ex;
                         logger(req, error_logger);
                         res.status(500).json(error_response);
@@ -623,6 +628,7 @@ applicantCtrl.saveApplicant = function (req, res, next) {
         }
     }
     catch (ex) {
+        console.log(ex);
         error_logger.error = ex;
         logger(req, error_logger);
         res.status(500).json(error_response);
@@ -1251,171 +1257,323 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 try {
                     if ((!err) && tokenResult) {
-                        // req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
-                        // req.body.jobTitleId = (req.body.jobTitleId) ? req.body.jobTitleId : [];
-                        // req.body.stageId = (req.body.stageId) ? req.body.stageId : [];
-                        // req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
-                        req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
-                        req.body.limit = (req.body.limit) ? req.body.limit : 12;
-                        req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
-                        req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
-                        req.body.type = (req.body.type) ? req.body.type : 1;
-                        req.body.name = (req.body.name) ? req.body.name.trim() : '';
-                        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+                        console.log(req.body);
+                        // req.query.isTallint = 0; // Delete isTallint this line later
+                        if (req.query.isTallint == 1) {
 
-                        if (req.body.name != "") {
-                            req.body.name = req.body.name.split(',');
-                        }
-                        else {
-                            req.body.name = [];
-                        }
+                            if (!req.query.HCUserId) {
+                                error.HCUserId = 'Invalid HCUserId';
+                                validationFlag *= false;
+                            }
 
-                        var getStatus = [
-                            req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.query.heMasterId),
-                            req.st.db.escape(JSON.stringify(heDepartmentId)),
-                            req.st.db.escape(JSON.stringify(jobTitleId)),
-                            // req.st.db.escape(req.query.heDepartmentId),
-                            // req.st.db.escape(req.query.jobTitleId),
-                            req.st.db.escape(req.body.applicantId),
-                            // req.st.db.escape(req.query.stageId),
-                            // req.st.db.escape(req.body.statusId),
-                            req.st.db.escape(JSON.stringify(stageId)),
-                            req.st.db.escape(JSON.stringify(statusId)),
-                            req.st.db.escape(req.body.startPage),
-                            req.st.db.escape(req.body.limit),
-                            req.st.db.escape(req.body.requirementId),
-                            req.st.db.escape(DBSecretKey),
-                            req.st.db.escape(req.body.type),
-                            req.st.db.escape(JSON.stringify(req.body.name || [])),
-                            req.st.db.escape(req.body.from || null),
-                            req.st.db.escape(req.body.to || null),
-                            req.st.db.escape(req.body.userMasterId || 0),
-                            req.st.db.escape(req.query.isWeb || 0),
-                            req.st.db.escape(JSON.stringify(req.body.stageDetail || {})),
-                            req.st.db.escape(req.body.applicantName || ""),
-                            req.st.db.escape(req.body.emailId || ""),
-                            req.st.db.escape(req.body.mobileNumber || ""),
-                            req.st.db.escape(req.body.requirementJobTitle || ""),
-                            req.st.db.escape(req.body.jobCode || ""),
-                            req.st.db.escape(req.body.clientName || ""),
-                            req.st.db.escape(req.body.stageName || ""),
-                            req.st.db.escape(req.body.statusName || ""),
-                            req.st.db.escape(req.body.applicantJobTitle || ""),
-                            req.st.db.escape(req.body.employer || ""),
-                            req.st.db.escape(req.body.experience || ""),
-                            req.st.db.escape(req.body.stageStatusNotes || ""),
-                            req.st.db.escape(req.body.cvSource || ""),
-                            req.st.db.escape(req.body.primarySkills || ""),
-                            req.st.db.escape(req.body.secondarySkills || ""),
-                            req.st.db.escape(req.body.presentLocation || ""),
-                            req.st.db.escape(req.body.education || ""),
-                            req.st.db.escape(req.body.passportNumber || ""),
-                            req.st.db.escape(req.body.faceSheet || ""),
-                            req.st.db.escape(req.body.cvCreatedUserName || ""),
-                            req.st.db.escape(req.body.cvUpdatedUserName || ""),
-                            req.st.db.escape(req.body.reqCvCreatedUserName || ""),
-                            req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
-                            req.st.db.escape(JSON.stringify(req.body.cvCreatedDate || {})),
-                            req.st.db.escape(JSON.stringify(req.body.cvUpdatedDate || {})),
-                            req.st.db.escape(JSON.stringify(req.body.reqCvCreatedDate || {})),
-                            req.st.db.escape(JSON.stringify(req.body.reqCvUpdatedDate || {})),
-                            req.st.db.escape(req.body.emigrationCheck || ""),
-                            req.st.db.escape(JSON.stringify(req.body.DOB || {})),
-                            req.st.db.escape(JSON.stringify(req.body.ppExpiryDate || {})),
-                            req.st.db.escape(JSON.stringify(req.body.ppIssueDate || {})),
-                            req.st.db.escape(req.body.isExport || 0),
-                            req.st.db.escape(req.body.customRange || 0)
-                        ];
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                // pass api type to below function
+                                req.query.type = 7;   // dashboard api
 
-                        var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
-                        console.log(procQuery);
-                        req.db.query(procQuery, function (err, Result) {
-                            try {
-                                console.log(err);
-                                if (!err && Result && Result[0] || Result[2] || Result[3]) {
-                                    response.status = true;
-                                    response.message = "Applicants loaded successfully";
-                                    response.error = null;
-                                    if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
-                                        for (var i = 0; i < Result[0].length; i++) {
-                                            Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+                                fetchAPiUrl(req, function (err, urlData) {
+                                    if (!err && urlData && urlData.apiPath) {
 
-                                            Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
+                                        req.body.startPage = req.body.startPage ? req.body.startPage : 1;
+                                        req.body.limit = req.body.limit ? req.body.limit : 50;
 
-                                            var facesheet = [];
-                                            for (var f = 0; f < Result[0][i].faceSheetDetailWithAnswers.length; f++) {
-                                                if (Result[0][i].faceSheetDetailWithAnswers[f].answer) {
-                                                    var answer = Result[0][i].faceSheetDetailWithAnswers[f].answer;
+                                        // use this after getting url from tallint
+                                        var url = urlData.apiPath + 'startpage=' + req.body.startPage + '&limit=' + req.body.limit;
+
+                                        var body = {
+                                            reqId: req.body.jobTitleId && req.body.jobTitleId.length && req.body.jobTitleId[0] > 0 ? JSON.stringify(req.body.jobTitleId || []) : "[]",
+                                            clientId: req.body.jobTitleId && req.body.jobTitleId.length && req.body.jobTitleId[0] != 0 ? JSON.stringify([] || req.body.heDepartmentId || []) : "[]",
+                                            stageId: JSON.stringify(req.body.stageId || []),
+                                            statusId: typeof (req.body.statusId) == 'object' ? JSON.stringify(req.body.statusId || []) : '[]',
+                                            status: 1
+                                        };
+                                        console.log('req.body', req.body);
+                                        console.log('for tallint', body);
+                                        console.log(url);
+                                        request({
+                                            url: url,
+                                            method: urlData.method,
+                                            json: true,   // <--Very important!!!
+                                            body: body
+                                        }, function (err, resp, result) {   // result contains tallint response data
+                                            console.log("error", err);
+                                            try {
+                                                if (!err && result && result.data) {
+                                                    var applicantList = [];
+
+                                                    if (result.data && result.data.applicantList && result.data.applicantList.length) {
+                                                        var appList = result.data.applicantList;
+                                                        for (var i = 0; i < appList.length; i++) {
+                                                            if (appList[i] && appList[i].reqApplicantId && appList[i].reqApplicantId != 0) {
+                                                                var obj = {};
+                                                                obj.reqApplicantId = appList[i] && appList[i].reqApplicantId ? appList[i].reqApplicantId : 0,
+                                                                    obj.requirementId = appList[i] && appList[i].requirementId ? appList[i].requirementId : 0,
+                                                                    obj.applicantId = appList[i] && appList[i].applicantId ? appList[i].applicantId : 0,
+                                                                    obj.imageUrl = appList[i] && appList[i].reqApplicantId ? appList[i].reqApplicantId : 0,
+                                                                    obj.createdDate = appList[i] && appList[i].createdDate ? appList[i].createdDate : null,
+                                                                    obj.lastUpdatedDate = appList[i] && appList[i].modifiedDate ? appList[i].modifiedDate : null,
+                                                                    obj.stageStatusNotes = appList[i] && appList[i].reqApplicantId ? appList[i].reqApplicantId : 0,
+                                                                    obj.stageStatusReason = appList[i] && appList[i].reqApplicantId ? appList[i].reqApplicantId : 0,
+                                                                    obj.reqCvCreatedUserName = appList[i] && appList[i].createdUser ? appList[i].createdUser : "",
+                                                                    obj.reqCvUpdatedUserName = appList[i] && appList[i].modifiedUser ? appList[i].modifiedUser : "",
+                                                                    obj.clientId = appList[i] && appList[i].clientId ? appList[i].clientId : 0,
+                                                                    obj.clientName = appList[i] && appList[i].clientName ? appList[i].clientName : "",
+                                                                    obj.name = appList[i] && appList[i].name ? appList[i].name : 0,
+                                                                    obj.emailId = appList[i] && appList[i].emailId ? appList[i].emailId : "",
+                                                                    obj.phoneCountryName = appList[i] && appList[i].phoneCountryName ? appList[i].phoneCountryName : "",
+                                                                    obj.mobileIsd = appList[i] && appList[i].mobileIsd ? appList[i].mobileIsd : "",
+                                                                    obj.mobileNo = appList[i] && appList[i].mobileNo ? appList[i].mobileNo : "",
+                                                                    obj.mobileNumber = appList[i] && appList[i].mobileNo ? appList[i].mobileNo : "",
+                                                                    obj.mobileCountryName = appList[i] && appList[i].mobileCountryName ? appList[i].mobileCountryName : "",
+                                                                    obj.status = appList[i] && appList[i].statusTitle ? appList[i].statusTitle : "",
+                                                                    obj.jobTitleId = appList[i] && appList[i].jobTitleId && appList[i].jobTitleId != '' && appList[i].jobTitleId != null && parseInt(appList[i].jobTitleId) != NaN ? parseInt(appList[i].jobTitleId) : 0,
+                                                                    obj.jobTitle = appList[i] && appList[i].jobTitle ? appList[i].jobTitle : "",
+                                                                    obj.stageId = appList[i] && appList[i].stageId ? appList[i].stageId : 0,
+                                                                    obj.stage = appList[i] && appList[i].stageTitle ? appList[i].stageTitle : "",
+                                                                    obj.stageTypeId = appList[i] && appList[i].stageTypeId ? appList[i].stageTypeId : 0,
+                                                                    obj.colorCode = appList[i] && appList[i].colorCode ? appList[i].colorCode : "#91214e",
+                                                                    obj.statusId = appList[i] && appList[i].statusId ? appList[i].statusId : 0,
+                                                                    obj.statusTypeId = appList[i] && appList[i].statusTypeId ? appList[i].statusTypeId : 0,
+                                                                    obj.jobCode = appList[i] && appList[i].jobCode ? appList[i].jobCode : "",
+                                                                    obj.clientContacts = appList[i] && appList[i].clientContacts && JSON.parse(appList[i].clientContacts) ? JSON.parse(appList[i].clientContacts) : []
+                                                                applicantList.push(obj);
+                                                            }
+                                                        }
+                                                    }
+                                                    response.status = true;
+                                                    response.message = "Data loaded successfully";
+                                                    response.error = null;
+                                                    response.data = {
+                                                        applicantlist: applicantList,
+                                                        count: result.data.count ? result.data.count : 0,
+                                                        cvSearchMasterData: {
+                                                            skillList: [{ skillId: 43, skillName: "Android Studio" }, { skillId: 44, skillName: "Objective C" }],
+                                                            roles: [{ jobtitleId: 43, title: "Android Developer" }, { jobtitleId: 44, title: "Ios Developer" }],
+                                                            industry: [{ industryId: 43, title: "Software IT" }, { industryId: 44, title: "Business Development" }],
+                                                            cvSource: [{ sourceId: 43, sourceName: "Naukri" }, { sourceId: 44, sourceName: "Monster" }],
+                                                            functionalAreas: [{ functionalAreaId: 43, functionalAreaName: "Software" }, { functionalAreaId: 44, functionalAreaName: "Business Enhancement" }],
+                                                            nationality: [{ nationalityId: 43, nationality: "India" }, { nationalityId: 44, nationality: "UAE" }]
+                                                        },
+                                                        offerMasterData: {
+                                                            currency: [{ currencyId: 1, currencySymbol: "INR" }, { currencyId: 2, currencySymbol: "USD" }],
+                                                            scale: [{ scaleId: 1, scale: "Hundreds" }, { scaleId: 2, scale: "Lakhs" }],
+                                                            duration: [{ durationId: 1, duration: "Per Hour" }, { durationId: 2, duration: "Per Annnum" }],
+                                                            attachment: [{ attachmentId: 1, attachmentName: "SSLC" }, { attachmentId: 2, attachmentName: "Degree" }],
+                                                            grade: [{ gradeId: 1, gradeName: "Grade-E" }, { gradeId: 2, gradeName: "Grade-E" }],
+                                                            designation: [{ jobtitleId: 1, title: "Android Developer" }, { jobtitleId: 1, title: "Ios Developer" }]
+                                                        }
+                                                    };
+
+                                                    // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                    // zlib.gzip(buf, function (_, result) {
+                                                    //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                    // });
+                                                }
+                                                else if (!err) {
+                                                    response.status = true;
+                                                    response.message = "no results found";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(200).json(response);
                                                 }
                                                 else {
-                                                    var answer = "Not Applicable";
+                                                    response.status = false;
+                                                    response.message = "Error while getting data";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
                                                 }
-                                                var QandA = Result[0][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
-                                                facesheet.push(QandA);
+
+                                            } catch (ex) {
+                                                console.log(ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
                                             }
-                                            Result[0][i].faceSheetDetailWithAnswers = facesheet;
-                                        }
-                                    }
-                                    var cvSearchMasterData = {};
-                                    var offerMasterData = {};
-                                    if (req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]) {
-                                        cvSearchMasterData = {
-                                            skillList: Result[6] ? Result[6] : [],
-                                            roles: Result[7] ? Result[7] : [],
-                                            industry: Result[8] ? Result[8] : [],
-                                            cvSource: Result[9] ? Result[9] : [],
-                                            functionalAreas: Result[10] ? Result[10] : [],
-                                            nationality: Result[11] ? Result[11] : []
 
-                                        }
-                                        offerMasterData = {
-                                            currency: Result[2] ? Result[2] : [],
-                                            scale: Result[3] ? Result[3] : [],
-                                            duration: Result[4] ? Result[4] : [],
-                                            attachment: Result[5] ? Result[5] : [],
-                                            grade: Result[12] ? Result[12] : [],
-                                            designation: Result[7] ? Result[7] : []
-                                        }
+                                        })
+                                    } else {
+                                        response.status = false;
+                                        response.message = "Error while getting data";
+                                        response.error = err;
+                                        response.data = null;
+                                        res.status(500).json(response);
                                     }
+                                })
+                            }
+                        } else {
+                            // req.query.heDepartmentId = (req.query.heDepartmentId) ? req.query.heDepartmentId : 0;
+                            // req.body.jobTitleId = (req.body.jobTitleId) ? req.body.jobTitleId : [];
+                            // req.body.stageId = (req.body.stageId) ? req.body.stageId : [];
+                            // req.body.statusId = (req.body.statusId) ? req.body.statusId : 0;
+                            req.body.startPage = (req.body.startPage) ? req.body.startPage : 0;
+                            req.body.limit = (req.body.limit) ? req.body.limit : 12;
+                            req.body.applicantId = (req.body.applicantId) || (req.body.applicantId == "") ? req.body.applicantId : 0;
+                            req.body.requirementId = (req.body.requirementId) ? req.body.requirementId : 0;
+                            req.body.type = (req.body.type) ? req.body.type : 1;
+                            req.body.name = (req.body.name) ? req.body.name.trim() : '';
+                            req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
 
-                                    response.data = {
-                                        applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
-                                        count: Result[1][0].count,
-                                        offerMasterData: offerMasterData,
-                                        cvSearchMasterData: cvSearchMasterData
-                                    };
-                                    // console.log(response.data);
-                                    res.status(200).json(response);
-                                }
-                                else if (!err) {
-                                    response.status = true;
-                                    response.message = "Applicants not found";
-                                    response.error = null;
-                                    response.data = {
-                                        applicantlist: [],
-                                        count: [],
-                                        currency: [],
-                                        scale: [],
-                                        duration: [],
-                                        attachment: []
-                                    };
-                                    res.status(200).json(response);
-                                }
-                                else {
-                                    response.status = false;
-                                    response.message = "Error while loading applicants";
-                                    response.error = null;
-                                    response.data = null;
-                                    res.status(500).json(response);
-                                }
+                            if (req.body.name != "") {
+                                req.body.name = req.body.name.split(',');
                             }
-                            catch (ex) {
-                                error_logger.error = ex;
-                                logger(req, error_logger);
-                                res.status(500).json(error_response);
+                            else {
+                                req.body.name = [];
                             }
-                        });
+
+                            var getStatus = [
+                                req.st.db.escape(req.query.token),
+                                req.st.db.escape(req.query.heMasterId),
+                                req.st.db.escape(JSON.stringify(heDepartmentId)),
+                                req.st.db.escape(JSON.stringify(jobTitleId)),
+                                // req.st.db.escape(req.query.heDepartmentId),
+                                // req.st.db.escape(req.query.jobTitleId),
+                                req.st.db.escape(req.body.applicantId),
+                                // req.st.db.escape(req.query.stageId),
+                                // req.st.db.escape(req.body.statusId),
+                                req.st.db.escape(JSON.stringify(stageId)),
+                                req.st.db.escape(JSON.stringify(statusId)),
+                                req.st.db.escape(req.body.startPage),
+                                req.st.db.escape(req.body.limit),
+                                req.st.db.escape(req.body.requirementId),
+                                req.st.db.escape(DBSecretKey),
+                                req.st.db.escape(req.body.type),
+                                req.st.db.escape(JSON.stringify(req.body.name || [])),
+                                req.st.db.escape(req.body.from || null),
+                                req.st.db.escape(req.body.to || null),
+                                req.st.db.escape(req.body.userMasterId || 0),
+                                req.st.db.escape(req.query.isWeb || 0),
+                                req.st.db.escape(JSON.stringify(req.body.stageDetail || {})),
+                                req.st.db.escape(req.body.applicantName || ""),
+                                req.st.db.escape(req.body.emailId || ""),
+                                req.st.db.escape(req.body.mobileNumber || ""),
+                                req.st.db.escape(req.body.requirementJobTitle || ""),
+                                req.st.db.escape(req.body.jobCode || ""),
+                                req.st.db.escape(req.body.clientName || ""),
+                                req.st.db.escape(req.body.stageName || ""),
+                                req.st.db.escape(req.body.statusName || ""),
+                                req.st.db.escape(req.body.applicantJobTitle || ""),
+                                req.st.db.escape(req.body.employer || ""),
+                                req.st.db.escape(req.body.experience || ""),
+                                req.st.db.escape(req.body.stageStatusNotes || ""),
+                                req.st.db.escape(req.body.cvSource || ""),
+                                req.st.db.escape(req.body.primarySkills || ""),
+                                req.st.db.escape(req.body.secondarySkills || ""),
+                                req.st.db.escape(req.body.presentLocation || ""),
+                                req.st.db.escape(req.body.education || ""),
+                                req.st.db.escape(req.body.passportNumber || ""),
+                                req.st.db.escape(req.body.faceSheet || ""),
+                                req.st.db.escape(req.body.cvCreatedUserName || ""),
+                                req.st.db.escape(req.body.cvUpdatedUserName || ""),
+                                req.st.db.escape(req.body.reqCvCreatedUserName || ""),
+                                req.st.db.escape(req.body.reqCvUpdatedUserName || ""),
+                                req.st.db.escape(JSON.stringify(req.body.cvCreatedDate || {})),
+                                req.st.db.escape(JSON.stringify(req.body.cvUpdatedDate || {})),
+                                req.st.db.escape(JSON.stringify(req.body.reqCvCreatedDate || {})),
+                                req.st.db.escape(JSON.stringify(req.body.reqCvUpdatedDate || {})),
+                                req.st.db.escape(req.body.emigrationCheck || ""),
+                                req.st.db.escape(JSON.stringify(req.body.DOB || {})),
+                                req.st.db.escape(JSON.stringify(req.body.ppExpiryDate || {})),
+                                req.st.db.escape(JSON.stringify(req.body.ppIssueDate || {})),
+                                req.st.db.escape(req.body.isExport || 0),
+                                req.st.db.escape(req.body.customRange || 0)
+                            ];
+
+                            var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
+                            console.log(procQuery);
+                            req.db.query(procQuery, function (err, Result) {
+                                try {
+                                    console.log(err);
+                                    if (!err && Result && Result[0] || Result[2] || Result[3]) {
+                                        response.status = true;
+                                        response.message = "Applicants loaded successfully";
+                                        response.error = null;
+                                        if (Result[0] && Result[0][0] && Result[0][0].reqApplicantId) {
+                                            for (var i = 0; i < Result[0].length; i++) {
+                                                Result[0][i].clientContacts = Result[0][i].clientContacts ? JSON.parse(Result[0][i].clientContacts) : [];
+
+                                                Result[0][i].faceSheetDetailWithAnswers = Result[0][i].faceSheetDetailWithAnswers ? JSON.parse(Result[0][i].faceSheetDetailWithAnswers) : [];
+
+                                                var facesheet = [];
+                                                for (var f = 0; f < Result[0][i].faceSheetDetailWithAnswers.length; f++) {
+                                                    if (Result[0][i].faceSheetDetailWithAnswers[f].answer) {
+                                                        var answer = Result[0][i].faceSheetDetailWithAnswers[f].answer;
+                                                    }
+                                                    else {
+                                                        var answer = "Not Applicable";
+                                                    }
+                                                    var QandA = Result[0][i].faceSheetDetailWithAnswers[f].question + " - " + answer;
+                                                    facesheet.push(QandA);
+                                                }
+                                                Result[0][i].faceSheetDetailWithAnswers = facesheet;
+                                            }
+                                        }
+                                        var cvSearchMasterData = {};
+                                        var offerMasterData = {};
+                                        if (req.query.isWeb == 0 && Result[6] && Result[6][0] && Result[7] && Result[7][0]) {
+                                            cvSearchMasterData = {
+                                                skillList: Result[6] ? Result[6] : [],
+                                                roles: Result[7] ? Result[7] : [],
+                                                industry: Result[8] ? Result[8] : [],
+                                                cvSource: Result[9] ? Result[9] : [],
+                                                functionalAreas: Result[10] ? Result[10] : [],
+                                                nationality: Result[11] ? Result[11] : []
+
+                                            }
+                                            offerMasterData = {
+                                                currency: Result[2] ? Result[2] : [],
+                                                scale: Result[3] ? Result[3] : [],
+                                                duration: Result[4] ? Result[4] : [],
+                                                attachment: Result[5] ? Result[5] : [],
+                                                grade: Result[12] ? Result[12] : [],
+                                                designation: Result[7] ? Result[7] : []
+                                            }
+                                        }
+
+                                        response.data = {
+                                            applicantlist: Result[0] && Result[0][0] && Result[0][0].reqApplicantId ? Result[0] : [],
+                                            count: Result[1][0].count,
+                                            offerMasterData: offerMasterData,
+                                            cvSearchMasterData: cvSearchMasterData
+                                        };
+                                        // console.log(response.data);
+                                        res.status(200).json(response);
+                                    }
+                                    else if (!err) {
+                                        response.status = true;
+                                        response.message = "Applicants not found";
+                                        response.error = null;
+                                        response.data = {
+                                            applicantlist: [],
+                                            count: [],
+                                            currency: [],
+                                            scale: [],
+                                            duration: [],
+                                            attachment: []
+                                        };
+                                        res.status(200).json(response);
+                                    }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Error while loading applicants";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                }
+                                catch (ex) {
+                                    error_logger.error = ex;
+                                    logger(req, error_logger);
+                                    res.status(500).json(error_response);
+                                }
+                            });
+                        }
                     }
                     else {
                         res.status(401).json(response);
@@ -1574,6 +1732,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                                             }
                                         }
                                         catch (ex) {
+                                            console.log(ex);
                                             error_logger.error = ex;
                                             logger(req, error_logger);
                                             res.status(500).json(error_response);
@@ -1582,6 +1741,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
                                 }
                             }
                             catch (ex) {
+                                console.log(ex);
                                 error_logger.error = ex;
                                 logger(req, error_logger);
                                 res.status(500).json(error_response);
@@ -1594,6 +1754,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
 
                 }
                 catch (ex) {
+                    console.log(ex);
                     error_logger.error = ex;
                     logger(req, error_logger);
                     res.status(500).json(error_response);
@@ -1602,6 +1763,7 @@ applicantCtrl.saveApplicantStageStatus = function (req, res, next) {
         }
     }
     catch (ex) {
+        console.log(ex);
         error_logger.error = ex;
         logger(req, error_logger);
         res.status(500).json(error_response);
@@ -1775,7 +1937,6 @@ applicantCtrl.resumeSearch = function (req, res, next) {
             req.st.validateToken(req.query.token, function (err, tokenResult) {
                 try {
                     if ((!err) && tokenResult) {
-                        req.query.isWeb = 1;
                         if (req.query.isWeb) {
                             if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != "") {
                                 var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
@@ -2000,6 +2161,8 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                             }
                         }
                         else {
+
+                            console.log(req.body);
                             if (!req.body.heMasterId) {
                                 error.heMasterId = 'Invalid company';
                                 validationFlag *= false;
@@ -2081,7 +2244,7 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                                 req.body.includeJd = req.body.includeJd ? req.body.includeJd : 0;
 
                                 req.body.start = req.body.start ? req.body.start : 1;
-                                req.body.limit = (req.body.limit) ? req.body.limit : 50;
+                                req.body.limit = (req.body.limit) ? req.body.limit : 12;
 
                                 req.body.start = ((((req.body.start) * req.body.limit) + 1) - req.body.limit) - 1;
 
@@ -2160,11 +2323,11 @@ applicantCtrl.resumeSearch = function (req, res, next) {
                                                 count: result[1][0].count,
                                                 applicantIdArray: (result[2] && result[2][0] && JSON.parse(result[2][0].applicantIdArray)) ? JSON.parse(result[2][0].applicantIdArray) : []
                                             };
-                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                            zlib.gzip(buf, function (_, result) {
-                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                                                res.status(200).json(response);
-                                            });
+                                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            // zlib.gzip(buf, function (_, result) {
+                                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                            res.status(200).json(response);
+                                            // });
 
                                         }
                                         else if (!err) {
