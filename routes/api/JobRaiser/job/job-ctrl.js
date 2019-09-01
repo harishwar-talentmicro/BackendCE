@@ -312,7 +312,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(JSON.stringify(req.body.interviewMailTemplate || [])),
                         req.st.db.escape(req.body.logoAligment || 'RIGHT'),
                         req.st.db.escape(req.body.clientCVHeaderAligment || 'RIGHT'),
-                        req.st.db.escape(req.body.clientCVFooterAligment || 'RIGHT')
+                        req.st.db.escape(req.body.clientCVFooterAligment || 'RIGHT'),
+                        req.st.db.escape(req.body.overwriteResumeJobPortal || 0)
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
