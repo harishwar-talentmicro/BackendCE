@@ -126,7 +126,6 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
     readStream.pipe(remoteWriteStream);
 
     remoteWriteStream.on('finish', function () {
-        console.log('done');
         if (callback) {
             if (typeof (callback) == 'function') {
                 callback(null);
@@ -894,6 +893,7 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
+
                 if (mimeType) {
                     if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
                         filetype = "png";
@@ -920,71 +920,88 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                         filetype = "doc"
                     }
                 }
+                console.log('filetype', filetype);
 
-                if (filetype != 'doc') {
-                    aUrl = uniqueId + '.' + filetype;
-                    aFilename = req.files.attachment.originalname;
-                    console.log("aFilenameaFilename", aFilename);
-                    console.log("aFilenameaFilename", req.files.attachment);
+                if (filetype && filetype != "") {
+                    if (filetype != 'doc' && filetype != 'pdf') {
+                        aUrl = uniqueId + '.' + filetype;
+                        aFilename = req.files.attachment.originalname;
+                        console.log("aFilenameaFilename", aFilename);
+                        console.log("aFilenameaFilename", req.files.attachment);
 
-                    console.log("req.files.attachment.path", req.files.attachment.path);
+                        console.log("req.files.attachment.path", req.files.attachment.path);
 
-                    var readStream = fs.createReadStream(req.files.attachment.path);
+                        var readStream = fs.createReadStream(req.files.attachment.path);
 
-                    uploadDocumentToCloud(aUrl, readStream, function (err) {
-                        try {
-                            if (!err) {
-                                responseMessage.status = true;
-                                responseMessage.message = 'attachment Uploaded successfully';
-                                responseMessage.data = {
-                                    a_url: aUrl,
-                                    a_fn: aFilename
-                                };
-                                console.log("responseMessage", responseMessage);
+                        uploadDocumentToCloud(aUrl, readStream, function (err) {
+                            try {
+                                if (!err) {
+                                    responseMessage.status = true;
+                                    responseMessage.message = 'attachment Uploaded successfully';
+                                    responseMessage.data = {
+                                        a_url: aUrl,
+                                        a_fn: aFilename
+                                    };
+                                    console.log("responseMessage", responseMessage);
 
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                }
+                                else {
+                                    responseMessage.message = 'attachment not upload';
+                                    res.status(200).json(responseMessage);
+                                    console.log('FnSaveServiceAttachment:attachment not upload');
+                                }
+                            } catch (ex) {
+                                console.log(ex);
+                                responseMessage.message = 'Failed to upload';
+                                res.status(500).json(responseMessage);
                             }
-                            else {
-                                responseMessage.message = 'attachment not upload';
-                                res.status(200).json(responseMessage);
-                                console.log('FnSaveServiceAttachment:attachment not upload');
+                        });
+                    } else {
+
+                        console.log('Api of doc to docx');
+                        var formData = {
+                            attachment: fs.createReadStream(req.files.attachment.path),
+                        };
+                        request.post({ url: 'http://23.236.49.140:1002/api/service_attachment_doc', formData: formData }, function (err, httpResponse, body) {
+                            console.log('doc error from att doc api', err);
+                            try {
+                                if (err) {
+                                    responseMessage.message = 'Failed to upload';
+                                    responseMessage.error = err;
+                                    res.status(200).json(responseMessage);
+                                    return console.error('upload failed:', err);
+                                }
+                                else {
+                                    console.log('Response message convert:', body);
+                                    responseMessage.message = "Converted to docx";
+                                    // responseMessage.data = body.data;
+
+                                    res.status(200).json(JSON.parse(body));
+                                }
+                            } catch (ex) {
+                                console.log(ex);
+                                responseMessage.message = 'Failed to upload';
+                                res.status(500).json(responseMessage);
                             }
-                        } catch (ex) {
-                            console.log(ex);
-                            responseMessage.message = 'Failed to upload';
-                            res.status(500).json(responseMessage);
-                        }
-                    });
+                        });
+
+                    }
                 } else {
-
-
-                    var formData = {
-                        attachment: fs.createReadStream(req.files.attachment.path),
-                    };
-                    request.post({ url: 'http://35.237.69.199/api/service_attachment_doc', formData: formData }, function (err, httpResponse, body) {
-                        try {
-                            if (err) {
-                                return console.error('upload failed:', err);
-                            }
-                            else {
-                                console.log('Response message convert:', body);
-                                responseMessage.message = "Converted to docx";
-                                // responseMessage.data = body.data;
-
-                                res.status(200).json(JSON.parse(body));
-                            }
-                        } catch (ex) {
-                            console.log(ex);
-                            responseMessage.message = 'Failed to upload';
-                            res.status(500).json(responseMessage);
-                        }
-                    });
-
+                    responseMessage.status = false;
+                    responseMessage.message = 'Invalid file type';
+                    res.status(200).json(responseMessage);
                 }
+            } else {
+                responseMessage.status = false;
+                responseMessage.message = 'file attachment is missing';
+                res.status(200).json(responseMessage);
+                console.log('file is required');
             }
         }
         else {
+            responseMessage.status = false;
             responseMessage.message = 'file is required';
             res.status(200).json(responseMessage);
             console.log('file is required');
@@ -1016,6 +1033,7 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
         message: '',
         data: null
     };
+    console.log('doc to docx', req.files);
 
     try {
         if (req.files) {
@@ -1023,6 +1041,8 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                 var uniqueId = uuid.v4();
                 var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
                 var mimeType = req.files.attachment.mimetype;
+                console.log('doc filetype', filetype);
+
                 if (mimeType) {
                     if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
                         filetype = "png";
@@ -1049,7 +1069,9 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                         filetype = "doc"
                     }
                 }
-                if (filetype != "doc") {
+
+                console.log('doc api log', filetype);
+                if (filetype != "doc" && filetype != "pdf") {
                     aUrl = uniqueId + '.' + filetype;
                     aFilename = req.files.attachment.originalname;
                     console.log("aFilenameaFilename", aFilename);
@@ -1086,29 +1108,35 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                     });
                 }
                 else {
-                    var file_name = 'pace' + Date.now() + '.doc';
-                    var file_name_docx = file_name + 'x';
-                    aUrl = uniqueId + '.docx';
+                    if (filetype == 'doc') {
+                        var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
+                        var file_name_docx = file_name + 'x';
+                    } else {
+                        var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
+                        var file_name_docx = file_name;
+                    }
 
-                    let writeStream = fs.createWriteStream(path.resolve(__dirname, file_name));
+                    aUrl = uniqueId + '.docx';
+                    console.log('doc to docx', aUrl);
+                    let writeStream = fs.createWriteStream(path.resolve(__dirname, file_name));  // create a file stream to write
 
                     // write some data with a base64 encoding
                     var rs = fs.createReadStream(req.files.attachment.path);
                     rs.pipe(writeStream);
-
+                    console.log('start to convert doc to docx');
                     // the finish event is emitted when all data has been flushed from the stream
                     writeStream.on('finish', () => {
                         try {
                             console.log('wrote all data to file');
                             console.log(path.resolve(__dirname, 'doc2docx.py'));
-                            var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]);
+                            var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]); // pass org file to convertor
                             // process.stdout.on('data',function(data){
                             //     console.log(data.toString());
                             // })
                             process.stdout.on('data', function (data) {
                                 console.log("Inside");
                                 if (data)
-                                    console.log(data.toString());
+                                    console.log('Hello data', data.toString());
                                 process.kill();
                                 setTimeout(function () {
                                     var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
