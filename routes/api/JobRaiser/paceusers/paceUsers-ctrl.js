@@ -3589,7 +3589,8 @@ paceUsersCtrl.smsMailTemplates = function (req, res, next) {
 
                 var inputs = [
                     req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId)
+                    req.st.db.escape(req.query.heMasterId),
+                    req.st.db.escape(req.query.mailerType || 0)
                 ];
 
                 var procQuery = 'CALL pace_mailer_smsTemplates( ' + inputs.join(',') + ')';

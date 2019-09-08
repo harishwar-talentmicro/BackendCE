@@ -221,6 +221,7 @@ dataMigration.tallint_manpower_dashboard = function (req, res, next) {
         var error_logger = {
             details: 'dataMigration.tallint_manpower_dashboard'
         }
+        var error = {};
 
         var error_response = {
             status: false,
@@ -289,13 +290,77 @@ dataMigration.tallint_manpower_dashboard = function (req, res, next) {
                                             console.log("error", err);
                                             try {
                                                 if (!err && result) {
-                                                    result[0].bgColorCode = "#C71585";
+                                                    result[0].bgColorCode = "#91214e";
                                                     result[0].companyLogo = "dbf89bcf-836a-48ba-94c2-6eecd50f30b7.png";
                                                     response.status = true;
                                                     response.message = "Data loaded successfully";
                                                     response.error = null;
+
+                                                    var stageList = [];
+                                                    stageList = [
+                                                        {
+                                                            stageId: 1,
+                                                            title: "Screening",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        },
+                                                        {
+                                                            stageId: 1,
+                                                            title: "Wheebox",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        },
+                                                        {
+                                                            stageId: 2,
+                                                            title: "HM Shortlist",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        },
+                                                        {
+                                                            stageId: 4,
+                                                            title: "Functional Interview",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        },
+                                                        {
+                                                            stageId: 4,
+                                                            title: "HR Interview",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        },
+                                                        {
+                                                            stageId: 5,
+                                                            title: "Offer",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        },
+                                                        {
+                                                            stageId: 6,
+                                                            title: "Joining",
+                                                            colorCode: "#91214e",
+                                                            statusList: []
+                                                        }
+                                                    ];
+
                                                     response.data = {
-                                                        tallintDashboardData: result[0]
+                                                        tallintDashboardData: result[0],
+                                                        stageList: stageList,
+                                                        cvSearchMasterData: {
+                                                            skillList: [{ skillId: 43, skillName: "Android Studio" }, { skillId: 44, skillName: "Objective C" }],
+                                                            roles: [{ jobtitleId: 43, title: "Android Developer" }, { jobtitleId: 44, title: "Ios Developer" }],
+                                                            industry: [{ industryId: 43, title: "Software IT" }, { industryId: 44, title: "Business Development" }],
+                                                            cvSource: [{ sourceId: 43, sourceName: "Naukri" }, { sourceId: 44, sourceName: "Monster" }],
+                                                            functionalAreas: [{ functionalAreaId: 43, functionalAreaName: "Software" }, { functionalAreaId: 44, functionalAreaName: "Business Enhancement" }],
+                                                            nationality: [{ nationalityId: 43, nationality: "India" }, { nationalityId: 44, nationality: "UAE" }]
+                                                        },
+                                                        offerMasterData: {
+                                                            currency: [{ currencyId: 1, currencySymbol: "INR" }, { currencyId: 2, currencySymbol: "USD" }],
+                                                            scale: [{ scaleId: 1, scale: "Hundreds" }, { scaleId: 2, scale: "Lakhs" }],
+                                                            duration: [{ durationId: 1, duration: "Per Hour" }, { durationId: 2, duration: "Per Annnum" }],
+                                                            attachment: [{ attachmentId: 1, attachmentName: "SSLC" }, { attachmentId: 2, attachmentName: "Degree" }],
+                                                            grade: [{ gradeId: 1, gradeName: "Grade-E" }, { gradeId: 2, gradeName: "Grade-E" }],
+                                                            designation: [{ jobtitleId: 1, title: "Android Developer" }, { jobtitleId: 1, title: "Ios Developer" }]
+                                                        }
                                                     };
                                                     if (req.query.isWeb == 0) {
                                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

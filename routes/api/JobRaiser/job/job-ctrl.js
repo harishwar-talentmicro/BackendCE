@@ -125,7 +125,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
     // if (!stageStatusList) {
     //     stageStatusList = [];
     // }
-    console.log(req.body);
+
     // if(!req.body || req.body == null || req.body =='null' ){
     //     response.error = 'Secret Key is null';
     //     response.message = 'req.body is null';
@@ -313,7 +313,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.logoAligment || 'RIGHT'),
                         req.st.db.escape(req.body.clientCVHeaderAligment || 'RIGHT'),
                         req.st.db.escape(req.body.clientCVFooterAligment || 'RIGHT'),
-                        req.st.db.escape(req.body.overwriteResumeJobPortal || 0)
+                        req.st.db.escape(req.body.overwriteResume || 0),
+                        req.st.db.escape(req.body.mergeResumeFields || 0)
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';

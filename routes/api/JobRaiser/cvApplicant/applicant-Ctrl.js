@@ -2841,7 +2841,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                                             previousClientCvPath: (result[3] && result[3][0]) ? result[3][0].previousClientCvPath : "",
                                             faceSheet: (result[4] && result[4][0]) ? JSON.parse(result[4][0].faceSheet) : {},
                                             mailTransactions: result[5] ? result[5] : [],
-                                            followUpNotes: result[6] && result[6][0] ? result[6] : []
+                                            followUpNotes: result[6] && result[6][0] ? result[6] : [],
+                                            smsHistory : result[7] && result[7][0] ? result[7] : []
                                         };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -2861,7 +2862,8 @@ applicantCtrl.getApplicantDetails = function (req, res, next) {
                                         previousClientCvPath: "",
                                         faceSheet: {},
                                         mailTransactions: [],
-                                        followUpNotes: []
+                                        followUpNotes: [],
+                                        smsHistory : []
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
