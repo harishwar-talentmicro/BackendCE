@@ -6222,6 +6222,7 @@ sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
                                                 response.message = "mails saved sucessfully";
                                                 response.error = null;
                                                 response.data = result[0][0];
+                                                response.data.reqAppList = result[1] && result[1][0] ? result[1] : [];  
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
                                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -9096,7 +9097,9 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                                 req.st.db.escape(mobileNo),
                                                 req.st.db.escape(isdMobile),
                                                 req.st.db.escape(message),
-                                                req.st.db.escape(1)
+                                                req.st.db.escape(1),
+                                                req.st.db.escape(reqApplicants[0])
+                                                
                                             ];
 
                                             var procQuery = 'CALL pace_save_sentSmsHistory( ' + inputs.join(',') + ')';
@@ -9111,6 +9114,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                                         response.error = null;
                                                         response.data = null;
                                                         res.status(200).json(response);
+                                                        console.log('after sending sms res');
                                                     }
                                                 }
                                                 else if (!smserr && smsresult && smsresult[0] && smsresult[0][0] && smsresult[0][0].errorCode == 0) {
@@ -9145,31 +9149,30 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                 //         }
                                 //     );
                                 // }
+                                // if (sentSMS) {
+                                //     var savesms = [
+                                //         req.st.db.escape(req.query.token),
+                                //         req.st.db.escape(req.query.heMasterId),
+                                //         req.st.db.escape(reqApplicants[0]),
+                                //         req.st.db.escape(message || ""),    // sms message
+                                //         req.st.db.escape(isdMobile),
+                                //         req.st.db.escape(MobileNumber)
+                                //     ];
 
-                                if (sentSMS) {
-                                    var savesms = [
-                                        req.st.db.escape(req.query.token),
-                                        req.st.db.escape(req.query.heMasterId),
-                                        req.st.db.escape(reqApplicants[0]),
-                                        req.st.db.escape(message || ""),    // sms message
-                                        req.st.db.escape(isdMobile),
-                                        req.st.db.escape(MobileNumber)
-                                    ];
-
-                                    //saving the mail after sending it
-                                    var saveMailHistory = 'CALL pace_save_smsHistory( ' + savesms.join(',') + ')';
-                                    console.log(saveMailHistory);
-                                    req.db.query(saveMailHistory, function (smserr, smsresult) {
-                                        console.log("error of save mail", smserr);
-                                        if (!smserr && smsresult && smsresult[0] && smsresult[0][0]) {
-                                            console.log('sms sent and saved successfully');
-                                        }
-                                        else {
-                                            console.log('Mails could not be saved');
-                                        }
-                                    });
-                                    console.log('Mail sent now save sent history');
-                                }
+                                //     //saving the mail after sending it
+                                //     var saveMailHistory = 'CALL pace_save_smsHistory( ' + savesms.join(',') + ')';
+                                //     console.log(saveMailHistory);
+                                //     req.db.query(saveMailHistory, function (smserr, smsresult) {
+                                //         console.log("error of save mail", smserr);
+                                //         if (!smserr && smsresult && smsresult[0] && smsresult[0][0]) {
+                                //             console.log('sms sent and saved successfully');
+                                //         }
+                                //         else {
+                                //             console.log('Mails could not be saved');
+                                //         }
+                                //     });
+                                //     console.log('Mail sent now save sent history');
+                                // }
                                 // }
                             }
                             // }
