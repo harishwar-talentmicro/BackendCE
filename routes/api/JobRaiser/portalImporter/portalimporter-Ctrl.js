@@ -1482,8 +1482,8 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                         if (name.split(' ')) {
                             if (name.split(' ')[0])
                                 first_name = removeExtraChars(name.split(' ')[0]);
-                            if (name.split(' ')[name.split(' ').length-1])
-                                last_name = removeExtraChars(name.split(' ')[name.split(' ').length-1]);
+                            if (name.split(' ')[name.split(' ').length - 1])
+                                last_name = removeExtraChars(name.split(' ')[name.split(' ').length - 1]);
                         }
 
                         if (document.getElementsByClassName('ftRight') && document.getElementsByClassName('ftRight')[i] && document.getElementsByClassName('ftRight')[i].innerHTML && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ') && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1] && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1].split('</span>') && document.getElementsByClassName('ftRight')[i].innerHTML.split('Modified: ')[1].split('</span>')[0]) {
@@ -1573,8 +1573,8 @@ portalimporter.checkApplicantExistsFromNaukriPortal = function (req, res, next) 
                     if (name.split(' ')) {
                         if (name.split(' ')[0])
                             first_name = removeExtraChars(name.split(' ')[0]);
-                        if (name.split(' ')[name.split(' ').length-1])
-                            last_name = removeExtraChars(name.split(' ')[name.split(' ').length-1]);
+                        if (name.split(' ')[name.split(' ').length - 1])
+                            last_name = removeExtraChars(name.split(' ')[name.split(' ').length - 1]);
                     }
 
                     if (document.getElementsByClassName('ftRight') && document.getElementsByClassName('ftRight')[selected_candidates[i]] && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ') && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1] && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1].split('</span>') && document.getElementsByClassName('ftRight')[selected_candidates[i]].innerHTML.split('Modified: ')[1].split('</span>')[0]) {
@@ -1748,8 +1748,8 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
             name = removeExtraChars(name);
             if (name && name.split(' ')[0])
                 details.firstName = removeExtraChars(name.split(' ')[0]);
-            if (name && name.split(' ')[name.split(' ').length-1])
-                details.lastName = removeExtraChars(name.split(' ')[name.split(' ').length-1]);
+            if (name && name.split(' ')[name.split(' ').length - 1])
+                details.lastName = removeExtraChars(name.split(' ')[name.split(' ').length - 1]);
         }
 
         var tempEmailId = document.getElementsByClassName('bkt4 email');
@@ -2220,6 +2220,7 @@ portalimporter.saveApplicantsFromNaukri = function (req, res, next) {
         }
 
         else {
+            console.log(details);
             savePortalApplicants(portalId, cvSourceId, details, req, res);
         }
 
