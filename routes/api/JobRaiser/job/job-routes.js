@@ -43,5 +43,8 @@ router.get('/getReqContactsForMobile',jobCtrl.getRequirementContactsOfBranchForM
 
 router.get('/columns',jobCtrl.columns);
 router.post('/report',jobCtrl.dynamicReport);
+
+router.get('/jobtitlelist',jobCtrl.jobtitlelist);
+
 module.exports = router;
 

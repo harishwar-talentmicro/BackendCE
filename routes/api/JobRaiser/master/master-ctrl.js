@@ -1080,11 +1080,17 @@ masterCtrl.savetemplate = function (req, res, next) {
                         req.body.updateFlag = (req.body.updateFlag) ? req.body.updateFlag : 0;
                         req.body.SMSMessage = (req.body.SMSMessage) ? req.body.SMSMessage : '';
                         req.body.whatmateMessage = (req.body.whatmateMessage) ? req.body.whatmateMessage : '';
+                        var templateId = req.body.template ? req.body.template.templateId : 0;
+                        var whatmateMessage = req.body.whatmateMessage || '';
+                        var smsMsg = req.body.smsMsg || '';
+                        var smsFlag = req.body.smsFlag || 0;
+                        var tableTags = req.body.tableTags || {};
+                        var trackerTemplate = req.body.trackerTemplate || {};
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
-                            req.st.db.escape(req.body.templateId),
-                            req.st.db.escape(req.body.heMasterId),
+                            req.st.db.escape(templateId),
+                            req.st.db.escape(req.query.heMasterId),
                             req.st.db.escape(req.body.templateName),
                             req.st.db.escape(req.body.type),
                             req.st.db.escape(JSON.stringify(toMail)),
@@ -1095,30 +1101,32 @@ masterCtrl.savetemplate = function (req, res, next) {
                             req.st.db.escape(req.body.replymailId),
                             req.st.db.escape(req.body.priority),
                             req.st.db.escape(req.body.updateFlag),
-                            req.st.db.escape(req.body.SMSMessage),
-                            req.st.db.escape(req.body.whatmateMessage),
+                            req.st.db.escape(smsMsg),
+                            req.st.db.escape(whatmateMessage),
                             req.st.db.escape(JSON.stringify(attachment)),
                             req.st.db.escape(JSON.stringify(tags)),
                             req.st.db.escape(JSON.stringify(stage)),
-                            req.st.db.escape(req.body.sendSMS || 0),
+                            req.st.db.escape(req.body.mailerType),
+                            req.st.db.escape(JSON.stringify(tableTags)),
+                            req.st.db.escape(req.body.smsFlag || 0),
                             req.st.db.escape(req.body.attachJD || 0),
                             req.st.db.escape(req.body.attachResume || 0),
                             req.st.db.escape(req.body.interviewerFlag || 0),
-                            req.st.db.escape(req.body.resumeFileName || ""),
+                            req.st.db.escape(req.body.resumeFileName || ''),
                             req.st.db.escape(req.body.attachResumeFlag || 0),
-                            req.st.db.escape(JSON.stringify(req.body.trackerTemplate || {})),
+                            req.st.db.escape(JSON.stringify(trackerTemplate)),
                             req.st.db.escape(req.body.isSingleMail || 0)
                         ];
                         var procQuery = 'CALL WM_save_1010_mailTemplate( ' + inputs.join(',') + ')';
                         console.log(procQuery);
                         req.db.query(procQuery, function (err, results) {
                             console.log(err);
-                            if (!err && results && results[0]) {
+                            if (!err && results && results[0] && results[0][0] && results[0][0].templateId) {
                                 response.status = true;
                                 response.message = "Mail template saved successfully";
                                 response.error = null;
                                 response.data = {
-                                    templateId: results[0]
+                                    templateId: results[0][0].templateId
                                 };
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                 zlib.gzip(buf, function (_, result) {

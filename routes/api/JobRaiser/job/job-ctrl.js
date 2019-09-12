@@ -314,7 +314,8 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.clientCVHeaderAligment || 'RIGHT'),
                         req.st.db.escape(req.body.clientCVFooterAligment || 'RIGHT'),
                         req.st.db.escape(req.body.overwriteResume || 0),
-                        req.st.db.escape(req.body.mergeResumeFields || 0)
+                        req.st.db.escape(req.body.mergeResumeFields || 0),
+                        req.st.db.escape(req.body.scheduleDailyInterviewSms || 0)
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -2082,7 +2083,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
 
                                         // use this after getting url from tallint
                                         var url = urlData.apiPath;
-                                        console.log("req.body",JSON.stringify(req.body));
+                                        console.log("req.body", JSON.stringify(req.body));
                                         req.body.hcUserId = req.body.HCUserId;
                                         request({
                                             url: url,
@@ -3358,6 +3359,61 @@ jobCtrl.dynamicReport = function (req, res, next) {
             console.log(ex);
             console.log('Error: ' + ex);
         }
+    }
+};
+
+
+
+
+jobCtrl.jobtitlelist = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
+        var procQuery = 'select * from mhejobtitles';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            console.log(err);
+            if (!err && result) {
+                response.status = true;
+                response.message = "list  loaded successfully";
+                response.error = null;
+                response.data = {
+                    list: result
+                };
+                res.status(200).json(response);
+            }
+            else if (!err) {
+                response.status = true;
+                response.message = "Jd TemplateList not found";
+                response.error = null;
+                response.data = {
+                    list: []
+                };
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while getting jdTemplateList";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+
     }
 };
 
