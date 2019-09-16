@@ -145,6 +145,7 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
                         console.log(data.toString());
                         if (data.toString().indexOf('File is not a zip file') > -1) {
                             response.status = true;
+                            response.error = data.toString();
                             response.message = "Error while masking";
                             res.status(500).json(response);
                             return;
