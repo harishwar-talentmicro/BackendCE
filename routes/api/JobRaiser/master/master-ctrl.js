@@ -1071,7 +1071,6 @@ masterCtrl.savetemplate = function (req, res, next) {
                     }
                     else {
                         req.query.isWeb = (req.query.isWeb) ? req.query.isWeb : 0;
-                        req.body.templateId = (req.body.templateId) ? req.body.templateId : 0;
                         req.body.type = (req.body.type) ? req.body.type : 0;
                         req.body.subject = (req.body.subject) ? req.body.subject : '';
                         req.body.mailBody = (req.body.mailBody) ? req.body.mailBody : '';
@@ -1080,7 +1079,7 @@ masterCtrl.savetemplate = function (req, res, next) {
                         req.body.updateFlag = (req.body.updateFlag) ? req.body.updateFlag : 0;
                         req.body.SMSMessage = (req.body.SMSMessage) ? req.body.SMSMessage : '';
                         req.body.whatmateMessage = (req.body.whatmateMessage) ? req.body.whatmateMessage : '';
-                        var templateId = req.body.template ? req.body.template.templateId : 0;
+                        var templateId =  req.body.template && (req.body.template.templateId)  ? (req.body.template.templateId)  : req.body.templateId || 0;
                         var whatmateMessage = req.body.whatmateMessage || '';
                         var smsMsg = req.body.smsMsg || '';
                         var smsFlag = req.body.smsFlag || 0;

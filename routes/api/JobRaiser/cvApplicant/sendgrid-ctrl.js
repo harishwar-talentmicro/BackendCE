@@ -6222,7 +6222,7 @@ sendgridCtrl.saveMailSentByGmail = function (req, res, next) {
                                                 response.message = "mails saved sucessfully";
                                                 response.error = null;
                                                 response.data = result[0][0];
-                                                response.data.reqAppList = result[1] && result[1][0] ? result[1] : [];  
+                                                response.data.reqAppList = result[1] && result[1][0] ? result[1] : [];
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {
                                                     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
@@ -8976,7 +8976,7 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                             var temp2 = req.body.smsMsg;
                             // var applicantData = [];
                             // var JDAttachment = [];
-                            var tags = result[2] && result[2][0] ? JSON.parse(result[2][0].tags) : {};
+                            var tags = req.body.tags ? req.body.tags : {};
 
                             // isSMS = result[3] && result[3][0] && result[3][0].isSMS ? result[3][0].isSMS : 0
 
@@ -8985,31 +8985,42 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                             for (var applicantIndex = 0; applicantIndex < idArray.length; applicantIndex++) {
                                 // console.log('applicantIndex=', applicantIndex);
 
-                                for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
+                                if (tags && (tags.applicant || tags.requirement || tags.interview || tags.client)) {
+                                    for (var tagIndex = 0; tagIndex < tags.applicant.length; tagIndex++) {
 
-                                    if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
+                                        if ((result[0][applicantIndex][tags.applicant[tagIndex].tagName] && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != null && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.applicant[tagIndex].tagName] != '') || result[0][applicantIndex][tags.applicant[tagIndex].tagName] >= 0) {
 
-                                        smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
+                                            smsMsg = replaceAll(smsMsg, '[applicant.' + tags.applicant[tagIndex].tagName + ']', result[0][applicantIndex][tags.applicant[tagIndex].tagName]);
 
+                                        }
                                     }
-                                }
 
-                                for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
+                                    for (var tagIndex = 0; tagIndex < tags.requirement.length; tagIndex++) {
 
-                                    if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
+                                        if ((result[0][applicantIndex][tags.requirement[tagIndex].tagName] && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != null && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.requirement[tagIndex].tagName] != '') || result[0][applicantIndex][tags.requirement[tagIndex].tagName] >= 0) {
 
-                                        smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                            smsMsg = replaceAll(smsMsg, '[requirement.' + tags.requirement[tagIndex].tagName + ']', result[0][applicantIndex][tags.requirement[tagIndex].tagName]);
+                                        }
                                     }
-                                }
 
-                                for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
+                                    for (var tagIndex = 0; tagIndex < tags.interview.length; tagIndex++) {
 
-                                    if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
+                                        if ((result[0][applicantIndex][tags.interview[tagIndex].tagName] && result[0][applicantIndex][tags.interview[tagIndex].tagName] != null && result[0][applicantIndex][tags.interview[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.interview[tagIndex].tagName] != '') || result[0][applicantIndex][tags.interview[tagIndex].tagName] >= 0) {
 
-                                        smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                            smsMsg = replaceAll(smsMsg, '[interview.' + tags.interview[tagIndex].tagName + ']', result[0][applicantIndex][tags.interview[tagIndex].tagName]);
+                                        }
                                     }
-                                }
 
+                                    for (var tagIndex = 0; tagIndex < tags.client.length; tagIndex++) {
+
+                                        if ((result[0][applicantIndex][tags.client[tagIndex].tagName] && result[0][applicantIndex][tags.client[tagIndex].tagName] != null && result[0][applicantIndex][tags.client[tagIndex].tagName] != 'null' && result[0][applicantIndex][tags.client[tagIndex].tagName] != '') || result[0][applicantIndex][tags.client[tagIndex].tagName] >= 0) {
+
+                                            smsMsg = replaceAll(smsMsg, '[client.' + tags.client[tagIndex].tagName + ']', result[0][applicantIndex][tags.client[tagIndex].tagName]);
+
+                                        }
+                                    }
+
+                                }
                                 // applicantData.push(result[0][applicantIndex].EmailId);
                                 // JDAttachment.push(result[0][applicantIndex].JDAttachment);
                                 // mailbody_array.push(mailBody);
@@ -9025,157 +9036,177 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                             }
 
                             // console.log("toEmailID", toEmailID);
-                            for (var receiverIndex = 0; receiverIndex < MobileNumber.length; receiverIndex++) {
-                                var sentSMS = 0;
-                                // assign mobile no and isdMobile to send sms
-                                isdMobile = MobileISD[receiverIndex];
-                                mobileNo = MobileNumber[receiverIndex];
-                                message = smsMsg_array[receiverIndex];
+                            if (!req.body.smsMsgPreview) {
+                                for (var receiverIndex = 0; receiverIndex < MobileNumber.length; receiverIndex++) {
+                                    var sentSMS = 0;
+                                    // assign mobile no and isdMobile to send sms
+                                    isdMobile = MobileISD[receiverIndex];
+                                    mobileNo = MobileNumber[receiverIndex];
+                                    message = smsMsg_array[receiverIndex];
 
-                                // to send normal sms
-                                // if (isSMS) {
+                                    // to send normal sms
+                                    // if (isSMS) {
 
-                                console.log('inside send sms');
-                                console.log(isdMobile, ' ', mobileNo);
+                                    console.log('inside send sms');
+                                    console.log(isdMobile, ' ', mobileNo);
 
-                                if (isdMobile == "+91") {
-                                    request({
-                                        url: 'https://aikonsms.co.in/control/smsapi.php',
-                                        qs: {
-                                            user_name: 'janardana@hirecraft.com',
-                                            password: 'Ezeid2015',
-                                            sender_id: result[3][0].smsSenderId,
-                                            service: 'TRANS',
-                                            mobile_no: mobileNo,
-                                            message: message,
-                                            method: 'send_sms'
-                                        },
-                                        method: 'GET'
+                                    if (isdMobile == "+91") {
+                                        request({
+                                            url: 'https://aikonsms.co.in/control/smsapi.php',
+                                            qs: {
+                                                user_name: 'janardana@hirecraft.com',
+                                                password: 'Ezeid2015',
+                                                sender_id: result[3][0].smsSenderId,
+                                                service: 'TRANS',
+                                                mobile_no: mobileNo,
+                                                message: message,
+                                                method: 'send_sms'
+                                            },
+                                            method: 'GET'
 
-                                    }, function (error, aikonresponse, body) {
-                                        if (error) {
-                                            console.log(error, "SMS");
-                                            response.status = false;
-                                            response.message = "Failed to send sms";
-                                            response.error = null;
-                                            response.data = null;
-                                            res.status(200).json(response);
-                                            return;
-                                            // var req1 = http.request(options, function (res1) {
-                                            //     var chunks = [];
+                                        }, function (error, aikonresponse, body) {
+                                            if (error) {
+                                                console.log(error, "SMS");
+                                                response.status = false;
+                                                response.message = "Failed to send sms";
+                                                response.error = null;
+                                                response.data = null;
+                                                res.status(200).json(response);
+                                                return;
+                                                // var req1 = http.request(options, function (res1) {
+                                                //     var chunks = [];
 
-                                            //     res1.on("data", function (chunk) {
-                                            //         chunks.push(chunk);
-                                            //     });
+                                                //     res1.on("data", function (chunk) {
+                                                //         chunks.push(chunk);
+                                                //     });
 
-                                            //     res1.on("end", function () {
-                                            //         var body = Buffer.concat(chunks);
-                                            //         console.log(body.toString());
-                                            //     });
-                                            // });
+                                                //     res1.on("end", function () {
+                                                //         var body = Buffer.concat(chunks);
+                                                //         console.log(body.toString());
+                                                //     });
+                                                // });
 
-                                            // req1.write(qs.stringify({
-                                            //     userId: 'talentmicro',
-                                            //     password: 'TalentMicro@123',
-                                            //     senderId: 'WTMATE',
-                                            //     sendMethod: 'simpleMsg',
-                                            //     msgType: 'text',
-                                            //     mobile: isdMobile.replace("+", "") + mobileNo,
-                                            //     msg: message,
-                                            //     duplicateCheck: 'true',
-                                            //     format: 'json'
-                                            // }));
-                                            // req1.end();
-                                        }
-                                        else {
-                                            sentSMS = 1;
-                                            console.log("SUCCESS aikon", "SMS response " + sentSMS);
+                                                // req1.write(qs.stringify({
+                                                //     userId: 'talentmicro',
+                                                //     password: 'TalentMicro@123',
+                                                //     senderId: 'WTMATE',
+                                                //     sendMethod: 'simpleMsg',
+                                                //     msgType: 'text',
+                                                //     mobile: isdMobile.replace("+", "") + mobileNo,
+                                                //     msg: message,
+                                                //     duplicateCheck: 'true',
+                                                //     format: 'json'
+                                                // }));
+                                                // req1.end();
+                                            }
+                                            else {
+                                                sentSMS = 1;
+                                                console.log("SUCCESS aikon", "SMS response " + sentSMS);
 
-                                            var inputs = [
-                                                req.st.db.escape(req.query.token),
-                                                req.st.db.escape(req.query.heMasterId),
-                                                req.st.db.escape(mobileNo),
-                                                req.st.db.escape(isdMobile),
-                                                req.st.db.escape(message),
-                                                req.st.db.escape(1),
-                                                req.st.db.escape(reqApplicants[0])
-                                                
-                                            ];
+                                                var inputs = [
+                                                    req.st.db.escape(req.query.token),
+                                                    req.st.db.escape(req.query.heMasterId),
+                                                    req.st.db.escape(mobileNo),
+                                                    req.st.db.escape(isdMobile),
+                                                    req.st.db.escape(message),
+                                                    req.st.db.escape(1),
+                                                    req.st.db.escape(reqApplicants[0])
+                                                ];
 
-                                            var procQuery = 'CALL pace_save_sentSmsHistory( ' + inputs.join(',') + ')';
-                                            console.log(procQuery);
-                                            req.db.query(procQuery, function (smserr, smsresult) {
-                                                if (!smserr && smsresult && smsresult[0] && smsresult[0][0] && smsresult[0][0].errorCode == 1) {
-                                                    console.log("Continue sending sms");
-                                                    console.log('receiverIndex', receiverIndex, 'MobileNumber.length', MobileNumber.length);
-                                                    if (receiverIndex == MobileNumber.length) {
-                                                        response.status = true;
-                                                        response.message = "Sms sent successfully";
+                                                var procQuery = 'CALL pace_save_sentSmsHistory( ' + inputs.join(',') + ')';
+                                                console.log(procQuery);
+                                                req.db.query(procQuery, function (smserr, smsresult) {
+                                                    if (!smserr && smsresult && smsresult[0] && smsresult[0][0] && smsresult[0][0].errorCode == 1) {
+                                                        console.log("Continue sending sms");
+                                                        console.log('receiverIndex', receiverIndex, 'MobileNumber.length', MobileNumber.length);
+                                                        if (receiverIndex == MobileNumber.length) {
+                                                            response.status = true;
+                                                            response.message = "Sms sent successfully";
+                                                            response.error = null;
+                                                            response.data = null;
+                                                            res.status(200).json(response);
+                                                            console.log('after sending sms res');
+                                                        }
+                                                    }
+                                                    else if (!smserr && smsresult && smsresult[0] && smsresult[0][0] && smsresult[0][0].errorCode == 0) {
+                                                        response.status = false;
+                                                        response.message = smsresult[0][0]._error;
                                                         response.error = null;
                                                         response.data = null;
                                                         res.status(200).json(response);
-                                                        console.log('after sending sms res');
+                                                        return;
                                                     }
-                                                }
-                                                else if (!smserr && smsresult && smsresult[0] && smsresult[0][0] && smsresult[0][0].errorCode == 0) {
-                                                    response.status = false;
-                                                    response.message = smsresult[0][0]._error;
-                                                    response.error = null;
-                                                    response.data = null;
-                                                    res.status(200).json(response);
-                                                    return;
-                                                }
 
-                                            });
+                                                });
 
-                                        }
-                                    });
+                                            }
+                                        });
+                                    }
+                                    // else if (isdMobile != "") {
+                                    //     client.messages.create(
+                                    //         {
+                                    //             body: message,
+                                    //             to: isdMobile + mobileNo,
+                                    //             from: FromNumber
+                                    //         },
+                                    //         function (error, response) {
+                                    //             if (error) {
+                                    //                 console.log(error, "SMS");
+                                    //             }
+                                    //             else {
+                                    //                 sentSMS = 1;
+                                    //                 console.log("SUCCESS", "SMS response");
+                                    //             }
+                                    //         }
+                                    //     );
+                                    // }
+                                    // if (sentSMS) {
+                                    //     var savesms = [
+                                    //         req.st.db.escape(req.query.token),
+                                    //         req.st.db.escape(req.query.heMasterId),
+                                    //         req.st.db.escape(reqApplicants[0]),
+                                    //         req.st.db.escape(message || ""),    // sms message
+                                    //         req.st.db.escape(isdMobile),
+                                    //         req.st.db.escape(MobileNumber)
+                                    //     ];
+
+                                    //     //saving the mail after sending it
+                                    //     var saveMailHistory = 'CALL pace_save_smsHistory( ' + savesms.join(',') + ')';
+                                    //     console.log(saveMailHistory);
+                                    //     req.db.query(saveMailHistory, function (smserr, smsresult) {
+                                    //         console.log("error of save mail", smserr);
+                                    //         if (!smserr && smsresult && smsresult[0] && smsresult[0][0]) {
+                                    //             console.log('sms sent and saved successfully');
+                                    //         }
+                                    //         else {
+                                    //             console.log('Mails could not be saved');
+                                    //         }
+                                    //     });
+                                    //     console.log('Mail sent now save sent history');
+                                    // }
+                                    // }
+                                    else {
+                                        response.status = false;
+                                        response.message = "Invalid Mobile Isd";
+                                        response.error = null;
+                                        response.data = null;
+                                        res.status(200).json(response);
+                                        return;
+                                    }
                                 }
-                                // else if (isdMobile != "") {
-                                //     client.messages.create(
-                                //         {
-                                //             body: message,
-                                //             to: isdMobile + mobileNo,
-                                //             from: FromNumber
-                                //         },
-                                //         function (error, response) {
-                                //             if (error) {
-                                //                 console.log(error, "SMS");
-                                //             }
-                                //             else {
-                                //                 sentSMS = 1;
-                                //                 console.log("SUCCESS", "SMS response");
-                                //             }
-                                //         }
-                                //     );
-                                // }
-                                // if (sentSMS) {
-                                //     var savesms = [
-                                //         req.st.db.escape(req.query.token),
-                                //         req.st.db.escape(req.query.heMasterId),
-                                //         req.st.db.escape(reqApplicants[0]),
-                                //         req.st.db.escape(message || ""),    // sms message
-                                //         req.st.db.escape(isdMobile),
-                                //         req.st.db.escape(MobileNumber)
-                                //     ];
-
-                                //     //saving the mail after sending it
-                                //     var saveMailHistory = 'CALL pace_save_smsHistory( ' + savesms.join(',') + ')';
-                                //     console.log(saveMailHistory);
-                                //     req.db.query(saveMailHistory, function (smserr, smsresult) {
-                                //         console.log("error of save mail", smserr);
-                                //         if (!smserr && smsresult && smsresult[0] && smsresult[0][0]) {
-                                //             console.log('sms sent and saved successfully');
-                                //         }
-                                //         else {
-                                //             console.log('Mails could not be saved');
-                                //         }
-                                //     });
-                                //     console.log('Mail sent now save sent history');
-                                // }
                                 // }
                             }
-                            // }
+                            else {
+                                response.status = true;
+                                response.message = "Sms data loaded successfully";
+                                response.error = null;
+                                response.data = {
+                                    smsMsg_array: smsMsg_array,
+                                    MobileISD: MobileISD,
+                                    MobileNumber: MobileNumber
+                                };
+                                res.status(200).json(response);
+                            }
 
 
                         }
