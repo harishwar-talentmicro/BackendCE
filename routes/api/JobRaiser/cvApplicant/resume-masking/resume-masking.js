@@ -103,7 +103,7 @@ resumeMaskingCtrl.resume_maskinghttp = function (req, res, next) {
 
                 new Promise(function (resolve, reject) {
                     console.log('Inside promise');
-                    if (orgCVPath.split('.')[orgCVPath.split('.').length - 1] == 'doc') {
+                    if (orgCVPath.split('.')[orgCVPath.split('.').length - 1] == 'doc' || orgCVPath.split('.')[orgCVPath.split('.').length - 1] == 'pdf') {
                         convertDocToDocx(orgCVPath, function (err, conres) {
                             try {
                                 if (!err && conres) {
