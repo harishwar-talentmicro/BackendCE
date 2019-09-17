@@ -923,7 +923,7 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                 console.log('filetype', filetype);
 
                 if (filetype && filetype != "") {
-                    if (filetype != 'doc' && filetype != 'pdf') {
+                    if (filetype != 'doc') { //&& filetype != 'pdf'
                         aUrl = uniqueId + '.' + filetype;
                         aFilename = req.files.attachment.originalname;
                         console.log("aFilenameaFilename", aFilename);
@@ -1071,7 +1071,7 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                 }
 
                 console.log('doc api log', filetype);
-                if (filetype != "doc" && filetype != "pdf") {
+                if (filetype != "doc") {
                     aUrl = uniqueId + '.' + filetype;
                     aFilename = req.files.attachment.originalname;
                     console.log("aFilenameaFilename", aFilename);
@@ -1108,13 +1108,13 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                     });
                 }
                 else {
-                    if (filetype == 'doc') {
+                    // if (filetype == 'doc') {
                         var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
                         var file_name_docx = file_name + 'x';
-                    } else {
-                        var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
-                        var file_name_docx = file_name;
-                    }
+                    // } else {
+                    //     var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
+                    //     var file_name_docx = file_name;
+                    // }
 
                     aUrl = uniqueId + '.docx';
                     console.log('doc to docx', aUrl);
