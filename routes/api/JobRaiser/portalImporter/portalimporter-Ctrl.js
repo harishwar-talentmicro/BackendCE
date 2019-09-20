@@ -2245,111 +2245,187 @@ portalimporter.checkApplicantExistsFromShinePortal = function (req, res, next) {
     };
     var validationFlag = true;
     var portalId = 4;  // shine
+    try {
+        const { JSDOM } = jsdom;
+        var xml_string = req.body.xml_string;
 
-    const { JSDOM } = jsdom;
-    var xml_string = req.body.xml_string;
+        var document = new JSDOM(xml_string).window.document;
+        var applicants = [];
+        var selected_candidates = req.body.selected_candidates;
+        var is_select_all = req.body.is_select_all;
+        var search_results = document.getElementsByClassName('cls_loop_chng search_result2');
+        //console.log('search_results', search_results.length)
+        if (is_select_all == 1) {
 
-    var document = new JSDOM(xml_string).window.document;
-    var applicants = [];
-    var selected_candidates = req.body.selected_candidates;
-    var is_select_all = req.body.is_select_all;
-    var search_results = document.getElementsByClassName('cls_loop_chng search_result2');
-    //console.log('search_results', search_results.length)
-    if (is_select_all == 1) {
+            if (search_results)
+                for (var i = 0; i < search_results.length; i++) {
+                    if (search_results[i]) {
 
-        if (search_results)
-            for (var i = 0; i < search_results.length; i++) {
-                if (search_results[i]) {
-                    var tempname = search_results[i].getElementsByClassName('cls_circle_name');
-                    if (tempname && tempname[0] && tempname[0].innerHTML) {
-                        //console.log('name', name);
-                        var name = tempname[0].innerHTML.trim();
-                        var first_name = "";
-                        var last_name = "";
+                        try {
+                            var tempname = search_results[i].getElementsByClassName('cls_circle_name');
+                            if (tempname && tempname[0] && tempname[0].innerHTML && tempname[0].innerHTML.trim()) {
+                                //console.log('name', name);
+                                var name = tempname[0].innerHTML.trim();
+                                var first_name = "";
+                                var last_name = "";
 
-                        if (name.split(' ')) {
-                            if (name.split(' ')[0])
-                                first_name = removeExtraChars(name.split(' ')[0]);
-                            if (name.split(' ')[1]) {
-                                last_name = name.split(' ').splice(1).join(' ');
-                                last_name = removeExtraChars(last_name.trim());
+                                if (name && name.split(' ')) {
+                                    if (name.split(' ')[0])
+                                        first_name = removeExtraChars(name.split(' ')[0]);
+                                    if (name.split(' ')[1]) {
+                                        last_name = name.split(' ').splice(1).join(' ');
+                                        last_name = removeExtraChars(last_name.trim());
+                                    }
+                                }
                             }
+                        } catch (ex) {
+                            console.log(ex);
                         }
-                    }
-                    document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1].trim();
-                    if (document.getElementsByClassName('cls_loop_chng search_result2') && document.getElementsByClassName('cls_loop_chng search_result2')[i] && document.getElementsByClassName('cls_loop_chng search_result2')[i].getElementsByClassName('bot_profile') && document.getElementsByClassName('ftRight')[i].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n') && document.getElementsByClassName('ftRight')[i].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0] && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':') && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1]) {
-                        var dateStr = document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1].trim();
-                        var lastModifiedDate = dateConverter(dateStr);
-                    }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 4, index: i, lastModifiedDate: lastModifiedDate });
+
+                        try {
+                            if (document.getElementsByClassName('cls_loop_chng search_result2') && document.getElementsByClassName('cls_loop_chng search_result2')[i] && document.getElementsByClassName('cls_loop_chng search_result2')[i].getElementsByClassName('bot_profile') && document.getElementsByClassName('ftRight')[i].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n') && document.getElementsByClassName('ftRight')[i].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0] && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':') && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1]) {
+                                var dateStr = document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1].trim();
+                                var lastModifiedDate = dateConverter(dateStr);
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                        }
+
+                        applicants.push({ firstName: first_name, lastName: last_name, portalId: 4, index: i, lastModifiedDate: lastModifiedDate });
 
 
+
+                    }
 
                 }
-
-            }
-        //console.log('applicants', applicants);
-    }
-
-    else {
-        // console.log(document.getElementsByClassName('userChk')[0].checked);
-        if (search_results) {
-
-            for (var i = 0; i < selected_candidates.length; i++) {
-                if (selected_candidates[i] >= 0) {
-                    var tempname = search_results[selected_candidates[i]].getElementsByClassName('cls_circle_name');
-                    if (tempname && tempname[0] && tempname[0].innerHTML) {
-                        //console.log('name', name);
-                        var name = tempname[0].innerHTML.trim();
-                        var first_name = "";
-                        var last_name = "";
-
-                        if (name.split(' ')) {
-                            if (name.split(' ')[0])
-                                first_name = removeExtraChars(name.split(' ')[0]);
-                            if (name.split(' ')[1]) {
-                                last_name = name.split(' ').splice(1).join(' ');
-                                last_name = removeExtraChars(last_name.trim());
-                            }
-                        }
-                    }
-
-                    if (document.getElementsByClassName('cls_loop_chng search_result2') && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]] && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile') && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n') && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0] && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':') && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1]) {
-                        var dateStr = document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1].trim();
-                        var lastModifiedDate = dateConverter(dateStr);
-                    }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 4, index: selected_candidates[i] });
-                }
-            }
             //console.log('applicants', applicants);
+        }
 
+        else {
+            // console.log(document.getElementsByClassName('userChk')[0].checked);
+            if (search_results) {
+
+                for (var i = 0; i < selected_candidates.length; i++) {
+                    if (selected_candidates[i] >= 0) {
+
+                        try {
+                            var tempname = search_results[selected_candidates[i]].getElementsByClassName('cls_circle_name');
+                            if (tempname && tempname[0] && tempname[0].innerHTML && tempname[0].innerHTML.trim()) {
+                                //console.log('name', name);
+                                var name = tempname[0].innerHTML.trim();
+                                var first_name = "";
+                                var last_name = "";
+                                try {
+                                    if (name && name.split(' ')) {
+                                        if (name.split(' ')[0])
+                                            first_name = removeExtraChars(name.split(' ')[0]);
+                                        if (name.split(' ')[1]) {
+                                            last_name = name.split(' ').splice(1).join(' ');
+                                            last_name = removeExtraChars(last_name.trim());
+                                        }
+                                    }
+                                } catch (ex) {
+                                    console.log(ex);
+                                }
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                        }
+
+                        try {
+                            if (document.getElementsByClassName('cls_loop_chng search_result2') && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]] && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile') && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n') && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0] && document.getElementsByClassName('cls_loop_chng search_result2')[search_results[selected_candidates[i]]].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':') && document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1]) {
+                                var dateStr = document.getElementsByClassName('cls_loop_chng search_result2')[0].getElementsByClassName('bot_profile')[0].getElementsByClassName('bor_n')[0].innerHTML.split(':')[1].trim();
+                                var lastModifiedDate = dateConverter(dateStr);
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                        }
+                        applicants.push({ firstName: first_name, lastName: last_name, portalId: 4, index: selected_candidates[i] });
+                    }
+                }
+                //console.log('applicants', applicants);
+
+            }
+        }
+
+        // for tallint
+        var isTallint = req.body.isTallint || 0;
+        var isIntranet = req.body.isIntranet || 0;
+        // for tallint
+        if (isTallint && !isIntranet) {
+            // var token = req.query.token;
+            // var heMasterId = req.query.heMasterId;
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: { applicants: applicants }
+                }, function (error, resp, body) {
+                    try {
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: applicants,
+                                resonseOfTallint: body
+                            };
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: applicants,
+                                resonseOfTallint: error
+                            };
+                            res.status(500).json(response);
+                        }
+
+                    }
+                    catch (ex) {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = ex;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+        }
+
+        else if (isTallint && isIntranet) {
+            response.status = true;
+            response.message = "Parsed XML Successfully";
+            response.error = null;
+            response.data = applicants;
+            res.status(200).json(response);
+        }
+
+        else {
+            var portalId = 4;
+            checkPortalApplicants(portalId, applicants, req, res);
         }
     }
-
-    var isTallint = req.query.isTallint || 0;
-
-    // for tallint
-    if (isTallint) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
-        var portalId = 4;
-        var formData = {
-            applicants: applicants
-        };
-
-        request({
-            url: req.body.tallint_url,
-            method: "POST",
-            json: true,
-            body: applicants
-        }, function (error, response, body) {
-            if (!err && body) {
-                console.log('tallint response here');
-            }
-        });
-    }
-    else {
-        checkPortalApplicants(portalId, applicants, req, res);
+    catch (ex) {
+        console.log(ex);
+        response.status = false;
+        response.message = "Something went wrong";
+        response.error = ex;
+        response.data = null;
+        res.status(500).json(response);
     }
 };
 
@@ -2369,116 +2445,207 @@ portalimporter.checkApplicantExistsFromTimesJobsPortal = function (req, res, nex
     const { JSDOM } = jsdom;
     var xml_string = req.body.xml_string;
 
-    var document = new JSDOM(xml_string).window.document;
-    var applicants = [];
-    var selected_candidates = req.body.selected_candidates;
-    var is_select_all = req.body.is_select_all;
-    var search_results = document.getElementsByClassName('search-result-block search-result');
+    try {
 
-    document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML
+        var document = new JSDOM(xml_string).window.document;
+        var applicants = [];
+        var selected_candidates = req.body.selected_candidates;
+        var is_select_all = req.body.is_select_all;
+        var search_results = document.getElementsByClassName('search-result-block search-result');
 
 
-    //console.log('search_results', search_results.length)
-    if (is_select_all == 1) {
+        document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML
 
-        if (search_results)
-            for (var i = 1; i < search_results.length; i++) {
-                if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML) {
-                    var tempname = search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML;
+        //console.log('search_results', search_results.length)
+        if (is_select_all == 1) {
 
-                    if (tempname && tempname[0] && tempname[0].innerHTML) {
-                        //console.log('name', name);
-                        var name = tempname[0].innerHTML.trim();
-                        var first_name = "";
-                        var last_name = "";
+            if (search_results)
+                for (var i = 1; i < search_results.length; i++) {
+                    if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML) {
+                        try {
+                            //console.log('name', name);
+                            var name = search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML.trim();
+                            var first_name = "";
+                            var last_name = "";
 
-                        if (name.split(' ')) {
-                            if (name.split(' ')[0])
-                                first_name = removeExtraChars(name.split(' ')[0]);
-                            if (name.split(' ')[1]) {
-                                last_name = name.split(' ').splice(1).join(' ');
-                                last_name = removeExtraChars(last_name.trim());
+                            if (name && name.split(' ')) {
+                                try {
+                                    if (name.split(' ')[0])
+                                        first_name = removeExtraChars(name.split(' ')[0]);
+                                    if (name.split(' ')[1]) {
+                                        last_name = name.split(' ').splice(1).join(' ');
+                                        last_name = removeExtraChars(last_name.trim());
+                                    }
+                                }
+                                catch (ex) {
+                                    console.log(ex);
+                                }
+                            }
+
+                        }
+                        catch (ex) {
+                            console.log(ex);
+                        }
+                        if (document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1]) {
+                            try {
+                                var dateStr = document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1].trim();
+                                var lastModifiedDate = dateConverter(dateStr);
+
+                            }
+                            catch (ex) {
+                                console.log(ex);
                             }
                         }
-                    }
+                        applicants.push({ firstName: first_name, lastName: last_name, portalId: 3, index: i, lastModifiedDate: lastModifiedDate });
 
-                    if (document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1]) {
-                        var dateStr = document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1].trim();
-                        var lastModifiedDate = dateConverter(dateStr);
                     }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 3, index: i, lastModifiedDate: lastModifiedDate });
-
                 }
-            }
 
-        //console.log('applicants', applicants);
-    }
-
-    else {
-        // console.log(document.getElementsByClassName('userChk')[0].checked);
-        if (search_results) {
-
-            for (var i = 0; i < selected_candidates.length; i++) {
-                if (selected_candidates[i] >= 0) {
-                    var tempname = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML;
-
-                    if (search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML) {
-                        //console.log('name', name);
-                        var name = tempname[0].innerHTML.trim();
-                        var first_name = "";
-                        var last_name = "";
-
-                        if (name.split(' ')) {
-                            if (name.split(' ')[0])
-                                first_name = removeExtraChars(name.split(' ')[0]);
-                            if (name.split(' ')[1]) {
-                                last_name = name.split(' ').splice(1).join(' ');
-                                last_name = removeExtraChars(last_name.trim());
-                            }
-                        }
-                    }
-
-                    if (document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1]) {
-                        var dateStr = document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1].trim();
-                        var lastModifiedDate = dateConverter(dateStr);
-                    }
-                    applicants.push({ firstName: first_name, lastName: last_name, portalId: 3, index: selected_candidates[i] });
-
-
-                }
-            }
             //console.log('applicants', applicants);
+        }
+
+        else {
+            // console.log(document.getElementsByClassName('userChk')[0].checked);
+            if (search_results) {
+
+                for (var i = 0; i < selected_candidates.length; i++) {
+                    if (selected_candidates[i] >= 0) {
+                        try {
+                            var tempname = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML;
+
+                            if (search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML) {
+                                //console.log('name', name);
+                                try {
+                                    var name = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML.trim();
+                                    var first_name = "";
+                                    var last_name = "";
+
+                                    if (name.split(' ')) {
+                                        if (name.split(' ')[0])
+                                            first_name = removeExtraChars(name.split(' ')[0]);
+                                        if (name.split(' ')[1]) {
+                                            try {
+                                                last_name = name.split(' ').splice(1).join(' ');
+                                                last_name = removeExtraChars(last_name.trim());
+                                            }
+                                            catch (ex) {
+                                                console.log(ex);
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (ex) {
+                                    console.log(ex);
+                                }
+                            }
+                            try {
+                                if (document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1]) {
+                                    try {
+                                        var dateStr = document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1].trim();
+
+                                        var lastModifiedDate = dateConverter(dateStr);
+                                    }
+                                    catch (ex) {
+                                        console.log(ex);
+                                    }
+                                }
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                            }
+                            applicants.push({ firstName: first_name, lastName: last_name, portalId: 3, index: selected_candidates[i] });
+
+                        }
+                        catch (ex) {
+                            console.log(ex);
+                        }
+                    }
+                }
+                //console.log('applicants', applicants);
+
+            }
+
 
         }
 
+        // for tallint
+        var isTallint = req.body.isTallint || 0;
+        var isIntranet = req.body.isIntranet || 0;
+        // for tallint
+        if (isTallint && !isIntranet) {
+            // var token = req.query.token;
+            // var heMasterId = req.query.heMasterId;
+            if (req.body.tallint_url && req.body.tallint_url.length > 1) {
+                request({
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: { applicants: applicants }
+                }, function (error, resp, body) {
+                    try {
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: applicants,
+                                resonseOfTallint: body
+                            };
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: applicants,
+                                resonseOfTallint: error
+                            };
+                            res.status(500).json(response);
+                        }
 
-    }
-
-
-    var isTallint = req.query.isTallint || 0;
-
-    // for tallint
-    if (isTallint) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
-        var portalId = 3;
-        var formData = {
-            applicants: applicants
-        };
-
-        request({
-            url: req.body.tallint_url,
-            method: "POST",
-            json: true,
-            body: applicants
-        }, function (error, response, body) {
-            if (!err && body) {
-                console.log('tallint response here');
+                    }
+                    catch (ex) {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = ex;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
             }
-        });
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: applicants,
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+        }
+
+        else if (isTallint && isIntranet) {
+            response.status = true;
+            response.message = "Parsed XML Successfully";
+            response.error = null;
+            response.data = applicants;
+            res.status(200).json(response);
+        }
+
+        else {
+            var portalId = 3;
+            checkPortalApplicants(portalId, applicants, req, res);
+        }
     }
-    else {
-        checkPortalApplicants(portalId, applicants, req, res);
+    catch (ex) {
+        console.log(ex);
+        response.status = false;
+        response.message = "Something went wrong";
+        response.error = ex;
+        response.data = null;
+        res.status(500).json(response);
     }
 };
 
@@ -2495,181 +2662,320 @@ portalimporter.saveApplicantsFromShine = function (req, res, next) {
     var cvSourceId = 4;
 
     var details = {};
-    const { JSDOM } = jsdom;
 
-    var document = new JSDOM(req.body.xml_string).window.document;
-    // console.log('req.files.document',req.body.document);
+    try {
+        const { JSDOM } = jsdom;
 
-    if (document && document.getElementsByClassName('cls_circle_name') && document.getElementsByClassName('cls_circle_name')[0] && document.getElementsByClassName('cls_circle_name')[0].innerHTML) {
-        var tempName = document.getElementsByClassName('cls_circle_name');
-        if (tempName && tempName[0] && tempName[0].innerHTML) {
-            var name = tempName[0].innerHTML.trim(' ');
-            if (name && name.split(' ')[0])
-                details.firstName = removeExtraChars(name.split(' ')[0]);
-            if (name && name.split(' ')[1]) {
-                details.lastName = removeExtraChars(name.split(' ').splice(1).join(' '));
+        var document = new JSDOM(req.body.xml_string).window.document;
+        // console.log('req.files.document',req.body.document);
+        try {
+            if (document && document.getElementsByClassName('cls_circle_name') && document.getElementsByClassName('cls_circle_name')[0] && document.getElementsByClassName('cls_circle_name')[0].innerHTML) {
+                var tempName = document.getElementsByClassName('cls_circle_name');
+                if (tempName && tempName[0] && tempName[0].innerHTML && tempName[0].innerHTML.trim(' ')) {
+                    var name = tempName[0].innerHTML.trim(' ');
+                    if (name && name.split(' ')[0])
+                        details.firstName = removeExtraChars(name.split(' ')[0]);
+                    if (name && name.split(' ')[1]) {
+                        details.lastName = removeExtraChars(name.split(' ').splice(1).join(' '));
+                    }
+                }
             }
+        } catch (ex) {
+            console.log(ex)
         }
-    }
 
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0].innerHTML) {
-        var tempEmailId = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
-        if (tempEmailId && tempEmailId[0] && tempEmailId[0].innerHTML) {
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0].innerHTML) {
+                var tempEmailId = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
+                if (tempEmailId && tempEmailId[0] && tempEmailId[0].innerHTML) {
+                    try {
+                        var emailid = tempEmailId[0].innerHTML.trim();
+                        var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
+                        //console.log(emailid);
+                        // //console.log("using match all",matchAll(emailid,regularExp).toArray());
+                        //console.log('match all here', regularExp.exec(emailid));
+                        // res.status(200).json(regularExp.exec(emailid)[0]);
+                        if (regularExp.exec(emailid) && regularExp.exec(emailid)[0] && regularExp.exec(emailid)[0].trim())
+                            details.emailId = regularExp.exec(emailid)[0].trim();
 
-            var emailid = tempEmailId[0].innerHTML.trim();
-            var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
-            //console.log(emailid);
-            // //console.log("using match all",matchAll(emailid,regularExp).toArray());
-            //console.log('match all here', regularExp.exec(emailid));
-            // res.status(200).json(regularExp.exec(emailid)[0]);
-            if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
-                details.emailId = regularExp.exec(emailid)[0].trim();
-
-            details.emailId = removeExtraChars(details.emailId);
-        }
-    }
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[1].innerHTML) {
-        var tempMobileNumber = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');  // check
-        if (tempMobileNumber && tempMobileNumber[1] && tempMobileNumber[1].innerHTML) {
-            var mobileNumber = tempMobileNumber[1].innerHTML;
-            var regularExp = /(\d{7,10})/;
-            // console.log("match all mobileNumber", matchAll(mobilenumber, regularExp).toArray());
-            if (regularExp.exec(mobileNumber) && regularExp.exec(mobileNumber)[0])
-                details.mobileNumber = removeExtraChars(regularExp.exec(mobileNumber)[0].trim());
-
-            // if (mobileNumber.split(':'))
-            //     details.mobileNumber = mobileNumber.split(':')[1].trim(' ');
-        }
-    }
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0].innerHTML) {
-        var tempEmployer = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
-        if (tempEmployer && tempEmployer[0] && tempEmployer[0].innerHTML) {
-            details.employer = removeExtraChars(tempEmployer[0].innerHTML.split('Company:')[1].trim(' '));
-        }
-    }
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].innerHTML) {
-        var tempJobtitle = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
-
-        if (tempJobtitle && tempJobtitle[1] && tempJobtitle[1].innerHTML) {
-            details.jobTitle = removeExtraChars(tempJobtitle[1].innerHTML.split('Job Title:')[1].trim(' '));
-        }
-    }
-
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[2] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[2].innerHTML) {
-        var tempCTC = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
-        if (tempCTC && tempCTC[2] && tempCTC[2].innerHTML) {
-            details.presentSalary = removeExtraChars(tempCTC[2].innerHTML.trim(' '));
-        }
-    }
-
-    // if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[3].innerHTML) {
-    //     var tempExperience = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
-    //     if (tempExperience && tempExperience[3] && tempExperience[3].innerHTML) {
-    //         details.experience = removeExtraChars(tempExperience[3].innerHTML.trim(' '));
-    //     }
-    // }
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[4].innerHTML) {
-        var tempNoticePeriod = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[4];
-        if (tempNoticePeriod && tempNoticePeriod[4] && tempNoticePeriod[4].innerHTML) {
-            details.noticePeriod = removeExtraChars(tempNoticePeriod[4].innerHTML.trim(' '));
-        }
-    }
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[2].innerHTML) {
-        var tempLocation = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
-        if (tempLocation && tempLocation[2] && tempLocation[2].innerHTML) {
-            details.presentLocation = removeExtraChars(tempLocation[2].innerHTML.split('Location:')[1].trim(' '));
-        }
-    }
-
-    if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[3] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[3].innerHTML) {
-        var tempGender = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
-        if (tempGender && tempGender[3] && tempGender[3].innerHTML) {
-
-            if (removeExtraChars(tempGender[3].innerHTML.trim(' ')).toLowerCase().indexOf('female') > -1)
-                details.gender = 2;
-            else if (removeExtraChars(tempGender[3].innerHTML.trim(' ')).toLowerCase().indexOf('male') > -1)
-                details.gender = 1;
-        }
-    }
-
-
-    // if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[4] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[4].innerHTML) {
-    //     var tempDOB = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
-    //     if (tempDOB && tempDOB[4] && tempDOB[4].innerHTML) {
-    //         details.DOB = removeExtraChars(tempDOB[4].innerHTML.trim(' '));
-    //     }
-    // }
-
-    if (document && document.getElementsByClassName('resume_box wid100per') && document.getElementsByClassName('resume_box wid100per')[0].getElementsByClassName('pro_btn') && document.getElementsByClassName('resume_box wid100per')[0].getElementsByClassName('pro_btn')) {
-        var tempSkills = document.getElementsByClassName('resume_box wid100per')[0].getElementsByClassName('pro_btn'); // [0].innerHTML;
-        var skills = [];
-        for (var i = 0; i < tempSkills.length; i++) {
-            if (tempSkills && tempSkills[i] && tempSkills[i].getElementsByClassName('pro_mid') && tempSkills[i].getElementsByClassName('pro_mid')[0] && tempSkills[i].getElementsByClassName('pro_mid')[0].innerHTML) {
-                skills.push(removeExtraChars(tempSkills[i].getElementsByClassName('pro_mid')[0].innerHTML.split('<b')[0]));
+                        details.emailId = removeExtraChars(details.emailId);
+                    } catch (ex) {
+                        console.log(ex)
+                    }
+                }
             }
+        } catch (ex) {
+            console.log(ex)
         }
-        details.primarySkills = skills;
-    }
 
-    var isTallint = req.query.isTallint || 0;
-    var isIntranet = req.query.isIntranet || 0;
-    // for tallint
-    if (isTallint && !isIntranet) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
-        // var portalId = 4;
-        var formData = {
-            applicants: applicants
-        };
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[1].innerHTML) {
+                var tempMobileNumber = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');  // check
+                if (tempMobileNumber && tempMobileNumber[1] && tempMobileNumber[1].innerHTML) {
+                    var mobileNumber = tempMobileNumber[1].innerHTML;
+                    var regularExp = /(\d{7,10})/;
+                    // console.log("match all mobileNumber", matchAll(mobilenumber, regularExp).toArray());
+                    if (regularExp.exec(mobileNumber) && regularExp.exec(mobileNumber)[0] && regularExp.exec(mobileNumber)[0].trim())
+                        details.mobileNumber = removeExtraChars(regularExp.exec(mobileNumber)[0].trim());
 
-        request({
-            url: req.body.tallint_url,
-            method: "POST",
-            json: true,
-            body: details
-        }, function (error, response, body) {
-            if (!error && body) {
+                    // if (mobileNumber.split(':'))
+                    //     details.mobileNumber = mobileNumber.split(':')[1].trim(' ');
+                }
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0].innerHTML) {
+                var tempEmployer = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
+                if (tempEmployer && tempEmployer[0] && tempEmployer[0].innerHTML && tempEmployer[0].innerHTML.split('Company:') && tempEmployer[0].innerHTML.split('Company:')[1] && tempEmployer[0].innerHTML.split('Company:')[1].trim(' ')) {
+                    details.employer = removeExtraChars(tempEmployer[0].innerHTML.split('Company:')[1].trim(' '));
+                }
+            }
+
+        } catch (ex) {
+            console.log(ex)
+        }
+
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].innerHTML) {
+                var tempJobtitle = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
+
+                if (tempJobtitle && tempJobtitle[1] && tempJobtitle[1].innerHTML && tempJobtitle[1].innerHTML.split('Job Title:') && tempJobtitle[1].innerHTML.split('Job Title:')[1] && tempJobtitle[1].innerHTML.split('Job Title:')[1].trim(' ')) {
+                    details.jobTitle = removeExtraChars(tempJobtitle[1].innerHTML.split('Job Title:')[1].trim(' '));
+                }
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[2] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[2].innerHTML) {
+                var tempCTC = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
+                if (tempCTC && tempCTC[2] && tempCTC[2].innerHTML && tempCTC[2].innerHTML.trim(' ')) {
+                    details.presentSalary = removeExtraChars(tempCTC[2].innerHTML.trim(' '));
+                }
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+        // if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[3].innerHTML) {
+        //     var tempExperience = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
+        //     if (tempExperience && tempExperience[3] && tempExperience[3].innerHTML) {
+        //         details.experience = removeExtraChars(tempExperience[3].innerHTML.trim(' '));
+        //     }
+        // }
+
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li')[4].innerHTML) {
+                var tempNoticePeriod = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[0].getElementsByTagName('li');
+                if (tempNoticePeriod[4] && tempNoticePeriod[4].innerHTML && tempNoticePeriod[4].innerHTML.trim(' ')) {
+                    details.noticePeriod = removeExtraChars(tempNoticePeriod[4].innerHTML.trim(' '));
+                }
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[2].innerHTML) {
+                var tempLocation = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
+                if (tempLocation && tempLocation[2] && tempLocation[2].innerHTML) {
+                    details.presentLocation = removeExtraChars(tempLocation[2].innerHTML.split('Location:')[1].trim(' '));
+                }
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+
+        try {
+            if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[3] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[3].innerHTML) {
+                var tempGender = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
+                if (tempGender && tempGender[3] && tempGender[3].innerHTML) {
+
+                    if (removeExtraChars(tempGender[3].innerHTML.trim(' ')).toLowerCase().indexOf('female') > -1)
+                        details.gender = 2;
+                    else if (removeExtraChars(tempGender[3].innerHTML.trim(' ')).toLowerCase().indexOf('male') > -1)
+                        details.gender = 1;
+                }
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+
+
+        // if (document && document.getElementsByClassName('snapshot education_box wid100per') && document.getElementsByClassName('snapshot education_box wid100per')[0] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li') && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[4] && document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li')[4].innerHTML) {
+        //     var tempDOB = document.getElementsByClassName('snapshot education_box wid100per')[0].getElementsByClassName('inner_box')[1].getElementsByTagName('li');
+        //     if (tempDOB && tempDOB[4] && tempDOB[4].innerHTML) {
+        //         details.DOB = removeExtraChars(tempDOB[4].innerHTML.trim(' '));
+        //     }
+        // }
+
+        try {
+            if (document && document.getElementsByClassName('resume_box wid100per') && document.getElementsByClassName('resume_box wid100per')[0].getElementsByClassName('pro_btn') && document.getElementsByClassName('resume_box wid100per')[0].getElementsByClassName('pro_btn')) {
+                var tempSkills = document.getElementsByClassName('resume_box wid100per')[0].getElementsByClassName('pro_btn'); // [0].innerHTML;
+                var skills = [];
+                for (var i = 0; i < tempSkills.length; i++) {
+                    try {
+                        if (tempSkills && tempSkills[i] && tempSkills[i].getElementsByClassName('pro_mid') && tempSkills[i].getElementsByClassName('pro_mid')[0] && tempSkills[i].getElementsByClassName('pro_mid')[0].innerHTML && tempSkills[i].getElementsByClassName('pro_mid')[0].innerHTML.split('<b') && tempSkills[i].getElementsByClassName('pro_mid')[0].innerHTML.split('<b')[0]) {
+                            skills.push(removeExtraChars(tempSkills[i].getElementsByClassName('pro_mid')[0].innerHTML.split('<b')[0]));
+                        }
+                    } catch (ex) {
+                        console.log(ex)
+                    }
+                }
+                details.primarySkills = skills;
+            }
+        } catch (ex) {
+            console.log(ex)
+        }
+
+
+        
+        var isTallint = req.body.isTallint || 0;
+
+        if (typeof req.body.isTallint == "string") {
+            req.body.isTallint = parseInt(req.body.isTallint);
+        }
+        if (typeof req.body.isIntranet == "string") {
+            req.body.isIntranet = parseInt(req.body.isIntranet);
+        }
+
+        console.timeEnd("Completed with parsing");
+        // var isTallint = req.query.isTallint || 0;
+
+        // for tallint
+        if (isTallint) {
+            var token = req.query.token;
+            var heMasterId = req.query.heMasterId;
+            // var portalId = 2;
+
+            details.portalId = portalId;
+            details.token = req.body.tallintToken;
+            if (req.body.attachment) {
+                try {
+                    var attachment1 = req.body.attachment.split(',');
+                    //console.log(attachment1);
+                    if (attachment1.length && attachment1[0] && attachment1[1]) {
+
+                        details.resume_document = attachment1[1];
+                        var filetype = '';
+                        filetype = setFileType(attachment1[0]);
+                        details.resume_extension = '.' + filetype;
+                    }
+                } catch (ex) {
+                    console.log(ex);
+                }
+            }
+            delete (details.resumeText);
+
+            if (req.body.requirements)
+                details.requirements = [parseInt(req.body.requirements)];
+
+
+            if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1 && !req.body.isIntranet) {
+                request({
+                    headers: {
+                        Authorization: 'Bearer ' + req.body.tallintToken
+                    },
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: details
+                }, function (error, resp, body) {
+                    try {
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                },
+                                resonseOfTallint: body
+                            };
+                            if (body.Code != 'ERR0001') {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                res.status(500).json(response);
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                },
+                                resonseOfTallint: error
+                            };
+                            res.status(500).json(response);
+                        }
+                    } catch (ex) {
+                        console.log(ex);
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = ex;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+
+            else if (req.body.isTallint && (req.body.isIntranet)) {
                 response.status = true;
-                response.message = "Response from tallint DB";
-                response.error = null;
-                response.data = {
-                    resonseOfTallint: body
-                };
-                if (body.RID)
-                    res.status(200).json(response);
-                else
-                    res.status(500).json(response);
-
-            }
-            else if (error) {
-                response.status = false;
-                response.message = "Error from tallint DB";
-                response.error = null;
-                response.data = {
-                    resonseOfTallint: error
-                };
+                response.message = "XML Parsed";
+                response.error = false;
+                response.data = details;
                 res.status(200).json(response);
             }
 
-        });
-    }
+            else {
+                response.status = false;
+                response.message = "Tallint error! Api url not found";
+                response.error = null;
+                response.data = {
+                    ourjson: {
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    },
+                    resonseOfTallint: error
+                };
+                res.status(500).json(response);
+            }
+        }
 
-    else if (isTallint && isIntranet) {
-        response.status = true;
-        response.message = "Parsed XML Successfully";
-        response.error = null;
-        response.data = details;
-        res.status(200).json(response);
-    }
-
-    else {
-        savePortalApplicants(portalId, cvSourceId, details, req, res);
+        else {
+            console.log(details);
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
+    } catch (ex) {
+        console.log(ex);
+        response.status = false;
+        response.message = "Something went wrong";
+        response.error = ex;
+        response.data = null;
+        res.status(500).json(response);
     }
 };
 
@@ -2691,111 +2997,237 @@ portalimporter.saveApplicantsFromTimesjobs = function (req, res, next) {
     var details = {};
     const { JSDOM } = jsdom;
 
-    var document = new JSDOM(req.body.xml_string).window.document;
-    // console.log('req.files.document',req.body.document);
+    try {
+        var document = new JSDOM(req.body.xml_string).window.document;
+        // console.log('req.files.document',req.body.document);
+        try {
+            var tempName = document.getElementsByClassName('candidate-info lft');
 
-    var tempName = document.getElementsByClassName('candidate-info lft');
+            if (tempName && tempName[0] && tempName[0].getElementsByTagName('li') && tempName[0].getElementsByTagName('li')[0] && tempName[0].getElementsByTagName('li')[0].innerHTML)
+                var fullName = document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[0].innerHTML.trim();
 
-    if (tempName && tempName[0] && tempName[0].getElementsByTagName('li') && tempName[0].getElementsByTagName('li')[0] && tempName[0].getElementsByTagName('li')[0].innerHTML)
-        var fullName = document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[0].innerHTML.trim();
+            if (fullName && fullName.split(' ') && fullName.split(' ')[0])
+                details.firstName = removeExtraChars(fullName.split(' ')[0]);
+            if (fullName && fullName.split(' ') && fullName.split(' ')[1]) {
+                details.lastName = fullName.split(' ').splice(1).join(' ')
+                details.lastName = removeExtraChars(details.lastName.trim());
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
 
-    if (fullName && fullName.split(' ') && fullName.split(' ')[0])
-        details.firstName = removeExtraChars(fullName.split(' ')[0]);
-    if (fullName && fullName.split(' ') && fullName.split(' ')[1]) {
-        details.lastName = fullName.split(' ').splice(1).join(' ')
-        details.lastName = removeExtraChars(details.lastName.trim());
-    }
-
-    var tempDetails = document.getElementsByClassName('candidate-contact lft');
-    if (tempDetails && tempDetails[0] && tempDetails[0].getElementsByTagName('a') && tempDetails[0].getElementsByTagName('a')[1] && tempDetails[0].getElementsByTagName('a')[1].innerHTML) {
-        var emailid = tempDetails[0].getElementsByTagName('a')[1].innerHTML.trim();
-        var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
-        //console.log('match all here', regularExp.exec(emailid));
-        if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
-            details.emailId = removeExtraChars(regularExp.exec(emailid)[0].trim());
+        try {
+            var tempDetails = document.getElementsByClassName('candidate-contact lft');
+            if (tempDetails && tempDetails[0] && tempDetails[0].getElementsByTagName('a') && tempDetails[0].getElementsByTagName('a')[1] && tempDetails[0].getElementsByTagName('a')[1].innerHTML) {
+                try {
+                    var emailid = tempDetails[0].getElementsByTagName('a')[1].innerHTML.trim();
+                    var regularExp = /[A-Za-z]+[A-Za-z0-9._]+@[A-Za-z]+\.[A-Za-z.]{2,5}/;   // include /s in the end
+                    //console.log('match all here', regularExp.exec(emailid));
+                    if (regularExp.exec(emailid) && regularExp.exec(emailid)[0])
+                        details.emailId = removeExtraChars(regularExp.exec(emailid)[0].trim());
 
 
-        // if (tempDetails[0].innerHTML.indexOf(' at ') > -1) {
-        //     var tempDesignation = tempDetails[0].innerHTML.split(' at ');
-        //     if (tempDesignation && tempDesignation[0]) {
-        //         details.jobTitle = tempDesignation[0].trim();
-        //     }
-        //     if (tempDesignation && tempDesignation[1] && tempDesignation[1].split('<br>') && tempDesignation[1].split('<br>').length) {
-        //         details.employer = tempDesignation[1].split('<br>')[0].trim();
-        //     }
+                    // if (tempDetails[0].innerHTML.indexOf(' at ') > -1) {
+                    //     var tempDesignation = tempDetails[0].innerHTML.split(' at ');
+                    //     if (tempDesignation && tempDesignation[0]) {
+                    //         details.jobTitle = tempDesignation[0].trim();
+                    //     }
+                    //     if (tempDesignation && tempDesignation[1] && tempDesignation[1].split('<br>') && tempDesignation[1].split('<br>').length) {
+                    //         details.employer = tempDesignation[1].split('<br>')[0].trim();
+                    //     }
+                    // }
+
+                } catch (ex) {
+                    console.log(ex);
+                }
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+
+        try {
+            var tempMobile = document.getElementsByClassName('candidate-contact lft');
+            if (tempMobile && tempMobile[0] && tempMobile[0].getElementsByTagName('a') && tempMobile[0].getElementsByTagName('a')[0] && tempMobile[0].getElementsByTagName('a')[0].innerHTML) {
+                var mobilenumber = tempMobile[0].getElementsByTagName('a')[0].innerHTML.trim().split('-')[1];
+                var regularExp = /(\d{7,10})/;
+                if (regularExp.exec(mobilenumber) && regularExp.exec(mobilenumber)[0])
+                    details.mobileNumber = removeExtraChars(regularExp.exec(mobilenumber)[0].trim());
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+
+        try {
+            var tempMobileIsd = document.getElementsByClassName('candidate-contact lft');
+            if (tempMobileIsd && tempMobileIsd[0] && tempMobileIsd[0].getElementsByTagName('a') && tempMobileIsd[0].getElementsByTagName('a')[0] && tempMobileIsd[0].getElementsByTagName('a')[0].innerHTML) {
+                var mobileISD = tempMobileIsd[0].getElementsByTagName('a')[0].innerHTML.trim().split('-')[0];
+                var regularExp = /(\d{7,10})/;
+                if (regularExp.exec(mobileISD) && regularExp.exec(mobileISD)[0])
+                    details.mobileISD = removeExtraChars(regularExp.exec(mobileISD)[0].trim());
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+
+        try {
+            var tempExp = document.getElementsByClassName('candidate-info lft');
+            if (tempExp && tempExp[0] && tempExp[0].getElementsByTagName('li') && tempExp[0].getElementsByTagName('li')[1] && tempExp[0].getElementsByTagName('li')[1].innerHTML) {
+                details.experience = removeExtraChars(document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[1].innerHTML.trim()).split('Year')[0].trim();
+                //console.log(details.experience);
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+
+        // var tempSalary = document.getElementsByClassName('candidate-info lft');
+        // if(tempSalary && tempSalary[0] && tempSalary[0].getElementsByTagName('li') && tempSalary[0].getElementsByTagName('li')[1] && tempSalary[0].getElementsByTagName('li')[1].innerHTML){
+        //     details.presentSalary = document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[1].innerHTML.split('</span>')[1].trim();
         // }
-    }
-
-    var tempMobile = document.getElementsByClassName('candidate-contact lft');
-    if (tempMobile && tempMobile[0] && tempMobile[0].getElementsByTagName('a') && tempMobile[0].getElementsByTagName('a')[0] && tempMobile[0].getElementsByTagName('a')[0].innerHTML) {
-        var mobilenumber = tempMobile[0].getElementsByTagName('a')[0].innerHTML.trim().split('-')[1];
-        var regularExp = /(\d{7,10})/;
-        if (regularExp.exec(mobilenumber) && regularExp.exec(mobilenumber)[0])
-            details.mobileNumber = removeExtraChars(regularExp.exec(mobilenumber)[0].trim());
-    }
-
-    var tempMobileIsd = document.getElementsByClassName('candidate-contact lft');
-    if (tempMobileIsd && tempMobileIsd[0] && tempMobileIsd[0].getElementsByTagName('a') && tempMobileIsd[0].getElementsByTagName('a')[0] && tempMobileIsd[0].getElementsByTagName('a')[0].innerHTML) {
-        var mobileISD = tempMobileIsd[0].getElementsByTagName('a')[0].innerHTML.trim().split('-')[0];
-        var regularExp = /(\d{7,10})/;
-        if (regularExp.exec(mobileISD) && regularExp.exec(mobileISD)[0])
-            details.mobileISD = removeExtraChars(regularExp.exec(mobileISD)[0].trim());
-    }
-
-    var tempExp = document.getElementsByClassName('candidate-info lft');
-    if (tempExp && tempExp[0] && tempExp[0].getElementsByTagName('li') && tempExp[0].getElementsByTagName('li')[1] && tempExp[0].getElementsByTagName('li')[1].innerHTML) {
-        details.experience = removeExtraChars(document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[1].innerHTML.trim()).split('Year')[0].trim();
-        //console.log(details.experience);
-    }
 
 
-    // var tempSalary = document.getElementsByClassName('candidate-info lft');
-    // if(tempSalary && tempSalary[0] && tempSalary[0].getElementsByTagName('li') && tempSalary[0].getElementsByTagName('li')[1] && tempSalary[0].getElementsByTagName('li')[1].innerHTML){
-    //     details.presentSalary = document.getElementsByClassName('candidate-info lft')[0].getElementsByTagName('li')[1].innerHTML.split('</span>')[1].trim();
-    // }
+        var isTallint = req.body.isTallint || 0;
+
+        if (typeof req.body.isTallint == "string") {
+            req.body.isTallint = parseInt(req.body.isTallint);
+        }
+        if (typeof req.body.isIntranet == "string") {
+            req.body.isIntranet = parseInt(req.body.isIntranet);
+        }
+
+        console.timeEnd("Completed with parsing");
+        // var isTallint = req.query.isTallint || 0;
+
+        // for tallint
+        if (isTallint) {
+            var token = req.query.token;
+            var heMasterId = req.query.heMasterId;
+            // var portalId = 2;
+
+            details.portalId = portalId;
+            details.token = req.body.tallintToken;
+            if (req.body.attachment) {
+                try {
+                    var attachment1 = req.body.attachment.split(',');
+                    //console.log(attachment1);
+                    if (attachment1.length && attachment1[0] && attachment1[1]) {
+
+                        details.resume_document = attachment1[1];
+                        var filetype = '';
+                        filetype = setFileType(attachment1[0]);
+                        details.resume_extension = '.' + filetype;
+                    }
+                } catch (ex) {
+                    console.log(ex);
+                }
+            }
+            delete (details.resumeText);
+
+            if (req.body.requirements)
+                details.requirements = [parseInt(req.body.requirements)];
 
 
-    var isTallint = req.query.isTallint || 0;
+            if (req.body.isTallint && req.body.tallint_url && req.body.tallint_url.length > 1 && !req.body.isIntranet) {
+                request({
+                    headers: {
+                        Authorization: 'Bearer ' + req.body.tallintToken
+                    },
+                    url: req.body.tallint_url,
+                    method: "POST",
+                    json: true,
+                    body: details
+                }, function (error, resp, body) {
+                    try {
+                        if (!error && body) {
+                            response.status = true;
+                            response.message = "Response from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                },
+                                resonseOfTallint: body
+                            };
+                            if (body.Code != 'ERR0001') {
+                                res.status(200).json(response);
+                            }
+                            else {
+                                res.status(500).json(response);
+                            }
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error from tallint DB";
+                            response.error = null;
+                            response.data = {
+                                ourjson: {
+                                    headers: {
+                                        Authorization: 'Bearer ' + req.body.tallintToken
+                                    },
+                                    url: req.body.tallint_url,
+                                    method: "POST",
+                                    json: true,
+                                    body: details
+                                },
+                                resonseOfTallint: error
+                            };
+                            res.status(500).json(response);
+                        }
+                    } catch (ex) {
+                        console.log(ex);
+                        response.status = true;
+                        response.message = "Response from tallint DB";
+                        response.error = ex;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
 
-    // for tallint
-    if (isTallint) {
-        var token = req.query.token;
-        var heMasterId = req.query.heMasterId;
-        // var portalId = 4;
-        var formData = {
-            applicants: applicants
-        };
-
-        request({
-            url: req.body.tallint_url,
-            method: "POST",
-            json: true,
-            body: details
-        }, function (error, response, body) {
-            if (!error && body) {
+            else if (req.body.isTallint && (req.body.isIntranet)) {
                 response.status = true;
-                response.message = "Response from tallint DB";
-                response.error = null;
-                response.data = {
-                    resonseOfTallint: body
-                };
+                response.message = "XML Parsed";
+                response.error = false;
+                response.data = details;
                 res.status(200).json(response);
             }
-            else if (error) {
+
+            else {
                 response.status = false;
-                response.message = "Error from tallint DB";
+                response.message = "Tallint error! Api url not found";
                 response.error = null;
                 response.data = {
+                    ourjson: {
+                        headers: {
+                            Authorization: 'Bearer ' + req.body.tallintToken
+                        },
+                        url: req.body.tallint_url,
+                        method: "POST",
+                        json: true,
+                        body: details
+                    },
                     resonseOfTallint: error
                 };
-                res.status(200).json(response);
+                res.status(500).json(response);
             }
+        }
 
-        });
-    }
-
-    else {
-        savePortalApplicants(portalId, cvSourceId, details, req, res);
+        else {
+            console.log(details);
+            savePortalApplicants(portalId, cvSourceId, details, req, res);
+        }
+    } catch (ex) {
+        console.log(ex);
+        response.status = false;
+        response.message = "Something went wrong";
+        response.error = ex;
+        response.data = null;
+        res.status(500).json(response);
     }
 };
 
