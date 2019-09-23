@@ -5309,7 +5309,12 @@ User.prototype.getUserDetailsLatest = function (req, res, next) {
                                             isNewUser: UserDetailsResult[0][0].isNewUser,
                                             isConfigManager: UserDetailsResult[0][0].isConfigManager,
                                             groupId: UserDetailsResult[0][0].groupId,
-
+                                            appKey : UserDetailsResult[0][0] && UserDetailsResult[0][0].appKey ? UserDetailsResult[0][0].appKey : "",
+                                            securityKey : UserDetailsResult[0][0] && UserDetailsResult[0][0].securityKey ? UserDetailsResult[0][0].securityKey : "",
+                                            googleApiKey : UserDetailsResult[0][0] && UserDetailsResult[0][0].googleApiKey ? UserDetailsResult[0][0].googleApiKey : "",
+                                            distanceApiKey : UserDetailsResult[0][0] && UserDetailsResult[0][0].distanceApiKey ? UserDetailsResult[0][0].distanceApiKey : "",
+                                            accessKey : UserDetailsResult[0][0] && UserDetailsResult[0][0].accessKey ? UserDetailsResult[0][0].accessKey : "",
+                                            secretKey : UserDetailsResult[0][0] && UserDetailsResult[0][0].secretKey ? UserDetailsResult[0][0].secretKey : "",
                                             companyDetails: UserDetailsResult[1][0] ? (UserDetailsResult[1][0]) : null
                                         }
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

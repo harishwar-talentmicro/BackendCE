@@ -20,6 +20,7 @@ router.post('/savesocialmedia',companyCtrl.saveSocialMediaLinks);
 router.get('/socialmediaiconlist',companyCtrl.getSocialMediaList);
 
 router.get('/deleteMediaLink',companyCtrl.deleteMediaLink);
+router.get('/homePageUserRoles',companyCtrl.homePageUserRoles);
 
 
 module.exports = router;

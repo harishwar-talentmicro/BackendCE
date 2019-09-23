@@ -62,4 +62,6 @@ router.get('/getSalesCOnfigurationDetails',salesCtrl.getSalesCOnfigurationDetail
 router.post('/MeetingDistanceReportSS',salesCtrl.salesSupportMeetingDistanceReport);
 router.post('/updateEvent',salesCtrl.updateEventsReminder);
 
+router.post('/senotify',salesCtrl.salesEnqueryIntegration); // hirecraft sales enquery integration
+
 module.exports = router;

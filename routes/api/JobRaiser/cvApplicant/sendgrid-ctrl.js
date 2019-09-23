@@ -9110,7 +9110,8 @@ sendgridCtrl.sendSMSToCandidates = function (req, res, next) {
                                                     req.st.db.escape(isdMobile),
                                                     req.st.db.escape(message),
                                                     req.st.db.escape(1),
-                                                    req.st.db.escape(reqApplicants[0])
+                                                    req.st.db.escape(reqApplicants[0]),
+                                                    req.st.db.escape(req.body.mailerType)
                                                 ];
 
                                                 var procQuery = 'CALL pace_save_sentSmsHistory( ' + inputs.join(',') + ')';

@@ -1268,7 +1268,7 @@ salesCtrl.getSalesTracker = function (req, res, next) {
                 error.whatmateId = 'Invalid whatmateId';
                 validationFlag *= false;
             }
-        
+
 
             if (!validationFlag) {
                 response.error = error;
@@ -3067,7 +3067,7 @@ salesCtrl.saveSalesRequestWithTaskNew = function (req, res, next) {
                                     req.st.db.escape(req.body.currencyTitle2 || ""),
                                     req.st.db.escape(req.body.whatmateId || ""),
                                     req.st.db.escape(req.body.nkFlag || 0)
-            
+
                                 ];
 
                                 var salesFormId = 2000;
@@ -6377,5 +6377,183 @@ salesCtrl.updateEventsReminder = function (req, res, next) {
         });
     }
 };
+
+//for Hirecraft
+salesCtrl.salesEnqueryIntegration = function (req, res, next) {
+    var error = {};
+    var response = {
+        status: false,
+        message: "Something went wrong",
+        data: null,
+        error: null
+    };
+
+    var validationFlag = true;
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+        // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+        // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+        //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+        console.log(req.body);
+
+        var validationFlag = true;
+
+        if (!req.body.defaultWMId) {
+            error.defaultWMId = 'Invalid defaultWMId';
+            validationFlag *= false;
+        }
+
+        if (!req.body.heMasterId) {
+            error.heMasterId = 'Invalid heMasterId';
+            validationFlag *= false;
+        }
+
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+
+            var procParams = [
+                req.st.db.escape(req.body.defaultWMId),
+                req.st.db.escape(req.body.name || ''),
+                req.st.db.escape(req.body.emailId || ''),
+                req.st.db.escape(req.body.mobileNumber || ""),
+                req.st.db.escape(req.body.message || ""),
+                req.st.db.escape(req.body.heMasterId || 0),
+                req.st.db.escape(DBSecretKey)
+                // req.st.db.escape(req.body.subject || ""),
+                // req.st.db.escape(req.body.mailBody || "")
+            ];
+
+            var procQuery = 'CALL wm_save_HirecraftSalesEnquiry( ' + procParams.join(',') + ')';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, result) {
+                if (!err) {
+                    var mailSent = 0;
+                    var obj = {};
+                    return new Promise(function (resolve, reject) {
+                        try {
+                            if (req.body.emailId && req.body.emailId != "" && req.body.mailBody && req.body.mailBody != "") {
+                                if (result && result.length && result[result.length - 2] && result[result.length - 2][0] && result[result.length - 2][0].toEmailId) {
+                                    var toEmailId = [];
+                                    for (var i = 0; i < result[result.length - 2].length; i++) {
+                                        toEmailId.push(result[result.length - 2][i].toEmailId);
+                                    }
+
+                                    var mailOptions = {
+                                        from: req.body.emailId,
+                                        to: toEmailId,
+                                        subject: req.body.subject,
+                                        html: req.body.mailBody
+                                        // cc: cc,
+                                        // bcc: bcc
+                                    };
+
+                                    var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                    var email = new sendgrid.Email();
+                                    email.from = mailOptions.from;
+                                    email.to = mailOptions.to;
+                                    email.subject = mailOptions.subject;
+                                    // email.cc = mailOptions.cc;
+                                    // email.bcc = mailOptions.bcc;
+                                    email.html = mailOptions.html;
+
+                                    sendgrid.send(email, function (err, result) {
+                                        console.log(err);
+                                        if (!err) {
+                                            mailSent = 1;
+                                            console.log('Mail sent success');
+                                            obj.message = 'Mail sent success';
+                                            obj.mailSent = 1;
+                                            resolve(obj);
+                                        } else {
+                                            console.log('Failed to send mail');
+                                            obj.message = 'Failed to send mail';
+                                            obj.mailSent = 0;
+                                            resolve(obj);
+                                        }
+                                    })
+                                } else {
+                                    console.log("Receipient emailId not present");
+                                    obj.message = 'Receipient emailId not present';
+                                    obj.mailSent = 0;
+                                    resolve(obj);
+                                }
+                            } else {
+                                console.log('Mailbody empty');
+                                obj.message = 'Mailbody empty';
+                                obj.mailSent = 0;
+                                resolve(obj);
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                            obj.message = 'Something went wrong';
+                            obj.mailSent = 0;
+                            resolve(obj);
+                        }
+                    }).then(function (resp) {
+                        if (!err && result && result[0] && result[0][0]) {
+
+                            notifyMessages.getMessagesNeedToNotify();
+
+                            response.status = true;
+                            response.message = "Sales query notified success";
+                            response.error = null;
+                            response.data = obj
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "Failed to nofity query";
+                            response.data = null;
+                            response.error = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Something went wrong";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    })
+                } else {
+                    response.status = false;
+                    response.message = "Something went wrong";
+                    response.error = null;
+                    response.data = null;
+                    res.status(500).json(response);
+                }
+            });
+        }
+        // });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
 
 module.exports = salesCtrl;

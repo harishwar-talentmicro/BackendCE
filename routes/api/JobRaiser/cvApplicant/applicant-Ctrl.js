@@ -1482,7 +1482,8 @@ applicantCtrl.getreqApplicants = function (req, res, next) {
                                 req.st.db.escape(JSON.stringify(req.body.ppExpiryDate || {})),
                                 req.st.db.escape(JSON.stringify(req.body.ppIssueDate || {})),
                                 req.st.db.escape(req.body.isExport || 0),
-                                req.st.db.escape(req.body.customRange || 0)
+                                req.st.db.escape(req.body.customRange || 0),
+                                req.st.db.escape(JSON.stringify(req.body.reqStatus || []))
                             ];
 
                             var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';
@@ -8046,7 +8047,8 @@ applicantCtrl.getreqApplicantsWithColumnFilter = function (req, res, next) {
                                     req.st.db.escape(JSON.stringify(req.body.ppExpiryDate || {})),
                                     req.st.db.escape(JSON.stringify(req.body.ppIssueDate || {})),
                                     req.st.db.escape(req.body.isExport || 0),
-                                    req.st.db.escape(req.body.customRange || 0)
+                                    req.st.db.escape(req.body.customRange || 0),
+                                    req.st.db.escape(JSON.stringify(req.body.reqStatus || []))
                                 ];
 
                                 var procQuery = 'CALL wm_get_applicantsWithColumnFilter( ' + getStatus.join(',') + ')';

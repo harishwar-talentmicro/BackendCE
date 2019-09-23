@@ -315,7 +315,7 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.clientCVFooterAligment || 'RIGHT'),
                         req.st.db.escape(req.body.overwriteResume || 0),
                         req.st.db.escape(req.body.mergeResumeFields || 0),
-                        req.st.db.escape(req.body.scheduleDailyInterviewSms || 0)
+                        req.st.db.escape(JSON.stringify(req.body.scheduleDetails || []))
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -793,7 +793,7 @@ jobCtrl.getJobDefaults = function (req, res, next) {
                         response.message = "Requirement default data is";
                         response.error = null;
                         response.data = results[0][0].defaultFormData ? JSON.parse(results[0][0].defaultFormData) : {};
-
+                        response.data.masterScheduleList = results[1][0] ? results[1] : [];
                         if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
                             // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             // zlib.gzip(buf, function (_, result) {

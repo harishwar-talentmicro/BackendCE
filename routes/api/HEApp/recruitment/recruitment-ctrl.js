@@ -1386,12 +1386,12 @@ recruitmentCtrl.getInformationFinder = function(req,res,next){
 //     }
 // };
 
-recruitmentCtrl.extractTextFromFile = function(req,res,next){
+recruitmentCtrl.extractTextFromFile = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
 
@@ -1400,66 +1400,97 @@ recruitmentCtrl.extractTextFromFile = function(req,res,next){
         validationFlag *= false;
     }
 
-    if (!req.query.fileName)
-    {
+    if (!req.query.fileName) {
         error.fileName = 'Invalid fileName';
         validationFlag *= false;
     }
 
-    if (!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
-                http.get(req.query.fileName, function(fileResponse){
+                http.get(req.query.fileName, function (fileResponse) {
+                    try {
                         var bufs = [];
-                        fileResponse.on('data', function(d){ bufs.push(d); });
-                        fileResponse.on('end', function() {
+                        fileResponse.on('data', function (d) { bufs.push(d); });
+                        fileResponse.on('end', function () {
+                            try {
                                 var buf = Buffer.concat(bufs);
-                                textract.fromBufferWithName(req.query.fileName,buf, function( error, text ) {
-                                    if (!error) {
-                                        response.status = true;
-                                        response.message = "Information not found";
-                                        response.error = null;
-                                        response.data = {
-                                            speechContent : text
-                                        };
+                                textract.fromBufferWithName(req.query.fileName, buf, function (error, text) {
+                                    try {
+                                        if (!error) {
+                                            response.status = true;
+                                            response.message = "Information not found";
+                                            response.error = null;
+                                            response.data = {
+                                                speechContent: text
+                                            };
 
-                                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                                            res.status(200).json(response);
-                                        });
-                                    }
-                                    else {
-                                        response.status = false;
-                                        response.message = "Something went wrong .";
-                                        response.error = error;
-                                        response.data = {
-                                            speechContent : ""
-                                        };
-                                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
-                                            res.status(500).json(response);
-                                        });
+                                            buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                try {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                } catch (ex) {
+                                                    console.log(ex);
+                                                    response.message = "Data not fetched";
+                                                    res.status(500).json(response);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            response.status = false;
+                                            response.message = "Something went wrong .";
+                                            response.error = error;
+                                            response.data = {
+                                                speechContent: ""
+                                            };
+                                            buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                try {
+                                                    response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                    res.status(200).json(response);
+                                                } catch (ex) {
+                                                    console.log(ex);
+                                                    response.message = "Data not fetched";
+                                                    res.status(500).json(response);
+                                                }
+                                            });
 
+                                        }
+                                    } catch (ex) {
+                                        console.log(ex);
+                                        response.message = "Could not convert to text";
+                                        res.status(500).json(response);
                                     }
+
                                 })
+                            } catch (ex) {
+                                console.log(ex);
+                                response.message = "Data could not be converted to text";
+                                res.status(500).json(response);
                             }
-                        );
+
+                        });
+                    } catch (ex) {
+                        console.log(ex);
+                        response.message = "Invalid File";
+                        res.status(500).json(response);
                     }
+
+                }
 
 
                 );
 
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });

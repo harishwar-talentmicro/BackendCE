@@ -2058,6 +2058,11 @@ LoginCtrl.getClaimDetails = function (req, res, next) {
                             if (!result[0][i].attachments[0].CDNPath || result[0][i].attachments[0].CDNPath == null) {
                                 result[0][i].attachments = [];
                             }
+
+                            result[0][i].attachmentList = result[0][i] && result[0][i].attachmentList ? JSON.parse(result[0][i].attachmentList) : [];
+                            if (!result[0][i].attachmentList[0].CDNPath || result[0][i].attachmentList[0].CDNPath == null) {
+                                result[0][i].attachmentList = [];
+                            }
                         }
 
                         response.data = {
@@ -2272,7 +2277,8 @@ LoginCtrl.saveExpenseTypes = function (req, res, next) {
                     req.st.db.escape(req.body.enableExpConveyance || 0),
                     req.st.db.escape(req.body.enableExpVault || 0),
                     req.st.db.escape(req.body.enableRefNumber || 0),
-                    req.st.db.escape(req.body.enableExpTime || 0)
+                    req.st.db.escape(req.body.enableExpTime || 0),
+                    req.st.db.escape(req.body.expenseDefaultSelection || 0)
                 ];
                 /**
                  * Calling procedure to get form template

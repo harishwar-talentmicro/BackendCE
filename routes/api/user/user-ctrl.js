@@ -2275,8 +2275,7 @@ UserCtrl.getUserLink = function (req, res, next) {
 
         var procParams = [
            
-            req.st.db.escape(req.query.code),
-            req.st.db.escape(req.query.name)
+            req.st.db.escape(req.query.code)
         ];
 
         var procQuery = 'CALL wm_get_termsAndconditionlink( ' + procParams.join(',') + ')';

@@ -359,6 +359,7 @@ travelClaimCtrl.getTravelRequest = function(req,res,next){
                             enableExpConveyance : travelRequestResult[3][0].enableExpConveyance ? travelRequestResult[3][0].enableExpConveyance : 0,
                             enableRefNumber : travelRequestResult[3][0].enableRefNumber ? travelRequestResult[3][0].enableRefNumber : 0,
                             hideExpTime : travelRequestResult[3][0].hideExpTime ? travelRequestResult[3][0].hideExpTime : 0,
+                            expenseDefaultSelection : travelRequestResult[3][0].expenseDefaultSelection ? travelRequestResult[3][0].expenseDefaultSelection : 0,
                             statusSegmentColor : travelRequestResult[4] && travelRequestResult[4][0]  && JSON.parse(travelRequestResult[4][0].statusSegmentColor) ? JSON.parse(travelRequestResult[4][0].statusSegmentColor) : []
                         }
                     }
