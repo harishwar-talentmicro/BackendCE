@@ -257,6 +257,7 @@ var checkPortalApplicants = function (portalId, applicants, req, res) {
                     // console.log(result);
                     if (!err && result && result[0] && result[0][0]) {
                         response.status = true;
+                        response.applicants = applicants;
                         response.message = "Portal applicants verified successfully";
                         response.error = null;
                         if (result[0][0].importerResults && typeof (result[0][0].importerResults) == 'string') {
@@ -268,6 +269,7 @@ var checkPortalApplicants = function (portalId, applicants, req, res) {
 
                     else {
                         response.status = false;
+                        response.applicants = applicants;
                         response.message = "Something went wrong! Please try again";
                         response.error = null;
                         response.data = null;
@@ -276,6 +278,7 @@ var checkPortalApplicants = function (portalId, applicants, req, res) {
                 });
             }
             else {
+                response.applicants = applicants;
                 res.status(401).json(response);
             }
         });
@@ -359,6 +362,7 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
                         console.log(err);
                         if (!err && result && result[0] && result[0][0]) {
                             response.status = true;
+                            response.details = details;
                             response.message = "Portal applicants saved successfully";
                             response.error = null;
                             response.data = (result[0] && result[0][0]) ? result[0][0] : {};
@@ -368,6 +372,7 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
 
                         else {
                             response.status = false;
+                            response.details = details;
                             response.message = "Something went wrong! Please try again";
                             response.error = null;
                             response.data = null;
@@ -379,6 +384,7 @@ var savePortalApplicants = function (portalId, cvSourceId, details, req, res) {
                 });
             }
             else {
+                response.details = details;
                 res.status(401).json(response);
             }
         });
@@ -2936,7 +2942,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                 if (search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML) {
                                     timesJobs.educationHistory.push(
                                         {
-                                            UniversityName: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
+                                            universityName: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
 
                                             qualification: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '').trim()
 
@@ -3126,7 +3132,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                         if (search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML) {
                                             timesJobs.educationHistory.push(
                                                 {
-                                                    UniversityName: search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
+                                                    universityName: search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
 
                                                     qualification: search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '').trim()
 
