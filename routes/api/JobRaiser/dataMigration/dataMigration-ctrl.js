@@ -397,7 +397,7 @@ dataMigration.tallint_manpower_dashboard = function (req, res, next) {
                                                 }
                                             }
                                             catch (ex) {
-                                                console.log(ex);
+                                                console.log("tallint Response",ex);
                                                 error_logger.error = ex;
                                                 logger(req, error_logger);
                                                 res.status(500).json(error_response);
