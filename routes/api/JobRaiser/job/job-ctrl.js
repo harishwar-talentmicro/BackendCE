@@ -315,7 +315,11 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.clientCVFooterAligment || 'RIGHT'),
                         req.st.db.escape(req.body.overwriteResume || 0),
                         req.st.db.escape(req.body.mergeResumeFields || 0),
-                        req.st.db.escape(JSON.stringify(req.body.scheduleDetails || []))
+                        req.st.db.escape(JSON.stringify(req.body.scheduleDetails || [])),
+                        req.st.db.escape(req.body.defaultScreeningMailTemplateId || 0),
+                        req.st.db.escape(req.body.defaultSubmissionMailTemplateId || 0),
+                        req.st.db.escape(req.body.defaultInterviewMailTemplateId || 0),
+                        req.st.db.escape(req.body.defaultJobseekerMailTemplateId || 0)
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -1626,7 +1630,22 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                 req.st.db.escape(req.body.postJobCareerPortal || 0),
                                 req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
                                 req.st.db.escape(req.body.statusNotes || ""),
-                                req.st.db.escape(req.body.isMailTeamMembers || 0)
+                                req.st.db.escape(req.body.isMailTeamMembers || 0),
+                                req.st.db.escape(JSON.stringify(req.body.assessmentAttributes || {})),
+                                req.st.db.escape(JSON.stringify(req.body.teamAssigns || {})),
+                                req.st.db.escape(JSON.stringify(req.body.requesters || {})),
+                                req.st.db.escape(JSON.stringify(req.body.vertical || {})),
+                                req.st.db.escape(JSON.stringify(req.body.subDepartments || {})),
+                                req.st.db.escape(JSON.stringify(req.body.department || {})),
+                                req.st.db.escape(JSON.stringify(req.body.businessUnits || {})),
+                                req.st.db.escape(JSON.stringify(req.body.axisOrganizations || {})),
+                                req.st.db.escape(JSON.stringify(req.body.circles || {})),
+                                req.st.db.escape(JSON.stringify(req.body.postedBranches || {})),
+                                req.st.db.escape(JSON.stringify(req.body.grade || {})),
+                                req.st.db.escape(JSON.stringify(req.body.location || {})),
+                                req.st.db.escape(JSON.stringify(req.body.state || {})),
+                                req.st.db.escape(JSON.stringify(req.body.region || {})),
+                                req.st.db.escape(JSON.stringify(req.body.reasons || {}))
                             ];
 
                             var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
@@ -1988,10 +2007,30 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                     req.st.db.escape(req.body.postJobCareerPortal),
                                     req.st.db.escape(JSON.stringify(req.body.jobLocation || {})),
                                     req.st.db.escape(req.body.statusNotes || ""),
-                                    req.st.db.escape(req.body.isMailTeamMembers || 0)
+                                    req.st.db.escape(req.body.isMailTeamMembers || 0),
+                                    req.st.db.escape(JSON.stringify(req.body.assessmentAttributes || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.teamAssigns || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.requesters || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.vertical || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.subDepartments || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.department || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.businessUnits || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.axisOrganizations || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.circles || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.postedBranches || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.grade || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.location || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.state || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.region || {})),
+                                    req.st.db.escape(JSON.stringify(req.body.reasons || {}))
                                 ];
 
-                                var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
+                                if (req.query.isTallint == 1) {
+                                    var procQuery = 'CALL WM_save_requirement_notification_new_TalintData( ' + procParams.join(',') + ')';
+                                }
+                                else {
+                                    var procQuery = 'CALL WM_save_requirement_notification_new( ' + procParams.join(',') + ')';  // call procedure to save requirement data
+                                }
                                 console.log(procQuery);
 
                                 req.db.query(procQuery, function (err, results) {
@@ -2061,7 +2100,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                             }
                         }
                         // req.body.isTallint = 0; // Delete isTallint this line later
-                        if (req.body.isTallint == 1) {
+
+                        if (req.query.isTallint == 1) {
 
                             if (!req.body.HCUserId) {
                                 error.HCUserId = 'Invalid hcUserId';
@@ -2108,7 +2148,7 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                                 }
                                             }
                                             catch (ex) {
-                                                console.log(ex);
+                                                console.log("Tallint Response", ex);
                                                 error_logger.error = ex;
                                                 logger(req, error_logger);
                                                 res.status(500).json(error_response);

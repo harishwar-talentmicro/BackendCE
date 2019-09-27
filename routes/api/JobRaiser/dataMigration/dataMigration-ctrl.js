@@ -397,7 +397,7 @@ dataMigration.tallint_manpower_dashboard = function (req, res, next) {
                                                 }
                                             }
                                             catch (ex) {
-                                                console.log("tallint Response",ex);
+                                                console.log("tallint Response", ex);
                                                 error_logger.error = ex;
                                                 logger(req, error_logger);
                                                 res.status(500).json(error_response);
@@ -685,5 +685,434 @@ dataMigration.tallint_requirement_teamMembers = function (req, res, next) {
         res.status(500).json(error_response);
     }
 };
+
+
+dataMigration.tallint_ER_jobList = function (req, res, next) {
+    try {
+        var error_logger = {
+            details: 'dataMigration.tallint_Employee_portal_jobList'
+        }
+        var error = {};
+
+        var error_response = {
+            status: false,
+            message: "Some error occurred!",
+            error: null,
+            data: null
+        }
+        var response = {
+            status: false,
+            message: "Invalid Token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
+
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
+
+                        if (req.query.isTallint) {
+
+                            // if (!req.query.HCUserId) {
+                            //     error.HCUserId = 'Invalid HCUserId';
+                            //     validationFlag *= false;
+                            // }
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                // pass api type to below function
+                                req.query.type = 8;   // dashboard api
+
+                                fetchAPiUrl(req, function (err, urlData) {
+                                    if (!err && urlData && urlData.apiPath) {
+
+                                        // use this after getting url from tallint
+                                        var url = urlData.apiPath + "lng_id=" + req.query.lng_id;
+                                        request({
+                                            url: url,
+                                            method: urlData.method,
+                                            json: true,   // <--Very important!!!
+                                            // body: dbResponse
+                                        }, function (err, resp, result) {   // result contains tallint response data
+                                            var err = null;
+                                            var result = 1;
+                                            console.log("error", err);
+                                            try {
+                                                if (!err && result) {
+                                                    var result = {
+                                                        "code": 200,
+                                                        "message": "Data Retrieved Successfully",
+                                                        "error": null,
+                                                        "data": {
+                                                            "masters": {},
+                                                            "list": [
+                                                                {
+                                                                    "reqId": 342,
+                                                                    "title": ".Net Architect",
+                                                                    "jobCode": "JCDR232"
+                                                                },
+                                                                {
+                                                                    "reqId": 343,
+                                                                    "title": "Java developer",
+                                                                    "jobCode": "JCRR236"
+                                                                },
+                                                                {
+                                                                    "reqId": 344,
+                                                                    "title": "Node developer",
+                                                                    "jobCode": "NRRR236"
+                                                                }
+                                                            ],
+                                                            "details": {}
+                                                        },
+                                                        "status": true,
+                                                        "query_data": null,
+                                                        "form_data": null
+                                                    };
+
+                                                    // response.status = true;
+                                                    // response.message = "Data loaded successfully";
+                                                    // response.error = null;
+                                                    // response.data = result;
+                                                    response = result;
+                                                    if (req.query.isWeb == 1) {
+                                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                        zlib.gzip(buf, function (_, result) {
+                                                            try {
+                                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                                res.status(200).json(response);
+                                                            }
+                                                            catch (ex) {
+                                                                console.log(ex);
+                                                                error_logger.error = ex;
+                                                                logger(req, error_logger);
+                                                                res.status(500).json(error_response);
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        res.status(200).json(response);
+                                                    }
+                                                }
+                                                else if (!err) {
+                                                    response.status = true;
+                                                    response.message = "no results found";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(200).json(response);
+                                                }
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Error while getting data";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                }
+                                            }
+                                            catch (ex) {
+                                                console.log("tallint Response", ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    } else {
+                                        response.status = false;
+                                        response.message = "Error while getting data";
+                                        response.error = err;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                })
+                            }
+                        } else {
+                            response.status = true;
+                            response.message = "No Dashboard data for whatmate user";
+                            response.error = null;
+                            response.data = {
+                                tallintDashboardData: null
+                            };
+                            if (req.query.isWeb == 1) {
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    try {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    }
+                                    catch (ex) {
+                                        console.log(ex);
+                                        error_logger.error = ex;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+                                });
+                            }
+                            else {
+                                res.status(200).json(response);
+                            }
+                        }
+                    }
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
+};
+
+dataMigration.tallint_ER_Dashboard = function (req, res, next) {
+    try {
+        var error_logger = {
+            details: 'dataMigration.tallint_ER_Dashboard'
+        }
+        var error = {};
+
+        var error_response = {
+            status: false,
+            message: "Some error occurred!",
+            error: null,
+            data: null
+        }
+        var response = {
+            status: false,
+            message: "Invalid Token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
+
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        req.body.userMasterId = req.body.userMasterId ? req.body.userMasterId : 0;
+
+                        if (req.query.isTallint) {
+
+                            // if (!req.query.HCUserId) {
+                            //     error.HCUserId = 'Invalid HCUserId';
+                            //     validationFlag *= false;
+                            // }
+
+                            if (!validationFlag) {
+                                response.error = error;
+                                response.message = 'Please check the errors';
+                                res.status(400).json(response);
+                                console.log(response);
+                            }
+                            else {
+                                // pass api type to below function
+                                req.query.type = 8;   // dashboard api
+
+                                fetchAPiUrl(req, function (err, urlData) {
+                                    if (!err && urlData && urlData.apiPath) {
+
+                                        // use this after getting url from tallint
+                                        var url = urlData.apiPath + "lng_id=" + req.query.lng_id;
+                                        request({
+                                            url: url,
+                                            method: urlData.method,
+                                            json: true,   // <--Very important!!!
+                                            // body: dbResponse
+                                        }, function (err, resp, result) {   // result contains tallint response data
+                                            var err = null;
+                                            var result = 1;
+                                            console.log("error", err);
+                                            try {
+                                                if (!err && result) {
+                                                    var result = {
+                                                        "code": 200,
+                                                        "message": "Data Retrieved Successfully",
+                                                        "error": null,
+                                                        "data": {
+                                                            "masters": {},
+                                                            "list": {
+                                                                "open_requirements": [
+                                                                    {
+                                                                        "open_requirements": 1379
+                                                                    }
+                                                                ],
+                                                                "referred_users": [
+                                                                    {
+                                                                        "referred_users": 2
+                                                                    }
+                                                                ],
+                                                                "stage_wise_users": [
+                                                                    {
+                                                                        "stage_users": 1
+                                                                    }
+                                                                ],
+                                                                "points_earned": [
+                                                                    {
+                                                                        "points_allocated": 500
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "details": {}
+                                                        },
+                                                        "status": true,
+                                                        "query_data": null,
+                                                        "form_data": null
+                                                    };
+
+                                                    // response.status = true;
+                                                    // response.message = "Data loaded successfully";
+                                                    // response.error = null;
+                                                    // response.data = result;
+                                                    response = result;
+                                                    if (req.query.isWeb == 1) {
+                                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                                        zlib.gzip(buf, function (_, result) {
+                                                            try {
+                                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                                res.status(200).json(response);
+                                                            }
+                                                            catch (ex) {
+                                                                console.log(ex);
+                                                                error_logger.error = ex;
+                                                                logger(req, error_logger);
+                                                                res.status(500).json(error_response);
+                                                            }
+                                                        });
+                                                    }
+                                                    else {
+                                                        res.status(200).json(response);
+                                                    }
+                                                }
+                                                else if (!err) {
+                                                    response.status = true;
+                                                    response.message = "no results found";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(200).json(response);
+                                                }
+                                                else {
+                                                    response.status = false;
+                                                    response.message = "Error while getting data";
+                                                    response.error = null;
+                                                    response.data = null;
+                                                    res.status(500).json(response);
+                                                }
+                                            }
+                                            catch (ex) {
+                                                console.log("tallint Response", ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    } else {
+                                        response.status = false;
+                                        response.message = "Error while getting data";
+                                        response.error = err;
+                                        response.data = null;
+                                        res.status(500).json(response);
+                                    }
+                                })
+                            }
+                        } else {
+                            response.status = true;
+                            response.message = "No Dashboard data for whatmate user";
+                            response.error = null;
+                            response.data = {
+                                tallintDashboardData: null
+                            };
+                            if (req.query.isWeb == 1) {
+                                var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                zlib.gzip(buf, function (_, result) {
+                                    try {
+                                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        res.status(200).json(response);
+                                    }
+                                    catch (ex) {
+                                        console.log(ex);
+                                        error_logger.error = ex;
+                                        logger(req, error_logger);
+                                        res.status(500).json(error_response);
+                                    }
+                                });
+                            }
+                            else {
+                                res.status(200).json(response);
+                            }
+                        }
+                    }
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
+};
+
 
 module.exports = dataMigration;

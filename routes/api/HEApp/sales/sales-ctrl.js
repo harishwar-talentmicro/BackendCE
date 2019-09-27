@@ -1060,14 +1060,23 @@ salesCtrl.getSalesItems = function (req, res, next) {
     };
 
     var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
 
-    if (!req.query.groupId) {
-        error.groupId = 'Invalid groupId';
-        validationFlag *= false;
+    if (!req.query.isTallint) {
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+
+        if (!req.query.groupId) {
+            error.groupId = 'Invalid groupId';
+            validationFlag *= false;
+        }
+    }
+    else {
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid heMasterId';
+            validationFlag *= false;
+        }
     }
 
     if (!validationFlag) {
@@ -1077,11 +1086,12 @@ salesCtrl.getSalesItems = function (req, res, next) {
         console.log(response);
     }
     else {
-        if (req.query.nkFlag == 1) {
+        if (req.query.nkFlag == 1 || req.query.isTallint == 1) {
             var procParams = [
                 req.st.db.escape(req.query.token),
-                req.st.db.escape(req.query.groupId),
+                req.st.db.escape(req.query.groupId || 0),
                 req.st.db.escape(req.query.keywords),
+                req.st.db.escape(req.query.heMasterId || 0)
                 // req.st.db.escape(req.query.whatmateId)
             ];
             /**
@@ -1145,7 +1155,8 @@ salesCtrl.getSalesItems = function (req, res, next) {
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.groupId),
-                        req.st.db.escape(req.query.keywords)
+                        req.st.db.escape(req.query.keywords),
+                        req.st.db.escape(req.query.heMasterId || 0)
                     ];
                     /**
                      * Calling procedure to save form sales items
@@ -6424,6 +6435,107 @@ salesCtrl.salesEnqueryIntegration = function (req, res, next) {
             console.log(response);
         }
         else {
+
+            // raise sales request here
+            req.body.whatmateId = req.body.defaultWMId;
+            req.body.nkFlag = req.body.isTallint || 1;
+            req.body.contactDetails = {
+                firstName: req.body.name || "",
+                emailId: req.body.emailId || "",
+                mobileNumber: req.body.mobileNumber || "",
+                companyName: req.body.companyName || ""
+            };
+
+            var keywordList = req.body.keywordList;
+            if (typeof (keywordList) == "string") {
+                keywordList = JSON.parse(keywordList);
+            }
+            if (!keywordList) {
+                keywordList = [];
+            }
+
+            var attachmentList = req.body.attachmentList;
+            if (typeof (attachmentList) == "string") {
+                attachmentList = JSON.parse(attachmentList);
+            }
+            if (!attachmentList) {
+                attachmentList = [];
+            }
+
+            var items = req.body.items;
+            if (typeof (items) == "string") {
+                items = JSON.parse(items);
+            }
+            if (!items) {
+                items = [];
+            }
+
+            var taskDetails;
+
+            var procParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(req.body.parentId || 0),
+                req.st.db.escape(req.body.categoryId || 0),
+                req.st.db.escape(req.body.requirement || ""),
+                req.st.db.escape(req.body.senderNotes || ""),
+                req.st.db.escape(req.body.stage || 0),
+                req.st.db.escape(req.body.status || 0),
+                req.st.db.escape(req.body.reason || ""),
+                req.st.db.escape(req.body.receiverNotes || ""),
+                req.st.db.escape(req.body.currencyId || 0),
+                req.st.db.escape(req.body.amount || 0),
+                req.st.db.escape(req.body.probability || 0),
+                req.st.db.escape(req.body.infoToSender || ""),
+                req.st.db.escape(JSON.stringify(attachmentList || [])),
+                req.st.db.escape(req.body.changeLog || ""),
+                req.st.db.escape(req.body.groupId),
+                req.st.db.escape(req.body.learnMessageId || 0),
+                req.st.db.escape(req.body.accessUserType || 0),
+                req.st.db.escape(req.body.categoryTitle || ""),
+                req.st.db.escape(req.body.stageTitle || ""),
+                req.st.db.escape(req.body.statusTitle || ""),
+                req.st.db.escape(req.body.currencyTitle || ""),
+                req.st.db.escape(req.body.isInfoToSenderChanged || 0),
+                req.st.db.escape(req.body.discount || 0),
+                req.st.db.escape(JSON.stringify(items || [])),
+                req.st.db.escape(req.body.itemCurrencyId || 0),
+                req.st.db.escape(req.body.itemCurrencySymbol || ""),
+                req.st.db.escape(req.body.targetDate || null),
+                req.st.db.escape(DBSecretKey),
+                req.st.db.escape(req.body.timestamp || ""),
+                req.st.db.escape(req.body.createdTimeStamp || null),
+                req.st.db.escape(JSON.stringify(req.body.contactDetails || {})),
+                req.st.db.escape(JSON.stringify(req.body.taskIdList || [])),
+                req.st.db.escape(req.body.forcastValue || 0),
+                req.st.db.escape(JSON.stringify(taskDetails || null)),
+                req.st.db.escape(req.body.isReportingManager || 0),
+                req.st.db.escape(req.body.isTargetDate || 0),
+                req.st.db.escape(req.body.isConsider || 0),
+                req.st.db.escape(req.body.amount2 || 0),
+                req.st.db.escape(req.body.currencyId2 || 0),
+                req.st.db.escape(req.body.currencyTitle2 || ""),
+                req.st.db.escape(req.body.whatmateId || ""),
+                req.st.db.escape(req.body.nkFlag || 0)
+            ];
+
+            var salesFormId = 2000;
+            var keywordsParams = [
+                req.st.db.escape(req.query.token),
+                req.st.db.escape(salesFormId),
+                req.st.db.escape(JSON.stringify(keywordList)),
+                req.st.db.escape(req.body.groupId)
+            ];
+
+            var procQuery = 'CALL he_save_salesRequest_WithTask_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+            console.log(procQuery);
+            req.db.query(procQuery, function (err, results) {
+                console.log(err);
+                if (!err && results && results[0] && results[0][0]) {
+                    console.log("Sales request raised");
+                    notifyMessages.getMessagesNeedToNotify();
+                }
+            });
+            // sales query end
 
             var procParams = [
                 req.st.db.escape(req.body.defaultWMId),
