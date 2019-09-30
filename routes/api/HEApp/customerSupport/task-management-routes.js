@@ -7,5 +7,5 @@ router.post('/saveproject',taskManagementCtrl.saveproject);
 router.get('/projectDetails',taskManagementCtrl.projectdetails);
 router.get('/getStageList',taskManagementCtrl.getstage);
 router.post('/saveticketsforcustomers',taskManagementCtrl.saveticketforcustomers);
-
+router.get('/getticketsforcustomers',taskManagementCtrl.getticketsforcustomers);
 module.exports = router;

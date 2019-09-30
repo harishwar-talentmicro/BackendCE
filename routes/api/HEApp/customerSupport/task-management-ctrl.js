@@ -124,7 +124,7 @@ taskManagementCtrl.projectdetails = function (req, res, next) {
                         response.error = null;
 
                         response.data = {
-                            Project_Details: result[0] && result[0][0] ? result[0][0] : null
+                            Project_Details: result[0]
                         }
                         res.status(200).json(response);
                     }
@@ -299,5 +299,69 @@ taskManagementCtrl.saveticketforcustomers = function (req, res, next) {
    }
 };
 
+
+taskManagementCtrl.getticketsforcustomers = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.ticketId),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                var procQuery = 'call wm_get_ticketsforcustomers(' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                   
+                    if (!err && result) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+
+                        response.data = {
+                            ticketcustomer_details: result[0]
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = taskManagementCtrl;
