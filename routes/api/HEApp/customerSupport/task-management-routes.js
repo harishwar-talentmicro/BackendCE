@@ -6,6 +6,6 @@ var taskManagementCtrl = require('./task-management-ctrl');
 router.post('/saveproject',taskManagementCtrl.saveproject);
 router.get('/projectDetails',taskManagementCtrl.projectdetails);
 router.get('/getStageList',taskManagementCtrl.getstage);
-
+router.post('/saveticketsforcustomers',taskManagementCtrl.saveticketforcustomers);
 
 module.exports = router;
