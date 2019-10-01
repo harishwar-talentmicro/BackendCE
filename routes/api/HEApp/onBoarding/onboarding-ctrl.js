@@ -28,10 +28,10 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
         error: null
     };
     var validationFlag = true;
-    if (!req.query.token) {
-        error.token = 'Invalid token';
-        validationFlag *= false;
-    }
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
 
     if (!req.query.heMasterId) {
         error.heMasterId = 'Invalid heMasterId';
@@ -46,8 +46,8 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token, function (err, tokenResult) {
-            if ((!err) && tokenResult) {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -106,11 +106,11 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
                         response.data = null;
                         res.status(500).json(response);
                     }
-                });
-            }
-            else {
-                res.status(401).json(response);
-            }
+            //     });
+            // }
+            // else {
+            //     res.status(401).json(response);
+            // }
         });
     }
 

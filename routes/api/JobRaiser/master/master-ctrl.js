@@ -127,6 +127,12 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                                             result.data.scale = result.data.scale && result.data.scale != null ? result.data.scale : [{ scaleId: 1, scale: "Hundreds" }, { scaleId: 2, scale: "Lakhs" }];
                                             result.data.industry = result.data.industry && result.data.industry != null ? result.data.industry : [{ industryId: 43, title: "Software IT", industryTitle: "Software IT" }, { industryId: 44, title: "Business Development", industryTitle: "Business Development" }];
                                             result.data.teamMembers = [{ memberId: 1, displayName: "Hirecraft HC" }, { memberId: 1, displayName: "Hirecraft HC" }, { memberId: 43589, displayName: "Aauyush sharma" }, { memberId: 43589, displayName: "Aauyush sharma" }];
+                                            
+                                            // result.data.department = result.data.department && result.data.department.length!=0 ? result.data.department : [{ departmentId: 1, department: "Sales" }, { departmentId: 2, department: "Customer Support" }];
+
+                                            // result.data.subDepartments = result.data.subDepartments && result.data.subDepartments.length!=0 ? result.data.subDepartments : [{ subDepartmentId: 1, subDepartment: "Sales Division A" }, { subDepartmentId: 2, subDepartment: "Customer Support Division A" }];
+
+                                            // result.data.vertical = result.data.vertical && result.data.vertical.length!=0 ? result.data.vertical : [{ verticalId: 1, verticalTitle: "Test 10" }, { verticalId: 2, verticalTitle: "Test 11" }];
 
                                             response.data = result.data;
                                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');

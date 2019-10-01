@@ -182,6 +182,7 @@ var dateConverter = function (param) {
     }
 }
 
+var removeTagsRegex = /(<[^>]+>|<[^>]>|<\/[^>]>)/g;
 
 var setFileType = function (mimeType) {
     var filetype = '';
@@ -2777,7 +2778,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
         data: null,
         error: null
     };
-
+    var exception = {}
     var validationFlag = true;
     var portalId = 3;   // timesjob portal
 
@@ -2788,11 +2789,11 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
     try {
 
         var document = new JSDOM(xml_string).window.document;
-        var applicants = [];
+
         var selected_candidates = req.body.selected_candidates;
         var is_select_all = req.body.is_select_all;
         var search_results = document.getElementsByClassName('search-result-block search-result');
-
+        var applicants = [];
 
         document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML
 
@@ -2802,6 +2803,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
             if (search_results)
                 for (var i = 1; i < search_results.length; i++) {
                     var timesJobs = {};
+
                     if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('span')[1].getElementsByTagName('li')[0].innerHTML) {
                         try {
                             //console.log('name', name);
@@ -2812,25 +2814,28 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                             if (name && name.split(' ')) {
                                 try {
                                     if (name.split(' ')[0])
-                                        first_name = removeExtraChars(name.split(' ')[0]);
-                                    if (name.split(' ')[name.split(' ').length - 1]) {
-                                        last_name = name.split(' ')[name.split(' ').length - 1];
-                                        last_name = removeExtraChars(last_name.trim());
+                                        timesJobs.first_name = removeExtraChars(name.split(' ')[0]);
+                                    if (name.split(' ')[1]) {
+                                        last_name = name.split(' ').splice(1).join(' ');
+                                        timesJobs.last_name = removeExtraChars(last_name.trim());
                                     }
                                 }
                                 catch (ex) {
                                     console.log(ex);
+                                    exception.fname = ex
                                 }
                             }
 
                         }
                         catch (ex) {
                             console.log(ex);
+                            exception.name = ex
                         }
+
                         if (document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0] && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':') && document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1]) {
                             try {
                                 var dateStr = document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1].trim();
-                                timesJobs.lastModifiedDate = dateConverter(dateStr);
+                                var lastModifiedDate = dateConverter(dateStr);
 
                             }
                             catch (ex) {
@@ -2843,45 +2848,44 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
 
                     // -------------------experience--------
 
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].innerHTML) {
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].innerHTML) {
-                        try {
                             timesJobs.experience = search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].innerHTML.replace(removeTagsRegex, '').trim();
-
-                        }
-                        catch (ex) {
-                            console.log(ex);
                         }
                     }
-
+                    catch (ex) {
+                        console.log(ex);
+                        exception.experience = ex
+                    }
                     // ----------------salary----------
+                    try {
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].innerHTML) {
-                        try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].innerHTML) {
 
                             timesJobs.salary = search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].innerHTML.replace(removeTagsRegex, '').trim();
-
-                        }
-                        catch (ex) {
-                            console.log(ex);
                         }
                     }
-
+                    catch (ex) {
+                        console.log(ex);
+                        exception.experisalaryence = ex;
+                    }
                     // ----------------place----------
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3].innerHTML) {
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('candidate-profile lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3].innerHTML) {
-                        try {
                             timesJobs.place = search_results[i].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3].innerHTML.replace(removeTagsRegex, '').trim();
                         }
-                        catch (ex) {
-                            console.log(ex);
-                        }
                     }
-
+                    catch (ex) {
+                        console.log(ex);
+                        exception.place = ex;
+                    }
                     // ----------------primary skills----------
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('srp-key-skills') && search_results[i].getElementsByClassName('srp-key-skills')[0] && search_results[i].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt') && search_results[i].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt').length) {
-                        try {
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('srp-key-skills') && search_results[i].getElementsByClassName('srp-key-skills')[0] && search_results[i].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt') && search_results[i].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt').length) {
+
                             timesJobs.primarySkills = [];
 
                             for (var j = 0; j < search_results[i].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt').length; j++) {
@@ -2890,77 +2894,77 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                 }
                             }
                         }
-                        catch (ex) {
-                            console.log(ex);
-                        }
                     }
-
+                    catch (ex) {
+                        console.log(ex);
+                        exception.primarySkills = ex;
+                    }
 
                     // ----------------Job Title----------
-
-                    if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray')[0]) {
-                        try {
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray')[0]) {
                             timesJobs.jobTitle = search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '');
                         }
-                        catch (ex) {
-                            console.log(ex);
-                        }
                     }
-
+                    catch (ex) {
+                        console.log(ex);
+                        exception.jobTitle = ex;
+                    }
                     // imployement History
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
-                        try {
                             timesJobs.employementHistory = [];
                             for (var k = 0; k < search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p').length; k++) {
 
-                                if (search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML) {
-                                    timesJobs.employementHistory.push(
-                                        {
-                                            companyName: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
+                                if (search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k]) {
 
-                                            jobTitle: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '').trim()
+                                    var tempEmpHis = {}
+                                    if (search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML) {
+                                        tempEmpHis.companyName = search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim();
+                                    }
+                                    if (search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML) {
+                                        tempEmpHis.jobTitle = search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '').trim()
+                                    }
 
-                                        })
+                                    timesJobs.employementHistory.push(tempEmpHis);
                                 }
                             }
                         }
-                        catch (err) {
-                            console.log(err);
-                        }
+                    }
+                    catch (err) {
+                        console.log(err);
+                        exception.jobTitle = err;
                     }
 
-
                     // education History
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
-
-                        try {
                             timesJobs.educationHistory = [];
                             for (var k = 0; k < search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p').length; k++) {
 
                                 if (search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML) {
                                     timesJobs.educationHistory.push(
                                         {
-                                            universityName: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
+                                            UniversityName: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
 
                                             qualification: search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '').trim()
 
                                         })
                                 }
-
                             }
-                        } catch (err) {
-                            console.log(err);
                         }
-
                     }
-
+                    catch (err) {
+                        console.log(err);
+                        exception.educationHistory = err;
+                    }
                     // ---keystrength---
+                    try {
+                        if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray').length) {
 
-                    if (search_results[i] && search_results[i].getElementsByClassName('srp-key lft') && search_results[i].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray') && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray').length) {
 
-                        try {
                             timesJobs.keystrength = []
                             for (var k = 0; k < search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray').length; k++) {
                                 timesJobs.keystrength.push(
@@ -2968,15 +2972,15 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                 );
                             }
                         }
-                        catch (err) {
-                            console.log(err);
-                        }
                     }
-
-                    applicants.push({ firstName: timesJobs.name, experience: timesJobs.experience, salary: timesJobs.salary, place: timesJobs.place, primarySkills: timesJobs.primarySkills, jobTitle: timesJobs.jobTitle, employmentHistory: timesJobs.employementHistory, educationHistory: timesJobs.educationHistory, keystrength: timesJobs.keystrength, lastModifiedDate: timesJobs.lastModifiedDate });
+                    catch (err) {
+                        console.log(err);
+                        exception.keystrength = err;
+                    }
+                    applicants.push({ portalId: 3, index: i, firstName: timesJobs.first_name, lastName: last_name, experience: timesJobs.experience, salary: timesJobs.salary, place: timesJobs.place, primarySkills: timesJobs.primarySkills, jobTitle: timesJobs.jobTitle, employmentHistory: timesJobs.employementHistory, educationHistory: timesJobs.educationHistory, keystrength: timesJobs.keystrength });
                 }
 
-            //console.log('applicants', applicants);
+            console.log('applicants', applicants);
         }
 
         else {
@@ -2998,11 +3002,11 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
 
                                     if (name.split(' ')) {
                                         if (name.split(' ')[0])
-                                            first_name = removeExtraChars(name.split(' ')[0]);
-                                        if (name.split(' ')[name.split(' ').length - 1]) {
+                                            timesJobs.first_name = removeExtraChars(name.split(' ')[0]);
+                                        if (name.split(' ')[1]) {
                                             try {
-                                                last_name = name.split(' ')[name.split(' ').length - 1];
-                                                last_name = removeExtraChars(last_name.trim());
+                                                last_name = name.split(' ').splice(1).join(' ');
+                                                timesJobs.last_name = removeExtraChars(last_name.trim());
                                             }
                                             catch (ex) {
                                                 console.log(ex);
@@ -3012,6 +3016,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                 }
                                 catch (ex) {
                                     console.log(ex);
+                                    exception.name = ex;
                                 }
                             }
                             try {
@@ -3019,7 +3024,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                     try {
                                         var dateStr = document.getElementsByClassName('search-result-block search-result')[1].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('modify-active clearfix')[0].getElementsByClassName('lft')[0].innerHTML.split(':')[1].trim();
 
-                                        timesJobs.lastModifiedDate = dateConverter(dateStr);
+                                        var lastModifiedDate = dateConverter(dateStr);
                                     }
                                     catch (ex) {
                                         console.log(ex);
@@ -3028,50 +3033,51 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                             }
                             catch (ex) {
                                 console.log(ex);
+                                exception.lastModifiedDate = ex;
                             }
                             // applicants.push({ firstName: first_name, lastName: last_name, portalId: 3, index: selected_candidates[i] });
 
                             // -------------------experience--------
 
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].innerHTML) {
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].innerHTML) {
-                                try {
                                     timesJobs.experience = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].innerHTML.replace(removeTagsRegex, '').trim();
-
-                                }
-                                catch (ex) {
-                                    console.log(ex);
                                 }
                             }
-
+                            catch (ex) {
+                                console.log(ex);
+                                exception.experience = ex;
+                            }
                             // ----------------salary----------
-
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].innerHTML) {
-                                try {
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].innerHTML) {
 
                                     timesJobs.salary = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].innerHTML.replace(removeTagsRegex, '').trim();
 
                                 }
-                                catch (ex) {
-                                    console.log(ex);
-                                }
                             }
-
+                            catch (ex) {
+                                console.log(ex);
+                                exception.salary = ex;
+                            }
                             // ----------------place----------
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3].innerHTML) {
-                                try {
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3] && search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3].innerHTML) {
+
                                     timesJobs.place = search_results[selected_candidates[i]].getElementsByClassName('candidate-profile lft')[0].getElementsByClassName('profile-des lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[3].innerHTML.replace(removeTagsRegex, '').trim();
-                                }
-                                catch (ex) {
-                                    console.log(ex);
+
                                 }
                             }
-
+                            catch (ex) {
+                                console.log(ex);
+                                exception.place = ex;
+                            }
                             // ----------------primary skills----------
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills') && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt') && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt').length) {
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills') && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt') && search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt').length) {
-                                try {
                                     timesJobs.primarySkills = [];
 
                                     for (var j = 0; j < search_results[selected_candidates[i]].getElementsByClassName('srp-key-skills')[0].getElementsByClassName('srphglt').length; j++) {
@@ -3080,28 +3086,28 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                         }
                                     }
                                 }
-                                catch (ex) {
-                                    console.log(ex);
-                                }
                             }
-
+                            catch (ex) {
+                                console.log(ex);
+                                exception.primarySkills = ex;
+                            }
 
                             // ----------------Job Title----------
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray')[0]) {
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[i].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray')[0]) {
-                                try {
                                     timesJobs.jobTitle = search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p')[0].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '');
                                 }
-                                catch (ex) {
-                                    console.log(ex);
-                                }
                             }
-
+                            catch (ex) {
+                                console.log(ex);
+                                exception.jobTitle = ex;
+                            }
                             // imployement History
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
 
-                                try {
                                     timesJobs.employementHistory = [];
                                     for (var k = 0; k < search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[0].getElementsByTagName('div')[0].getElementsByTagName('p').length; k++) {
 
@@ -3115,43 +3121,42 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                                 })
                                         }
                                     }
-                                } catch (err) {
-                                    console.log(err);
                                 }
                             }
-
+                            catch (err) {
+                                console.log(err);
+                                exception.employementHistory = err;
+                            }
 
                             // education History
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p').length) {
 
-                                try {
                                     timesJobs.educationHistory = [];
                                     for (var k = 0; k < search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p').length; k++) {
 
                                         if (search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML) {
                                             timesJobs.educationHistory.push(
                                                 {
-                                                    universityName: search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
+                                                    UniversityName: search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('dis-heading')[0].innerHTML.replace(removeTagsRegex, '').trim(),
 
                                                     qualification: search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[1].getElementsByTagName('div')[0].getElementsByTagName('p')[k].getElementsByClassName('gray')[0].innerHTML.replace(removeTagsRegex, '').trim()
 
                                                 })
                                         }
-
                                     }
-                                } catch (err) {
-                                    console.log(err);
                                 }
-
-
                             }
-
+                            catch (err) {
+                                console.log(err);
+                                exception.employementHistory = err;
+                            }
                             // ---keystrength---
+                            try {
+                                if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray').length) {
 
-                            if (search_results[selected_candidates[i]] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0] && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray') && search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray').length) {
 
-                                try {
                                     timesJobs.keystrength = []
                                     for (var k = 0; k < search_results[selected_candidates[i]].getElementsByClassName('srp-key lft')[0].getElementsByTagName('ul')[0].getElementsByTagName('li')[2].getElementsByTagName('div')[0].getElementsByClassName('gray').length; k++) {
                                         timesJobs.keystrength.push(
@@ -3159,12 +3164,12 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                         );
                                     }
                                 }
-                                catch (err) {
-                                    console.log(err);
-                                }
                             }
-
-                            applicants.push({ firstName: timesJobs.name, experience: timesJobs.experience, salary: timesJobs.salary, place: timesJobs.place, primarySkills: timesJobs.primarySkills, jobTitle: timesJobs.jobTitle, employmentHistory: timesJobs.employementHistory, educationHistory: timesJobs.educationHistory, keystrength: timesJobs.keystrength, lastModifiedDate: timesJobs.lastModifiedDate });
+                            catch (err) {
+                                console.log(err);
+                                exception.keystrength = err;
+                            }
+                            applicants.push({ portalId: 3, index: i, firstName: timesJobs.first_name, lastName: timesJobs.last_name, experience: timesJobs.experience, salary: timesJobs.salary, place: timesJobs.place, primarySkills: timesJobs.primarySkills, jobTitle: timesJobs.jobTitle, employmentHistory: timesJobs.employementHistory, educationHistory: timesJobs.educationHistory, keystrength: timesJobs.keystrength });
                         }
                         catch (ex) {
                             console.log(ex);
@@ -3201,6 +3206,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                 ourjson: applicants,
                                 resonseOfTallint: body
                             };
+                            response.exception = exception;
                             res.status(200).json(response);
                         }
                         else {
@@ -3211,6 +3217,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                                 ourjson: applicants,
                                 resonseOfTallint: error
                             };
+                            response.exception = exception;
                             res.status(500).json(response);
                         }
 
@@ -3220,6 +3227,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                         response.message = "Something went wrong";
                         response.error = ex;
                         response.data = null;
+                        response.exception = exception;
                         res.status(500).json(response);
                     }
                 });
@@ -3232,6 +3240,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
                     ourjson: applicants,
                     resonseOfTallint: error
                 };
+                response.exception = exception;
                 res.status(500).json(response);
             }
         }
@@ -3241,6 +3250,7 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
             response.message = "Parsed XML Successfully";
             response.error = null;
             response.data = applicants;
+            response.exception = exception;
             res.status(200).json(response);
         }
 
@@ -3255,9 +3265,14 @@ portalimporter.checkApplicantExistsFromTimesJobsPortalNew = function (req, res, 
         response.message = "Something went wrong";
         response.error = ex;
         response.data = null;
+        response.exception = exception;
         res.status(500).json(response);
     }
 };
+
+
+
+
 
 
 portalimporter.saveApplicantsFromShine = function (req, res, next) {
@@ -3851,6 +3866,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
         data: null,
         error: null
     };
+    var exception = {};
     var validationFlag = true;
     var portalId = 3;   // timesjob
     var cvSourceId = 3;
@@ -3875,6 +3891,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.fName = ex
         }
 
         try {
@@ -3900,10 +3917,12 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
                 } catch (ex) {
                     console.log(ex);
+                    exception.emailId = ex;
                 }
             }
         } catch (ex) {
             console.log(ex);
+            exception.emailId = ex;
         }
 
         try {
@@ -3916,6 +3935,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.mobileNumber = ex;
         }
 
         try {
@@ -3928,6 +3948,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.mobileISD = ex;
         }
 
         try {
@@ -3938,6 +3959,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.experience = ex;
         }
 
         //-------job Title--------
@@ -3951,6 +3973,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (ex) {
             console.log(ex);
+            exception.jobTitle = ex;
         }
         // -----------salary------
 
@@ -3961,6 +3984,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.salary = ex;
         }
 
         //Date Of Birth
@@ -3973,6 +3997,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.DOB = ex;
         }
 
         //-------address---------
@@ -3986,6 +4011,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (ex) {
             console.log(ex);
+            exception.address = ex;
         }
 
         // ---primarySkills--
@@ -4005,6 +4031,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (err) {
             console.log(err);
+            exception.primarySkills = err;
         }
 
         // ---Current Employer---
@@ -4016,6 +4043,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (err) {
             console.log(err);
+            exception.currentEmployer = err;
         }
 
         // ----Current Location---
@@ -4027,6 +4055,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (err) {
             console.log(err);
+            exception.currentLocation = err;
         }
 
         // ----Preferred Location---
@@ -4038,6 +4067,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             }
         } catch (err) {
             console.log(err);
+            exception.preferredLocation = err;
         }
 
         // ----Notice Period ----
@@ -4045,9 +4075,25 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
             var tempCurrentEmployer = document.getElementsByClassName('candidate-exp');
             if (tempCurrentEmployer && tempCurrentEmployer[0] && tempCurrentEmployer[0].getElementsByClassName('other-key-info') && tempCurrentEmployer[0].getElementsByClassName('other-key-info')[0] && tempCurrentEmployer[0].getElementsByClassName('other-key-info')[0].getElementsByTagName('p') && tempCurrentEmployer[0].getElementsByClassName('other-key-info')[0].getElementsByTagName('p')[3] && tempCurrentEmployer[0].getElementsByClassName('other-key-info')[0].getElementsByTagName('p')[3].getElementsByClassName('other-key')[0]) {
                 details.noticePeriod = removeExtraChars(tempCurrentEmployer[0].getElementsByClassName('other-key-info')[0].getElementsByTagName('p')[3].getElementsByClassName('other-key')[0].innerHTML.trim().replace(removeTagsRegex, ''));
+
+                if (details.noticePeriod.toUpperCase() == 'IMMEDIATELY') {
+                    details.noticePeriod = 15;
+                }
+                else if (details.noticePeriod.toUpperCase().indexOf('DAYS') > -1) {
+                    details.noticePeriod = details.noticePeriod.split('Days')[0] * 1;
+                }
+                else if (details.noticePeriod.toUpperCase().indexOf('MONTH') > -1) {
+                    details.noticePeriod = details.noticePeriod.toUpperCase().split('MONTH')[0] * 30;
+                }
+                else if (details.noticePeriod.toUpperCase().indexOf('MONTHS') > -1) {
+                    details.noticePeriod = details.noticePeriod.toUpperCase().split('MONTHS')[0] * 30;
+                }
+
+
             }
         } catch (err) {
             console.log(err);
+            exception.noticePeriod = err;
         }
 
         //------functional area-------
@@ -4062,6 +4108,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (err) {
             console.log(err);
+            exception.functionalArea = err;
         }
 
         // ------current roll
@@ -4076,6 +4123,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (err) {
             console.log(err);
+            exception.currentRole = err;
         }
 
         //----area of specialization-----
@@ -4089,6 +4137,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (err) {
             console.log(err);
+            exception.specializationArea = err;
         }
 
         // -------industry-----
@@ -4103,6 +4152,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (err) {
             console.log(err);
+            exception.industry = err;
         }
 
 
@@ -4110,20 +4160,21 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
         // --------language----------
 
         try {
-            var tempLaguage = document.getElementsByClassName('professional-exp');
-            if (tempLaguage && tempLaguage[3] && tempLaguage[3].getElementsByClassName('lang-info') && tempLaguage[3].getElementsByClassName('lang-info')[0] && tempLaguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul') && tempLaguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul').length) {
-                details.tempLaguages = [];
-                for (var j = 1; j < tempLaguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul').length; j++) {
+            var tempLanguage = document.getElementsByClassName('professional-exp');
+            if (tempLanguage && tempLanguage[3] && tempLanguage[3].getElementsByClassName('lang-info') && tempLanguage[3].getElementsByClassName('lang-info')[0] && tempLanguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul') && tempLanguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul').length) {
+                details.languages = [];
+                for (var j = 1; j < tempLanguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul').length; j++) {
 
-                    if (tempLaguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul')[j].getElementsByTagName('li') && tempLaguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul')[j].getElementsByTagName('li')[0])
+                    if (tempLanguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul')[j].getElementsByTagName('li') && tempLanguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul')[j].getElementsByTagName('li')[0])
 
-                        details.laguages.push(removeExtraChars(tempLaguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul')[j].getElementsByTagName('li')[0].innerHTML.trim().replace(removeTagsRegex, '')))
+                        details.languages.push(removeExtraChars(tempLanguage[3].getElementsByClassName('lang-info')[0].getElementsByTagName('ul')[j].getElementsByTagName('li')[0].innerHTML.trim().replace(removeTagsRegex, '')))
                 }
 
             }
 
         } catch (err) {
             console.log(err);
+            exception.laguages = err;
         }
 
 
@@ -4155,6 +4206,8 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (err) {
             console.log(err);
+            exception.UGeducationDetails = err;
+
         }
 
         // ---------PG----------
@@ -4183,6 +4236,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
 
         } catch (err) {
             console.log(err);
+            exception.PGeducationDetails = err;
         }
 
         console.log(details);
@@ -4261,6 +4315,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
                                 },
                                 resonseOfTallint: body
                             };
+                            response.exception = exception;
                             if (body.Code != 'ERR0001') {
                                 res.status(200).json(response);
                             }
@@ -4284,6 +4339,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
                                 },
                                 resonseOfTallint: error
                             };
+                            response.exception = exception;
                             res.status(500).json(response);
                         }
                     } catch (ex) {
@@ -4292,6 +4348,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
                         response.message = "Response from tallint DB";
                         response.error = ex;
                         response.data = null;
+                        response.exception = exception;
                         res.status(500).json(response);
                     }
                 });
@@ -4302,6 +4359,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
                 response.message = "XML Parsed";
                 response.error = false;
                 response.data = details;
+                response.exception = exception;
                 res.status(200).json(response);
             }
 
@@ -4321,6 +4379,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
                     },
                     resonseOfTallint: error
                 };
+                response.exception = exception;
                 res.status(500).json(response);
             }
         }
@@ -4335,6 +4394,7 @@ portalimporter.saveApplicantsFromTimesjobsNew = function (req, res, next) {
         response.message = "Something went wrong";
         response.error = ex;
         response.data = null;
+        response.exception = exception;
         res.status(500).json(response);
     }
 };
