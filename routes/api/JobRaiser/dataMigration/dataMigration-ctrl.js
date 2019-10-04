@@ -774,17 +774,62 @@ dataMigration.tallint_ER_jobList = function (req, res, next) {
                                                                 {
                                                                     "reqId": 342,
                                                                     "title": ".Net Architect",
-                                                                    "jobCode": "JCDR232"
+                                                                    "jobCode": "JCDR232",
+                                                                    "shortJobDescription" : "Designation: Dot net Developer Total Experience: 4- 10 years Notice Period : Immediate or 30 Days Max",
+                                                                    "jobDescription" : `Job responsibilities for DotNet developer:
+
+                                                                    • Design and implementation of new software architectures based on Linux and Adaptive AUTOSAR for high-performance computing platforms for embedded automotive applications
+                                                                    • Elaboration of technical documentation and reports
+                                                                    • Technical contact to customers, stakeholders and development partners
+                                                                    Skills required:
+                                                                    • 4 to10 years of experience in automotive embedded software development (Must).
+                                                                    • Adaptive AUTOSAR experience (Must).
+                                                                    • Experience with in AUTOSAR development methodology, architecture and workflow.
+                                                                    • Experience with Vector/Electrobit Adaptive AUTOSAR stack is highly preferred.
+                                                                    • Good object-oriented programming skills, preferably in C++ or Java.
+                                                                    • Experience in development and/or integration of Linux based for automotive embedded applications
+                                                                    • Experience with automotive networks like CAN, Flexray, Ethernet etc.
+                                                                    • Familiarity with tools like JIRA, GitHub, Jenkins etc.`
                                                                 },
                                                                 {
                                                                     "reqId": 343,
                                                                     "title": "Java developer",
-                                                                    "jobCode": "JCRR236"
+                                                                    "jobCode": "JCRR236",
+                                                                    "shortJobDescription" : "Designation: Java Developer Total Experience: 4- 10 years Notice Period : Immediate or 30 Days Max",
+                                                                    "jobDescription" : `Job responsibilities for Java developer:
+
+                                                                    • Design and implementation of new software architectures based on Linux and Adaptive AUTOSAR for high-performance computing platforms for embedded automotive applications
+                                                                    • Elaboration of technical documentation and reports
+                                                                    • Technical contact to customers, stakeholders and development partners
+                                                                    Skills required:
+                                                                    • 4 to10 years of experience in automotive embedded software development (Must).
+                                                                    • Adaptive AUTOSAR experience (Must).
+                                                                    • Experience with in AUTOSAR development methodology, architecture and workflow.
+                                                                    • Experience with Vector/Electrobit Adaptive AUTOSAR stack is highly preferred.
+                                                                    • Good object-oriented programming skills, preferably in C++ or Java.
+                                                                    • Experience in development and/or integration of Linux based for automotive embedded applications
+                                                                    • Experience with automotive networks like CAN, Flexray, Ethernet etc.
+                                                                    • Familiarity with tools like JIRA, GitHub, Jenkins etc.`
                                                                 },
                                                                 {
                                                                     "reqId": 344,
                                                                     "title": "Node developer",
-                                                                    "jobCode": "NRRR236"
+                                                                    "jobCode": "NRRR236",
+                                                                    "shortJobDescription" : "Designation: Node Developer Total Experience: 4- 10 years Notice Period : Immediate or 30 Days Max",
+                                                                    "jobDescription" : `Job responsibilities of Node developer:
+
+                                                                    • Design and implementation of new software architectures based on Linux and Adaptive AUTOSAR for high-performance computing platforms for embedded automotive applications
+                                                                    • Elaboration of technical documentation and reports
+                                                                    • Technical contact to customers, stakeholders and development partners
+                                                                    Skills required:
+                                                                    • 4 to10 years of experience in automotive embedded software development (Must).
+                                                                    • Adaptive AUTOSAR experience (Must).
+                                                                    • Experience with in AUTOSAR development methodology, architecture and workflow.
+                                                                    • Experience with Vector/Electrobit Adaptive AUTOSAR stack is highly preferred.
+                                                                    • Good object-oriented programming skills, preferably in C++ or Java.
+                                                                    • Experience in development and/or integration of Linux based for automotive embedded applications
+                                                                    • Experience with automotive networks like CAN, Flexray, Ethernet etc.
+                                                                    • Familiarity with tools like JIRA, GitHub, Jenkins etc.`
                                                                 }
                                                             ],
                                                             "details": {}

@@ -6,7 +6,7 @@ var portalimporter = require('./portalimporter-Ctrl');
 
 router.post('/checkPortalApplicantsMonster',portalimporter.checkApplicantExistsFromMonsterPortal);
 router.post('/checkPortalApplicantsNaukri',portalimporter.checkApplicantExistsFromNaukriPortal);
-router.post('/checkPortalApplicantsShine',portalimporter.checkApplicantExistsFromShinePortal);
+router.post('/checkPortalApplicantsShine',portalimporter.checkApplicantExistsFromShinePortalNew);
 router.post('/checkPortalApplicantsTimesJobs',portalimporter.checkApplicantExistsFromTimesJobsPortalNew);
 router.post('/checkPortalApplicantsTotalJobs',portalimporter.checkApplicantExistsFromTotalJobsPortal);
 router.post('/checkPortalApplicantsReed',portalimporter.checkApplicantExistsFromReed);
@@ -16,7 +16,7 @@ router.post('/checkPortalApplicantsJobSearch',portalimporter.checkApplicantExist
 
 router.post('/savePortalApplicantsMonster',portalimporter.saveApplicantsFromMonster);
 router.post('/savePortalApplicantsNaukri',portalimporter.saveApplicantsFromNaukri);
-router.post('/savePortalApplicantsShine',portalimporter.saveApplicantsFromShine);
+router.post('/savePortalApplicantsShine',portalimporter.saveApplicantsFromShineNew);
 router.post('/savePortalApplicantsTimesJobs',portalimporter.saveApplicantsFromTimesjobsNew);
 router.post('/savePortalApplicantsTotalJobs',portalimporter.saveApplicantsFromTotalJobs);
 router.post('/savePortalApplicantsReed',portalimporter.saveApplicantsFromReed);
