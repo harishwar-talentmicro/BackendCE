@@ -3694,7 +3694,7 @@ applicantCtrl.getInterviewScheduler = function (req, res, next) {
                                         res2.panelMembers = JSON.parse(result[2][i].panelMembers) ? JSON.parse(result[2][i].panelMembers) : [];
                                         res2.address = result[2][i].address ? result[2][i].address : '';
                                         res2.interviewType = JSON.parse(result[2][i].interviewType).interviewModeId ? JSON.parse(result[2][i].interviewType) : {};
-                                        res2.branchAddress = JSON.parse(result[2][i].interviewType).branchAddress ? JSON.parse(result[2][i].branchAddress) : {};
+                                        res2.branchAddress = JSON.parse(result[2][i].branchAddress) ? JSON.parse(result[2][i].branchAddress) : {};
 
                                         output.push(res2);
                                     }
