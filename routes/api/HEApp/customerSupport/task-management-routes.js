@@ -20,4 +20,9 @@ router.post('/saveticketconfig', taskManagementCtrl.saveTicketconfig);
 router.get('/getticketconfig', taskManagementCtrl.getTicketconfig);
 router.post('/savereasonconfig', taskManagementCtrl.saveReasonconfig);
 router.get('/getreasonconfig', taskManagementCtrl.getReasonconfig);
+router.get('/ticketMaster', taskManagementCtrl.ticketmaster);
+
+router.post('/saveTicketTypes', taskManagementCtrl.saveTicketTypes);
+router.post('/saveTaskTypes', taskManagementCtrl.saveTaskTypes);
+
 module.exports = router;

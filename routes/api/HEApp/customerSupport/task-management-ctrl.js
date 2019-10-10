@@ -46,8 +46,6 @@ taskManagementCtrl.saveproject = function (req, res, next) {
                     req.st.db.escape(JSON.stringify(req.body.attachments || [])),
                     req.st.db.escape(req.body.status),
                     req.st.db.escape(JSON.stringify(req.body.stages || []))
-
-
                 ];
 
                 var procQuery = 'call save_projects(' + procParams.join(',') + ')';
@@ -110,7 +108,8 @@ taskManagementCtrl.projectdetails = function (req, res, next) {
                 var inputs = [
                     req.st.db.escape(req.query.token),
                     req.st.db.escape(req.query.heMasterid),
-                    req.st.db.escape(req.query.keywords)
+                    req.st.db.escape(req.query.keywords || ""),
+                    req.st.db.escape(req.query.projectId || 0)                    
                 ];
 
                 var procQuery = 'call get_project_details(' + inputs.join(',') + ')';
@@ -395,15 +394,13 @@ taskManagementCtrl.checkezeid = function (req, res, next) {
                     console.log(result);
                     if (!err && result) {
 
-                        if (result[1][0].status = "true")
+                        if (result[1][0].status == "true")
                             response.status = true;
                         else
                             response.status = false;
 
                         response.message = result[0][0].message;
-
                         response.error = null;
-
                         response.data = null;
 
 
@@ -946,6 +943,7 @@ taskManagementCtrl.saveTicketconfig = function (req, res, next) {
     }
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
+            console.log(err);
             if ((!err) && tokenResult) {
 
                 var inputs = [
@@ -1150,6 +1148,225 @@ taskManagementCtrl.getReasonconfig = function (req, res, next) {
                         response.data = {}
 
                         response.data = result[0][0] ? result[0] : []
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+
+taskManagementCtrl.ticketmaster = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+           if ((!err) && tokenResult) {
+
+                var inputs = [
+                   
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'call pm_get_ticketmaster(' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result ) {
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+
+                        response.data={
+                            customers:result[0] && result[0][0] ? result[0] : [],
+                            projects:result[1][0].projects,
+                            priority:result[2] ? result[2] : [],
+                            ticketstatus:result[3] ? result[3] : [],
+                            reasons:result[4] ? result[4] : [],
+                            stagestatus:result[5] ? result[5] : [],
+                            taskTypes : result[6] ? result[6] : [],
+                            ticketTypes : result[7] ? result[7] : [],
+                            userList : result[8] ? result[8] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+taskManagementCtrl.saveTicketTypes = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+           if ((!err) && tokenResult) {
+
+                var inputs = [
+                   
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(JSON.stringify(req.body))
+                ];
+
+                var procQuery = 'call pm_save_config_ticketTypes(' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "Data saved successfully";
+                        response.error = null;
+
+                        response.data={
+                            ticketTypes : result[0] ? result[0] : []
+                        }
+                        res.status(200).json(response);
+                    }
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No result found";
+                        response.error = null;
+                        response.data = null;
+                        res.status(200).json(response);
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Something went wrong";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+taskManagementCtrl.saveTaskTypes = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Some error occured",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the error';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+           if ((!err) && tokenResult) {
+
+                var inputs = [
+                   
+                    req.st.db.escape(req.query.token),
+                    req.st.db.escape(JSON.stringify(req.body))
+                ];
+
+                var procQuery = 'call pm_save_config_taskTypes(' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+
+                    if (!err && result && result[0]) {
+                        response.status = true;
+                        response.message = "Data saved successfully";
+                        response.error = null;
+
+                        response.data={
+                            taskTypes : result[0] ? result[0] : []
+                        }
                         res.status(200).json(response);
                     }
 
