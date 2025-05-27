@@ -534,8 +534,8 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                                     req.st.db.escape(req.body.receivedCandidateArrivalInfo),
                                     req.st.db.escape(req.body.stageId),
                                     req.st.db.escape(req.body.departureFrom),
-                                    req.st.db.escape(req.body.departureTo)
-
+                                    req.st.db.escape(req.body.departureTo),
+                                    req.st.db.escape(JSON.stringify(req.body.attachments || []))
                                 ];
                                 var procQuery = 'CALL wm_save_paceDeparture( ' + inputs.join(',') + ')';
                                 console.log(procQuery);
@@ -551,6 +551,7 @@ gulfCtrl.saveDeparture = function (req, res, next) {
                                             for (var i = 0; i < results[0].length; i++) {
                                                 results[0][i].departureCurrency = results[0][i].departureCurrency ? JSON.parse(results[0][i].departureCurrency) : {};
                                                 results[0][i].departureCurrencyScale = results[0][i].departureCurrencyScale ? JSON.parse(results[0][i].departureCurrencyScale) : {};
+                                                results[0][i].attachments = results[0][i] && results[0][i].attachments ? JSON.parse(results[0][i].attachments) : [];
                                             }
 
                                             response.data = {
@@ -690,6 +691,7 @@ gulfCtrl.getDeparture = function (req, res, next) {
                                     for (var i = 0; i < result[0].length; i++) {
                                         result[0][i].departureCurrency = result[0][i].departureCurrency ? JSON.parse(result[0][i].departureCurrency) : {};
                                         result[0][i].departureCurrencyScale = result[0][i].departureCurrencyScale ? JSON.parse(result[0][i].departureCurrencyScale) : {};
+                                        result[0][i].attachments = result[0][i].attachments ? JSON.parse(result[0][i].attachments) : [];
                                     }
 
                                     var departureDetails = {};
@@ -804,7 +806,7 @@ gulfCtrl.saveVisa = function (req, res, next) {
                         zlib.unzip(decryptBuf, function (_, resultDecrypt) {
                             try {
                                 req.body = JSON.parse(resultDecrypt.toString('utf-8'));
-
+                                console.log(req.body);
                                 if (!req.body.reqApp || !req.body.reqApp.length) {
                                     error.reqApp = 'Invalid reqApplicantId';
                                     validationFlag *= false;
@@ -1328,8 +1330,6 @@ gulfCtrl.getAttestation = function (req, res, next) {
         error: null,
         data: null
     }
-    s
-
     try {
         var response = {
             status: false,

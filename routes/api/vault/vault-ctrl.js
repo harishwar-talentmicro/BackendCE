@@ -929,8 +929,8 @@ vaultCtrl.archiveItem = function (req, res, next) {
                     var procParams = [
                         req.st.db.escape(req.query.token),
                         req.st.db.escape(req.query.itemId),
-                        req.st.db.escape(req.query.isArchive)
-
+                        req.st.db.escape(req.query.isArchive),
+                        req.st.db.escape(req.query.isFolder || 0)
                     ];
 
                     var procQuery = 'CALL wm_save_archiveVaultItem( ' + procParams.join(',') + ')';
@@ -938,7 +938,7 @@ vaultCtrl.archiveItem = function (req, res, next) {
                     req.db.query(procQuery, function (err, vaultResult) {
                         if (!err && vaultResult && vaultResult[0] && vaultResult[0][0]) {
                             response.status = true;
-                            if (req.query.isArchive)
+                            if (req.query.isArchive == 1)
                                 response.message = "File archived successfully";
                             else
                                 response.message = "File restored successfully";

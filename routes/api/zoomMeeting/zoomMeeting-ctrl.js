@@ -20,7 +20,7 @@ const VoiceGrant = AccessToken.VoiceGrant;
 
 // Used when generating any kind of tokens
 // const accountSid = appConfig.DB.accountSid;  //'ACcf64b25bcacbac0b6f77b28770852ec9';//'AC3765f2ec587b6b5b893566f1393a00f4';
-const authToken = appConfig.DB.authToken || 'ff62486827ce8b68c70c1b8f7cef9748';   //'3abf04f536ede7f6964919936a35e614';  //'b36eba6376b5939cebe146f06d33ec57';//
+const authToken = appConfig.DB.authToken || 'ff62486827ce8b68c70c1b8f7cef9748';
 const FromNumber = appConfig.DB.FromNumber || '+16012286363';
 
 // used to get access token video

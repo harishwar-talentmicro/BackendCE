@@ -152,7 +152,8 @@ reqGroup.saveRequirementGroup = function (req, res, next) {
                                                                 reqGroupDetails: requirementResult[0][0],
                                                                 reqGroupCompleteDetails: requirementResult[1][0] ? requirementResult[1][0] : null,
                                                                 // followUpNotes: (requirementResult[2] && requirementResult[2][0]) ? requirementResult[2] : []
-                                                                requirementGroupList: requirementResult[2] ? requirementResult[2] : []
+                                                                requirementGroupList: requirementResult[2] ? requirementResult[2] : [],
+                                                                unreadNotifyCount : requirementResult[4] && requirementResult[4][0] && requirementResult[4][0].unreadNotifyCount ? requirementResult[4][0].unreadNotifyCount : 0
                                                             };
                                                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                             zlib.gzip(buf, function (_, result) {
@@ -482,7 +483,8 @@ reqGroup.getRequirementGroupWithMaster = function (req, res, next) {
                                         functionalAreas: result[16] ? result[16] : [],
 
                                         reqGroupDetails: result[17][0] ? result[17][0] : null,
-                                        followUpNotes: (result[18] && result[18][0]) ? result[18] : []
+                                        followUpNotes: (result[18] && result[18][0]) ? result[18] : [],
+                                        unreadNotifyCount : result[19] && result[19][0] && result[19][0].unreadNotifyCount ? result[19][0].unreadNotifyCount : 0
                                     };
 
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -599,9 +601,21 @@ reqGroup.getrequirementGroupList = function (req, res, next) {
                                         response.status = true;
                                         response.message = "Requirement list loaded successfully";
                                         response.error = null;
+
+                                        for (var i = 0; i < result[7].length; i++) {
+                                            result[7][i].searchJson = result[7][i] && result[7][i].searchJson ? JSON.parse(result[7][i].searchJson) : null;
+                                        }
+                                        
                                         response.data = {
                                             requirementGroupList: result[0] && result[0][0] ? result[0] : [],
-                                            totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0
+                                            totalDBResumeCount: result[1] && result[1][0] && result[1][0].totalDBResumeCount ? result[1][0].totalDBResumeCount : 0,
+                                            jobtitle: result[2] ? result[2] : [],
+                                            industry: result[3] ? result[3] : [],
+                                            locationList: result[4] ? result[4] : [],
+                                            skills: result[5] ? result[5] : [],
+                                            functionalAreas: result[6] ? result[6] : [],
+                                            cvSearchTemplateList: result[7] && result[7][0] ? result[7] : [],
+                                            educationList: result[8] ? result[8] : []
                                         }
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
@@ -797,7 +811,8 @@ reqGroup.getRequirementViewGroup = function (req, res, next) {
 
                                                 response.data = {
                                                     requirementGroupView: results[0] ? results[0] : [],
-                                                    requirementGroupCount: (results[1] && results[1][0] && results[1][0].requirementGroupCount) ? results[1][0].requirementGroupCount : 0
+                                                    requirementGroupCount: (results[1] && results[1][0] && results[1][0].requirementGroupCount) ? results[1][0].requirementGroupCount : 0,
+                                                    unreadNotifyCount: (results[2] && results[2][0] && results[2][0].unreadNotifyCount) ? results[2][0].unreadNotifyCount : 0
                                                 };
                                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                                 zlib.gzip(buf, function (_, result) {

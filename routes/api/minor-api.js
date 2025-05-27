@@ -103,7 +103,7 @@ var locForecastV1 = require('./line-of-career/loc-master.js');
 var apVersionV1 = require('./ap-module/version.js');
 var areaPartner = require('./area-partner/area-partner-master.js');
 var configuration = require('./configuration/deal.js');
-var jobRaiser = require('./job-raiser/job-raiser-routes');
+// var jobRaiser = require('./job-raiser/job-raiser-routes');
 
 var user = require('./user/user-routes');
 var community = require('./community/community-routes');
@@ -210,7 +210,7 @@ router.use('/loc', locForecastV1);
 router.use('/versionCode', apVersionV1);
 
 router.use('/area_partner', areaPartner);
-router.use('/job_raiser', jobRaiser);
+// router.use('/job_raiser', jobRaiser);
 router.use('/configuration', configuration);
 router.use('/user', user);
 router.use('/community', community);
@@ -417,6 +417,8 @@ var portal = require('./JobRaiser/portalImporter.js');
 var reqGroup = require('./JobRaiser/reqGroup.js');
 var dataMigration = require('./JobRaiser/dataMigration.js');
 var hris = require('./JobRaiser/hris.js');
+// var paceHCMCron = require('./JobRaiser/pacehcmCron.js');
+var ccav = require('./JobRaiser/ccavenue/ccavenue-routes.js');
 
 
 router.use('/WM', jobModule);
@@ -432,6 +434,8 @@ router.use('/WM', portal);
 router.use('/WM', reqGroup);
 router.use('/WM', dataMigration);
 router.use('/WM', hris);
+// router.use('/WM', paceHCMCron);
+router.use('/WM', ccav);
 
 // cron
 // var taskScheduler = require('../api/HEApp/task/task-ctrl');
@@ -484,10 +488,10 @@ cron.schedule('*/15 * * * *', function () {
 // });
 // cronJobMessage.start();
 
-cron.schedule('*/15 * * * *', function () {
-    console.log('running a notify messages');
-    notifyMessages.getMessagesNeedToNotify();
-});
+// cron.schedule('*/15 * * * *', function () {
+//     console.log('running a notify messages');
+//     notifyMessages.getMessagesNeedToNotify();
+// });
 
 
 //Example POST method invocation
@@ -777,11 +781,11 @@ if (cluster.isWorker) {
 //                             console.log("--------entered to loop")
 //                             var timestamp=[];
 //                             for (var i = 0; i < results[1].length;i++ ) {
-                           
+
 //                            greetingsFunction(results,i);
-                            
+
 //                             }
-                       
+
 
 
 //                         }
@@ -832,59 +836,84 @@ if (cluster.isWorker) {
 }
 
 // //  cron for attendance login
-// if (cluster.isWorker) {
+var Notification_aws = require('../modules/notification/aws-sns-push');
+var _Notification_aws = new Notification_aws();
+//  cron for attendance login
+if (cluster.isWorker) {
 
-//     if (cluster.worker.id == 1) {
-//         var login = new CronJob({
-//             cronTime: '1 * * * * *',
-//             onTick: function () {
+    if (cluster.worker.id == 1) {
+        var login = new CronJob({
+            cronTime: '00 10 * * *',
+            onTick: function () {
 
-//                 console.log('running a attendance Login notifier');
-//                 var query = 'call wm_get_attendanceLoginusers("' + DBSecretKey + '")';
-//                 db.query(query, function (err, result) {
-//                     if (err) {
-//                         console.log('error:wm_get_attendanceLoginusers', err);
-//                     }
-//                     else if(result && result[0] && result[0][0]){
-//                         notifyMessages.getMessagesNeedToNotify();
-//                     }
-//                 });
-//             },
-//             start: false,
-//             timeZone: 'America/Los_Angeles'
+                console.log('running a attendance Login notifier');
+                var query = 'call wm_get_attendanceLoginusers("' + DBSecretKey + '")';
+                db.query(query, function (err, result) {
+                    if (err) {
+                        console.log('error:wm_get_attendanceLoginusers', err);
+                    }
+                    else if (result) {
 
-//         });
-//         login.start();
-//     }
-// }
+                        var messagePayload = {
+                            message: "Attendance Alert: Please Login on whatmate!"
+                        }
+
+                        if (result && result[0] && result[0][0] && result[0][0].APNS_Id) {
+                            _Notification_aws.publish_IOS(result[0][0].APNS_Id, messagePayload, 0);
+                        }
+
+                        if (result && result[1] && result[1][0] && result[1][0].GCM_Id) {
+                            _Notification_aws.publish_Android(result[1][0].GCM_Id, messagePayload);
+                        }
+
+                    }
+                });
+            },
+            start: false,
+            timeZone: 'Asia/Calcutta'
+
+        });
+        login.start();
+    }
+}
 
 
-// //  cron for attendance login
-// if (cluster.isWorker) {
+//  cron for attendance login
+if (cluster.isWorker) {
 
-//     if (cluster.worker.id == 1) {
-//         var logout = new CronJob({
-//             cronTime: '0 * * * * *',
-//             onTick: function () {
+    if (cluster.worker.id == 1) {
+        var logout = new CronJob({
+            cronTime: '00 19 * * *',
+            onTick: function () {
 
-//                 console.log('running a attendance Logout notifier');
-//                 var query = 'call wm_get_attendanceLogoutusers("' + DBSecretKey + '")';
-//                 db.query(query, function (err, result) {
-//                     if (err) {
-//                         console.log('error:wm_get_attendanceLogoutusers', err);
-//                     }
-//                     else if(result && result[0] && result[0][0]) {
-//                         notifyMessages.getMessagesNeedToNotify();
-//                     }
-//                 });
-//             },
-//             start: false,
-//             timeZone: 'America/Los_Angeles'
+                console.log('running a attendance Logout notifier');
+                var query = 'call wm_get_attendanceLogoutusers("' + DBSecretKey + '")';
+                db.query(query, function (err, result) {
+                    if (err) {
+                        console.log('error:wm_get_attendanceLogoutusers', err);
+                    }
+                    else if (result) {
+                        var messagePayload = {
+                            message: "Attendance Alert: Please Logout!"
+                        }
 
-//         });
-//         logout.start();
-//     }
-// }
+                        if (result && result[0] && result[0][0] && result[0][0].APNS_Id) {
+                            _Notification_aws.publish_IOS(result[0][0].APNS_Id, messagePayload, 0);
+                        }
+
+                        if (result && result[1] && result[1][0] && result[1][0].GCM_Id) {
+                            _Notification_aws.publish_Android(result[1][0].GCM_Id, messagePayload);
+                        }
+                    }
+                });
+            },
+            start: false,
+            timeZone: 'Asia/Calcutta'
+        });
+        logout.start();
+    }
+}
+
 
 var cluster = require('cluster');
 
@@ -968,104 +997,104 @@ if (cluster.isWorker) {
 }
 
 
-function greetingsFunction(results,i){
-    var timestamp= Date.now();
+function greetingsFunction(results, i) {
+    var timestamp = Date.now();
     console.log(timestamp);
     console.log(i);
-    
 
-   results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
-   // console.log(results[1][i].formDataJSON)
-   var imageUrl = results[1][i].formDataJSON.CDNPath;
-   var displayImage = results[1][i].imageURL;
-   var displayName = results[1][i].displayName;
-   console.log(imageUrl);
-   console.log(displayImage);
-   console.log(displayName);
 
-   console.log("image imposing started")
-   // var imageUrl=results[1][i].formDataJSON.CDNPath;
-   Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
-       Jimp.read("https://storage.googleapis.com/ezeone/" + imageUrl, function (err, lenna) {
+    results[1][i].formDataJSON = results[1][i].formDataJSON ? JSON.parse(results[1][i].formDataJSON) : {};
+    // console.log(results[1][i].formDataJSON)
+    var imageUrl = results[1][i].formDataJSON.CDNPath;
+    var displayImage = results[1][i].imageURL;
+    var displayName = results[1][i].displayName;
+    console.log(imageUrl);
+    console.log(displayImage);
+    console.log(displayName);
 
-           var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + displayImage).then(function (image1) {
+    console.log("image imposing started")
+    // var imageUrl=results[1][i].formDataJSON.CDNPath;
+    Jimp.read("https://storage.googleapis.com/ezeone/f693c8c5-4928-438f-9c50-23c433cd6be8.png").then(function (image2) {
+        Jimp.read("https://storage.googleapis.com/ezeone/" + imageUrl, function (err, lenna) {
 
-               var profile = image1;
-               var mask = image2;
-               var w = mask.bitmap.width; // the width of the image
-               var h = mask.bitmap.height;
-               // console.log(w, h);
-               profile.resize(w, h);
-               // console.log(h);
-               
+            var p1 = Jimp.read('https://storage.googleapis.com/ezeone/' + displayImage).then(function (image1) {
 
-               profile.mask(mask, 0, 0)
-              
-                   .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function () {
-                      
-                       Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function (err, bdayImage) {
-                           console.log(bdayImage);
-                           bdayImage.resize(180, 180);
+                var profile = image1;
+                var mask = image2;
+                var w = mask.bitmap.width; // the width of the image
+                var h = mask.bitmap.height;
+                // console.log(w, h);
+                profile.resize(w, h);
+                // console.log(h);
 
-                           if (err) throw err;
-                           bdayImage.quality(100)
-                           Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
-                               lenna.print(font, 68, 850, displayName, 800);
 
-                               lenna.composite(bdayImage, 105, 104)
-                                   .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png" ,function () {
-                                       console.log('writing final image');
-                                       var attachment = {
-                                           path: "/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png",
-                                           extension: 'png',
-                                           fileName: 'gunasheel'
-                                       };
+                profile.mask(mask, 0, 0)
 
-                                       console.log("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png")
+                    .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function () {
 
-                                       var filetype = (attachment.extension) ? attachment.extension : '';
-                                       var uniqueId = uuid.v4();
-                                       // consol.log()
-                                       aUrl = uniqueId + '.' + filetype;
-                                       console.log(uniqueId);
-                                       aFilename = attachment.fileName;
-                                       // console.log("aFilenameaFilename", aFilename);
-                                       // console.log("req.files.attachment.path", attachment.path);
-                                       // return new Promise(function (resolve, reject) {
-                                       var readStream = fs.createReadStream(attachment.path);
-                                       documnt(aUrl,readStream,results,i,timestamp)
-                                       // console.log(readStream);
+                        Jimp.read("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png", function (err, bdayImage) {
+                            console.log(bdayImage);
+                            bdayImage.resize(180, 180);
 
-                                   
-                                     
-                                   // });
+                            if (err) throw err;
+                            bdayImage.quality(100)
+                            Jimp.loadFont(Jimp.FONT_SANS_64_BLACK).then(function (font) {
+                                lenna.print(font, 68, 850, displayName, 800);
+
+                                lenna.composite(bdayImage, 105, 104)
+                                    .write("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png", function () {
+                                        console.log('writing final image');
+                                        var attachment = {
+                                            path: "/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png",
+                                            extension: 'png',
+                                            fileName: 'gunasheel'
+                                        };
+
+                                        console.log("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png")
+
+                                        var filetype = (attachment.extension) ? attachment.extension : '';
+                                        var uniqueId = uuid.v4();
+                                        // consol.log()
+                                        aUrl = uniqueId + '.' + filetype;
+                                        console.log(uniqueId);
+                                        aFilename = attachment.fileName;
+                                        // console.log("aFilenameaFilename", aFilename);
+                                        // console.log("req.files.attachment.path", attachment.path);
+                                        // return new Promise(function (resolve, reject) {
+                                        var readStream = fs.createReadStream(attachment.path);
+                                        documnt(aUrl, readStream, results, i, timestamp)
+                                        // console.log(readStream);
 
 
 
-                                   });
-                           });
-                       });
-                   });
-           })
-       });
+                                        // });
 
-       //         senderGroupId = results[0][0].senderId;
-       // notifyMessages.getMessagesNeedToNotify();
-       // console.log("Greetings sent successfully")
-   });
+
+
+                                    });
+                            });
+                        });
+                    });
+            })
+        });
+
+        //         senderGroupId = results[0][0].senderId;
+        // notifyMessages.getMessagesNeedToNotify();
+        // console.log("Greetings sent successfully")
+    });
 
 }
 
-function documnt(aUrl,readStream,results,i,timestamp){
+function documnt(aUrl, readStream, results, i, timestamp) {
     uploadDocumentToCloud(aUrl, readStream, function (err) {
         if (!err) {
 
             console.log(aUrl);
             // results[1][i].formDataJSON.CDNPath=aUrl
             fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday_final" + timestamp + ".png");
-            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp  + ".png");
+            fs.unlinkSync("/home/ezeonetalent/ezeone1/api/routes/api/birthday" + timestamp + ".png");
             console.log(i);
-         //    console.log(count);
+            //    console.log(count);
             // console.log(results);
             // console.log(results[1][count]);
             console.log(results[1][i].formDataJSON);
@@ -1081,8 +1110,8 @@ function documnt(aUrl,readStream,results,i,timestamp){
                     // senderGroupId = results[0][0].senderId;
                     notifyMessages.getMessagesNeedToNotify();
                     console.log("Greetings sent successfully");
-                  
-                  
+
+
                     //  resolve(count);
 
                 }
@@ -1102,4 +1131,355 @@ function documnt(aUrl,readStream,results,i,timestamp){
     });
 }
 
+
+function usersList() {
+    var heMasterId = 1000;
+    var proQuery = 'call pace_report_ForEmail_userDetails_peepal(' + heMasterId + ')';
+    console.log(proQuery);
+    db.query(proQuery, function (err, results) {
+        if (!err && results && results[0] && results[0][0]) {
+
+            let userData = results[0];
+            console.log('userData', userData.length);
+
+            let sendEachReport = function (index) {
+                if (index >= userData.length - 1) {
+                    console.log("Completed End");
+                    return;
+                }
+                else {
+                    let userDataIndex = userData[index];
+                    let reportingUserId = userDataIndex.reportingUserId;
+
+                    let fromEmailId = userDataIndex.reportingUserDetails && JSON.parse(userDataIndex.reportingUserDetails) && JSON.parse(userDataIndex.reportingUserDetails).emailId ? JSON.parse(userDataIndex.reportingUserDetails).emailId : "";
+
+                    let toEmailId = userDataIndex.managerDetails && JSON.parse(userDataIndex.managerDetails) && JSON.parse(userDataIndex.managerDetails).emailId ? JSON.parse(userDataIndex.managerDetails).emailId : "";
+
+                    let fromUserName = userDataIndex.reportingUserDetails && JSON.parse(userDataIndex.reportingUserDetails) && JSON.parse(userDataIndex.reportingUserDetails).displayName ? JSON.parse(userDataIndex.reportingUserDetails).displayName : "";
+
+                    let toUserName = userDataIndex.managerDetails && JSON.parse(userDataIndex.managerDetails) && JSON.parse(userDataIndex.managerDetails).displayName ? JSON.parse(userDataIndex.managerDetails).displayName : "";
+                    console.log(fromUserName, fromEmailId);
+
+                    if (fromEmailId != "" && toEmailId != "") {
+                        var reportQuery = 'call pace_report_transactions_peepal(' + heMasterId + ',' + reportingUserId + ')';
+                        console.log(reportQuery);
+                        db.query(reportQuery, function (reportErr, reportData) {
+                            if (!err && reportData && reportData[0]) {
+                                let htmlContent = "";
+                                htmlContent += "<!DOCTYPE html><html><head lang='en'><meta charset='UTF-8'><title></title><body><h2 style='text-align:center;margin-bottom: 0px;'>";
+                                htmlContent += "Daily Report (" + reportData[1][0].todayDate + "): " + fromUserName;
+                                htmlContent += "</h2><br>";
+
+                                if (reportData[0] && reportData[0][0]) {
+                                    htmlContent += '<center><table style="border: 1px solid #ddd;min-width:50%;max-width: 100%;margin-bottom: 20px;border-spacing: 0;border-collapse: collapse;">';
+                                    htmlContent += "<thead><th>SL No.</th>";
+
+                                    for (var i = 0; i < Object.keys(reportData[0][0]).length; i++) {
+                                        htmlContent += '<th style="border-top: 0;border-bottom-width: 2px;border: 1px solid #ddd;vertical-align: bottom;text-align: left;padding: 8px;line-height: 1.42857143;font-family: Verdana,sans-serif;font-size: 15px;">' + Object.keys(reportData[0][0])[i] + '</th>';
+                                    }
+                                    htmlContent += "</thead>";
+
+                                    for (var j = 0; j < reportData[0].length; j++) {
+                                        htmlContent += '<tr><td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + (j + 1) + '</td>';
+                                        for (var i = 0; i < Object.keys(reportData[0][0]).length; i++) {
+                                            htmlContent += '<td style="border: 1px solid #ddd;padding: 8px;line-height: 1.42857143;vertical-align: top;border-top: 1px solid #ddd;">' + reportData[0][j][Object.keys(reportData[0][0])[i]] + '</td>';
+                                        }
+                                        htmlContent += "</tr>";
+                                    }
+                                }
+                                else {
+                                    htmlContent += "<br> <center><h3>NO DATA</h3>";
+                                }
+                                htmlContent += "<table></center></body></html>";
+
+                                // uncomment the below code to generate pdf
+                                // var options = { format: 'A4', width: '16in', height: '8in', border: '0', timeout: 30000, "zoomFactor": "1" };
+                                // let attachmentObjectsList = [];
+                                // htmlpdf.create(htmlContent, options).toBuffer(function (err, buffer) {
+                                //     attachmentObjectsList = [{
+                                //         filename: fromUserName + '.pdf',
+                                //         content: buffer
+
+                                //     }];
+
+                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
+                                var email = new sendgrid.Email();
+                                email.from = fromEmailId;
+                                email.to = toEmailId;
+                                email.subject = "Daily Report (" + reportData[1][0].todayDate + "): " + fromUserName;
+                                email.html = htmlContent;
+                                // email.cc = mailOptions.cc;
+                                // email.bcc = mailOptions.bcc;
+
+                                //if 1 or more attachments are present
+                                // email.addFile({
+                                //     filename: attachmentObjectsList[0].filename,
+                                //     content: attachmentObjectsList[0].content,
+                                //     contentType: "application/pdf"
+                                // });
+
+                                sendgrid.send(email, function (err, results) {
+                                    if (err) {
+                                        console.log("mail not sent", err);
+                                        console.log('mail not sent ' + index);
+                                        sendEachReport(++index);
+                                    }
+                                    else {
+                                        console.log('Mail sent successfully, plus plus index');
+                                        console.log('Success ' + index);
+                                        sendEachReport(++index);
+                                    }
+                                });
+                                // });  //generate pdf
+                            }
+                            else if (!err) {
+                                console.log('No transactions found ' + index);
+                                sendEachReport(++index);
+                            }
+                            else {
+                                console.log('reportErr', reportErr);
+                                console.log('DB Error ' + index);
+                                sendEachReport(++index);
+                            }
+                        });
+                    }
+                    else {
+                        console.log('No fromEmailId or toEmailId' + index);
+                        sendEachReport(++index);
+                    }
+
+                }
+
+            }
+            sendEachReport(0);
+        }
+        else if (!err) {
+            console.log('No reporting managers!');
+        }
+        else {
+            console.log('DB error', err);
+        }
+
+    });
+}
+
+// walk in integration with jobraiser
+var cluster = require('cluster');
+if (cluster.isWorker) {
+    console.log("Report ", cluster.worker.id);
+    if (cluster.worker.id == 1) {
+        cron.schedule('00 23 * * *', function () {
+            console.log("Pace report cron Running at 11 PM IST !!");
+            usersList();
+        });
+    }
+}
+
+
+var cluster = require('cluster');
+if (cluster.isWorker) {
+    if (cluster.worker.id == 1) {
+        var task = cron.schedule('*/2 * * * *', () => {
+            console.log('running walkin for jobraiser');
+
+            db.query('call wm_integrationUrlwalkInForJobRaiser()', function (err, result) {
+                console.log(err);
+                if (result && result[0] && result[0][0] && result[0][0].url && result[1] && result[1][0] && result[1][0].transId && result[1][0].formData) {
+                    var url = result[0][0].url;
+                    var fd = JSON.parse(result[1][0].formData);
+                    var transId1 = result[1][0].transId;
+
+                    request({
+                        url: url,
+                        method: "POST",
+                        json: true,
+                        body: fd
+                    }, function (error, response, body) {
+                        console.log("Jobraiser body", body);
+                        if (!error && body && body.Code && ((body.Code == "Saved") || body.RID || (body.Code == "INFO_01") || (body.Code == "INFO_02") || (body.Code == "ERR_01") || (body.Code == "ERR_01") || (body.Code == "ERR_02"))) {
+                            console.log(body);
+
+                            if ((body.Code == "Saved") || (body.Code == "INFO_01") || (body.Code == "INFO_02")) {
+                                var updateQuery = "update 1039_trans set sync=1, Rid=" + body.RID + " where heParentId=" + transId1
+                                    ;
+                                db.query(updateQuery, function (err, results) {
+                                    if (err) {
+                                        console.log("update sync query throws error");
+                                    }
+                                    else {
+                                        console.log(body.Code);
+
+                                    }
+                                    console.log("sync is updated to 1 successfully of transId", transId1);
+
+                                });
+                            }
+                            else {
+                                var updateQuery = "update 1039_trans set sync=2, Rid=" + body.RID || 0 + " where heParentId=" + transId1
+                                    ;
+                                db.query(updateQuery, function (err, results) {
+                                    if (err) {
+                                        console.log("update sync query throws error", err);
+                                    }
+                                    else {
+                                        console.log(body.Code);
+                                    }
+                                    console.log("sync is updated to 2 successfully because an error occured", transId1);
+
+                                });
+                            }
+
+                        }
+
+                    })
+
+                }
+                else {
+                    console.log("some error occured");
+                }
+            });
+        }, {
+            scheduled: true,
+        }
+        );
+        task.start();
+    }
+}
+
+
+// omgi interview sms scheduler
+var cluster = require('cluster');
+if (cluster.isWorker) {
+    if (cluster.worker.id == 1) {
+        var interviewScheduleTask = cron.schedule('00 07 * * *', () => {
+            console.log('running a task everyday at 7 AM');
+
+            db.query('call pace_get_scheduleDailyInterviewSms()', function (err, result) {
+                try {
+                    var arr = result[0].length;
+                    var i = 0;
+                    function interviewApplicants(i) {
+                        if (i < arr) {
+                            if (result && result[0] && result[0][i]) {
+                                try {
+                                    let HEPId = result[0][i].HEParentId;
+                                    var mobileNo = result[0][i].mobileNumber && result[0][i].mobileNumber != 'null' && result[0][i].mobileNumber != null ? result[0][i].mobileNumber : '';
+                                    var heMasterId = result[0][i].heMasterId;
+                                    var mailerType = result[0][i].mailerType;
+                                    var status = result[0][i].status;
+                                    var mobileISD = result[0][i].mobileISD && result[0][i].mobileISD != 'null' && result[0][i].mobileISD != null ? result[0][i].mobileISD : '+91';
+                                    var reqAppId = result[0][i].reqAppId;
+                                    var tags = result[0][i].tags ? JSON.parse(result[0][i].tags) : {};
+                                    var applicantTags = tags.applicant ? tags.applicant : [];
+                                    var interviewTags = tags.interview ? tags.interview : [];
+                                    var requirementTags = tags.requirement ? tags.requirement : [];
+                                    var sms = result[0][i].smsMsg ? result[0][i].smsMsg : '';
+                                    var smsSenderId = result[0][i].smsSenderId ? result[0][i].smsSenderId : 'PACHCM';
+
+                                    if (mobileNo && mobileNo != '' && sms && sms != '') {
+
+                                        for (var a = 0; a < applicantTags.length; a++) {
+                                            if ((result[0][i][applicantTags[a].tagName] && result[0][i][applicantTags[a].tagName] != null && result[0][i][applicantTags[a].tagName] != 'null') || result[0][i][applicantTags[a].tagName] >= 0)
+                                                sms = sms.replace('[applicant.' + applicantTags[a].tagName + ']', result[0][i][applicantTags[a].tagName]);
+                                        }
+
+                                        for (var a = 0; a < interviewTags.length; a++) {
+                                            if ((result[0][i][interviewTags[a].tagName] && result[0][i][interviewTags[a].tagName] != null && result[0][i][interviewTags[a].tagName] != 'null') || result[0][i][interviewTags[a].tagName] >= 0)
+                                                sms = sms.replace('[interview.' + interviewTags[a].tagName + ']', result[0][i][interviewTags[a].tagName]);
+                                        }
+
+                                        for (var a = 0; a < requirementTags.length; a++) {
+                                            if ((result[0][i][requirementTags[a].tagName] && result[0][i][requirementTags[a].tagName] != null && result[0][i][requirementTags[a].tagName] != 'null') || result[0][i][requirementTags[a].tagName] >= 0)
+                                                sms = sms.replace('[requirement.' + requirementTags[a].tagName + ']', result[0][i][requirementTags[a].tagName]);
+                                        }
+
+                                        request({
+                                            url: 'https://aikonsms.co.in/control/smsapi.php',
+                                            qs: {
+                                                user_name: 'janardana@hirecraft.com',
+                                                password: 'Ezeid2015',
+                                                sender_id: smsSenderId,
+                                                service: 'TRANS',
+                                                mobile_no: mobileNo,
+                                                message: sms,
+                                                method: 'send_sms'
+                                            },
+                                            method: 'GET'
+                                        },
+                                            function (error, response, body) {
+                                                try {
+                                                    if (error) {
+                                                        console.log("error while sending sms");
+                                                        interviewApplicants(i + 1);
+                                                    }
+                                                    else {
+                                                        var inputs = [
+                                                            db.escape(heMasterId),
+                                                            db.escape(mobileNo),
+                                                            db.escape(mobileISD),
+                                                            db.escape(sms),
+                                                            db.escape(status),
+                                                            db.escape(reqAppId),
+                                                            db.escape(mailerType),
+                                                            db.escape(HEPId)
+                                                        ]
+
+                                                        var procQuery = 'CALL pace_save_sentSmsHistory_InterviewSchedule( ' + inputs.join(',') + ')';
+
+                                                        db.query(procQuery, function (err, result) {
+                                                            if (err) {
+                                                                console.log("error while saving data");
+                                                            }
+                                                            else {
+                                                                console.log("sms sent and saved successfully" + JSON.stringify(result));
+                                                            }
+                                                        });
+                                                        return interviewApplicants(i + 1);
+                                                    }
+                                                } catch (ex) {
+                                                    console.log('exception', ex);
+                                                    return interviewApplicants(i + 1)
+                                                }
+                                            })
+                                    } else {
+                                        console.log('mobile number or sms content is not present ', mobileNo, ' sms ', smsMsg);
+                                        return interviewApplicants(i + 1);
+                                    }
+                                } catch (ex) {
+                                    console.log('exception', ex);
+                                    return interviewApplicants(i + 1)
+                                }
+                            }
+                        }
+                    }
+                    return interviewApplicants(0);
+                } catch (ex) {
+                    console.log('beginning excpetion', ex);
+                }
+            });
+        }, {
+            scheduled: true
+        });
+        interviewScheduleTask.start();
+    }
+}
+
+
+var cluster = require('cluster');
+if (cluster.isWorker) {
+    if (cluster.worker.id == 1) {
+        var paceNotification = cron.schedule('30 07 * * *', () => {
+            console.log('running a task everyday interview and followup reminders');
+
+            db.query('call pace_notificationReminders()', function (err, result) {
+                console.log("err",err);
+            });
+        }, {
+            scheduled: true,
+            start: false,
+            timeZone: 'Asia/Calcutta'
+        });
+        paceNotification.start();
+    }
+}
 module.exports = router;

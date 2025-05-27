@@ -638,22 +638,23 @@ LoginCtrl.getAttendanceRequestList = function (req, res, next) {
         req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
                 req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
-                    req.st.db.escape(req.query.status),
+                    req.st.db.escape(req.query.status || 0),
                     req.st.db.escape(req.query.startDate),
                     req.st.db.escape(req.query.endDate),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(tokenResult[0].masterid),
-                    req.st.db.escape(DBSecretKey)
-
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(JSON.stringify(req.body.rmGroupId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.workLocationId || [])),
+                    req.st.db.escape(req.body.exportALL || 0)
                 ];
                 /**
                  * Calling procedure to save form template
@@ -725,21 +726,24 @@ LoginCtrl.getLeaveRegister = function (req, res, next) {
         req.st.validateHEToken(req.query.APIKey, req.query.EZEOneId, req.query.password, req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                req.query.status = req.query.status ? req.query.status : 0;
                 req.query.startDate = req.query.startDate ? req.query.startDate : null;
                 req.query.endDate = req.query.endDate ? req.query.endDate : null;
                 req.query.pageNo = (req.query.pageNo) ? (req.query.pageNo) : 1;
                 req.query.limit = (req.query.limit) ? (req.query.limit) : 100;
 
                 var procParams = [
-                    req.st.db.escape(req.query.status),
+                    req.st.db.escape(req.query.status || 0),
                     req.st.db.escape(req.query.startDate),
                     req.st.db.escape(req.query.endDate),
                     req.st.db.escape(req.query.APIKey),
                     req.st.db.escape(req.query.pageNo),
                     req.st.db.escape(req.query.limit),
                     req.st.db.escape(tokenResult[0].masterid),
-                    req.st.db.escape(DBSecretKey)
+                    req.st.db.escape(DBSecretKey),
+                    req.st.db.escape(JSON.stringify(req.body.rmGroupId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.workLocationId || [])),
+                    req.st.db.escape(req.body.exportALL || 0)
+
                 ];
                 /**
                  * Calling procedure to save form template
@@ -942,8 +946,8 @@ LoginCtrl.getTravelClaim = function (req, res, next) {
                         response.message = "Data loaded successfully";
                         response.error = null;
                         response.data = {
-                            travelClaim : [],
-                            count : 0
+                            travelClaim: [],
+                            count: 0
                         };
                         res.status(200).json(response);
                     }
@@ -1176,8 +1180,11 @@ LoginCtrl.getAttendanceRegister = function (req, res, next) {
                     req.st.db.escape(req.query.workLocationIds),
                     req.st.db.escape(DBSecretKey),
                     req.st.db.escape(req.query.keywords || ""),
-                    req.st.db.escape(req.query.exportAll || 0)
-
+                    req.st.db.escape(req.query.exportAll || 0),
+                    req.st.db.escape(JSON.stringify(req.body.rmGroupId || [])),
+                    req.st.db.escape(JSON.stringify(req.body.workLocationId || [])),
+                    req.st.db.escape(req.query.startDate || null),
+                    req.st.db.escape(req.query.endDate || null)
                 ];
 
                 var procQuery = 'CALL WhatMate_get_attendanceRegister( ' + procParams.join(',') + ')';
@@ -1189,8 +1196,10 @@ LoginCtrl.getAttendanceRegister = function (req, res, next) {
                         response.message = "attendance register loaded successfully";
                         response.error = null;
                         response.data = {
-                            attendanceRegister: attendanceRegister[0],
-                            count: attendanceRegister[1][0].count
+                            attendanceRegister: attendanceRegister[0] ? attendanceRegister[0] : [],
+                            count: attendanceRegister[1] && attendanceRegister[1][0] && attendanceRegister[1][0].count ? attendanceRegister[1][0].count : 0,
+                            detailAttendance: attendanceRegister[2] ? attendanceRegister[2] : [],
+                            detailAttendanceCount: attendanceRegister[3] && attendanceRegister[3][0] && attendanceRegister[3][0].count ? attendanceRegister[3][0].count : 0
                         };
                         res.status(200).json(response);
                     }
@@ -2067,7 +2076,7 @@ LoginCtrl.getClaimDetails = function (req, res, next) {
 
                         response.data = {
                             claimDetails: result[0] && result[0][0] ? result[0] : [],
-                            enableRefNumber : result[1][0] ? result[1][0].enableRefNumber : 0
+                            enableRefNumber: result[1][0] ? result[1][0].enableRefNumber : 0
                         }
 
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2082,7 +2091,7 @@ LoginCtrl.getClaimDetails = function (req, res, next) {
                         response.message = "No data found";
                         response.error = null;
                         response.data = {
-                            claimDetails : []
+                            claimDetails: []
                         };
                         res.status(200).json(response);
                     }
@@ -2189,12 +2198,12 @@ LoginCtrl.updateExpenseClaimTransactionData = function (req, res, next) {
 
                         notifyMessages.getMessagesNeedToNotify();
 
-                        
+
                         response.data = {
                             details: result[0] && result[0][0] ? result[0][0] : null
                         }
                         response.data.expenseList = result[1] && result[1][0] ? result[1] : []
-                        enableRefNumber : result[2][0] ? result[2][0].enableRefNumber : 0
+                        enableRefNumber: result[2][0] ? result[2][0].enableRefNumber : 0
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         // zlib.gzip(buf, function (_, result) {
                         //     response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
@@ -2207,7 +2216,7 @@ LoginCtrl.updateExpenseClaimTransactionData = function (req, res, next) {
                         response.message = "No data found";
                         response.error = null;
                         response.data = {
-                            details : []
+                            details: []
                         };
                         res.status(200).json(response);
                     }
@@ -2294,7 +2303,7 @@ LoginCtrl.saveExpenseTypes = function (req, res, next) {
 
                         response.data = {
                             expenseTypeList: result[0] && result[0][0] ? result[0] : [],
-                            configData : result[1][0]
+                            configData: result[1][0]
                         }
 
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2309,7 +2318,7 @@ LoginCtrl.saveExpenseTypes = function (req, res, next) {
                         response.message = "No data found";
                         response.error = null;
                         response.data = {
-                            expenseTypeList : []
+                            expenseTypeList: []
                         };
                         res.status(200).json(response);
                     }
@@ -2386,7 +2395,7 @@ LoginCtrl.getExpenseTypes = function (req, res, next) {
 
                         response.data = {
                             expenseTypeList: result[0] && result[0][0] ? result[0] : [],
-                            configData : result[1][0]
+                            configData: result[1][0]
                         }
 
                         // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2401,7 +2410,7 @@ LoginCtrl.getExpenseTypes = function (req, res, next) {
                         response.message = "No data found";
                         response.error = null;
                         response.data = {
-                            expenseTypeList : []
+                            expenseTypeList: []
                         };
                         res.status(200).json(response);
                     }

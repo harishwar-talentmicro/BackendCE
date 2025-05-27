@@ -42,11 +42,11 @@ var mailerApi = new Mailer();
 var randomstring = require("randomstring");
 
 try {
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcryptjs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcrypt');
 }
 
 signupCtrl.sendOtp = function (req, res, next) {
@@ -137,39 +137,42 @@ signupCtrl.sendOtp = function (req, res, next) {
                             method: 'GET'
 
                         }, function (error, response, body) {
+                            console.log(error, "SMS then try with smsGateway service if one fails");
+
                             if (error) {
                                 console.log(error, "SMS then try with smsGateway service if one fails");
-                                var req = http.request(options, function (res) {
-                                    var chunks = [];
-        
-                                    res.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                        console.log("smsgateway service");
-                                    });
-        
-                                    res.on("end", function () {
-                                        var body = Buffer.concat(chunks);
-                                        console.log(body.toString());
-                                    });
-                                });
-        
-                                req.write(qs.stringify({
-                                    userId: 'talentmicro',
-                                    password: 'TalentMicro@123',
-                                    senderId: 'WTMATE',
-                                    sendMethod: 'simpleMsg',
-                                    msgType: 'text',
-                                    mobile: isdMobile.replace("+", "") + mobileNo,
-                                    msg: message,
-                                    duplicateCheck: 'true',
-                                    format: 'json'
-                                }));
-                                req.end();
                             }
                             else {
                                 console.log("SUCCESS aikon sms service", "SMS response");
                             }
                         });
+                        
+                        var req = http.request(options, function (res) {
+                            var chunks = [];
+
+                            res.on("data", function (chunk) {
+                                chunks.push(chunk);
+                                console.log("smsgateway service");
+                            });
+
+                            res.on("end", function () {
+                                var body = Buffer.concat(chunks);
+                                console.log(body.toString());
+                            });
+                        });
+
+                        req.write(qs.stringify({
+                            userId: 'talentmicro',
+                            password: 'TalentMicro@123',
+                            senderId: 'WTMATE',
+                            sendMethod: 'simpleMsg',
+                            msgType: 'text',
+                            mobile: isdMobile.replace("+", "") + mobileNo,
+                            msg: message,
+                            duplicateCheck: 'true',
+                            format: 'json'
+                        }));
+                        req.end();
 
                     }
                     else if (isdMobile != "") {

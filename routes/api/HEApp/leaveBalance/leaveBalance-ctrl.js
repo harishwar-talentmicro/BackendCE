@@ -225,7 +225,8 @@ leaveBalanceCtrl.getLeaveBalance = function(req,res,next){
                         var leaveTypes = JSON.parse(results[0][0].leaveJSON);
                         response.data = {
                             leaveTypes : JSON.parse(leaveTypes["leaveTypes"]),
-                            totalLeaves : leaveTypes["totalLeaves"]
+                            totalLeaves : leaveTypes["totalLeaves"],
+                            companyConfig: results[1] && results[1][0] ? results[1][0] : null
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {

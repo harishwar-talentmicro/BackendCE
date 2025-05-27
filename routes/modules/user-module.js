@@ -61,11 +61,11 @@ function FnEncryptPassword(Password) {
 var bcrypt = null;
 
 try {
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcryptjs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcrypt');
 }
 
 /**
@@ -521,6 +521,8 @@ User.prototype.getUserDetails = function (req, res, next) {
                 //console.log(Result);
                 if (!err) {
                     if (tokenResult) {
+                        console.log('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')');
+
                         st.db.query('CALL pGetEZEIDDetails(' + st.db.escape(Token) + ',' + st.db.escape(DBSecretKey) + ',' + st.db.escape(APNSID) + ',' + st.db.escape(GCMID) + ',' + st.db.escape(isDialer) + ')', function (err, UserDetailsResult) {
                             console.log(err);
                             if (!err) {
@@ -536,7 +538,7 @@ User.prototype.getUserDetails = function (req, res, next) {
                                         for (var i = 0; i < UserDetailsResult[1].length; i++) {
                                             UserDetailsResult[1][i].trackTemplateDetails = UserDetailsResult[1][i] && UserDetailsResult[1][i].trackTemplateDetails ? JSON.parse(UserDetailsResult[1][i].trackTemplateDetails) : [];
                                         }
-                                        console.log('user details', UserDetailsResult[1][0]);
+                                        // console.log('user details', UserDetailsResult[1][0]);
 
                                         UserDetailsResult[0][0].companyDetails = UserDetailsResult[1][0] ? UserDetailsResult[1][0] : {}
                                         res.send(UserDetailsResult[0]);

@@ -12,6 +12,7 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var http = require('https');
 var path = require('path');
+var htmlpdf = require('html-pdf');
 
 var request = require('request');
 var zlib = require('zlib');
@@ -47,6 +48,7 @@ var options = {
 var paceUsersCtrl = {};
 var error = {};
 var bcrypt = null;
+
 
 // try {
 //     bcrypt = require('bcrypt-nodejs');
@@ -89,6 +91,16 @@ var bcrypt = null;
 //     }
 //     return bcrypt.compareSync(password, hash);
 // }
+
+
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function replaceAll(mailStrBody, tagTerm, replaceFromResult) {
+    return mailStrBody.replace(new RegExp(escapeRegExp(tagTerm), 'g'), replaceFromResult);
+}
+
 
 paceUsersCtrl.checkUser = function (req, res, next) {
     var response = {
@@ -309,6 +321,8 @@ paceUsersCtrl.getUsers = function (req, res, next) {
                             result[0][0].branch = (result[0][0].branch && JSON.parse(result[0][0].branch).branchId) ? JSON.parse(result[0][0].branch) : {};
 
                             result[0][0].grade = (result[0][0].grade && JSON.parse(result[0][0].grade).gradeId) ? JSON.parse(result[0][0].grade) : {};
+
+                            result[0][0].longSignFile = result[0][0].longSignFile && JSON.parse(result[0][0].longSignFile) ? JSON.parse(result[0][0].longSignFile) : {};
                         }
 
                         response.data = {
@@ -554,10 +568,10 @@ paceUsersCtrl.getTaskPlanner = function (req, res, next) {
 
                         }
                         response.data =
-                            {
-                                pendingTasks: result[0],
-                                tasks: result[1]
-                            };
+                        {
+                            pendingTasks: result[0],
+                            tasks: result[1]
+                        };
                         console.log('secretKey', tokenResult[0].secretKey);
                         if (tokenResult[0] && tokenResult[0].secretKey && tokenResult[0].secretKey != null) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1543,9 +1557,14 @@ paceUsersCtrl.getJobPortalUsers = function (req, res, next) {
                         response.error = null;
                         response.data = {
                             portalUsersList: [],
-                            jobPortalList: []
+                            jobPortalList: [],
+                            DAD: 0
                         };
-                        res.status(200).json(response);
+                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        zlib.gzip(buf, function (_, result) {
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            res.status(200).json(response);
+                        });
                     }
                     else {
                         response.status = false;
@@ -3140,7 +3159,6 @@ paceUsersCtrl.sendApplicantInfoAsNotification = function (req, res, next) {
                                     respMsg.message = 'Please login to whatmate in mobile to receive details';
                                     respMsg.data = null;
                                     res.status(200).json(respMsg);
-
                                 }
                                 else if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].loggedInWhatmateUser) {
 
@@ -3735,5 +3753,775 @@ paceUsersCtrl.loginoutReport = function (req, res, next) {
     }
 };
 
+paceUsersCtrl.notifyApplicantDataForTallint = function (req, res, next) {
+
+    var validationFlag = true;
+    var status = true, error = {};
+    var respMsg = {
+        status: false,
+        message: '',
+        data: null,
+        error: null
+    };
+
+    if (!req.query.applicant_mobile_number) {
+        error['applicant_mobile_number'] = 'applicant_mobile_number is mandatory';
+        status *= false;
+    }
+
+    if (!req.query.applicant_name) {
+        error['applicant_name'] = 'applicant_name is mandatory';
+        status *= false;
+    }
+
+    if (!req.query.user_mobile_number) {
+        error['user_mobile_number'] = 'user_mobile_number is mandatory';
+        status *= false;
+    }
+
+    // if (!req.query.user_mobile_isd) {
+    //     error['user_mobile_isd'] = 'user_mobile_isd is mandatory';
+    //     status *= false;
+    // }
+
+    if (status) {
+        try {
+            if (!validationFlag) {
+                response.error = error;
+                response.message = 'Please check the errors';
+                res.status(400).json(response);
+                console.log(response);
+            }
+            else {
+
+                var message = "";
+                try {
+                    message = req.query.applicant_name + ", " + (req.query.applicant_mobile_isd || '') + req.query.applicant_mobile_number;
+                    message = "Contact details: " + message + " --TALLINT REFERRAL";
+                } catch (ex) {
+                    console.log(ex)
+                }
+                console.log(message);
+
+
+                var query = [
+                    req.st.db.escape(req.query.user_mobile_number),
+                    req.st.db.escape(req.query.user_mobile_isd),
+                    req.st.db.escape(message),
+                    req.st.db.escape(DBSecretKey)
+                ];
+
+                console.log('CALL pace_notifyApplicantInfo_forTallint(' + query.join(',') + ')');
+                req.st.db.query('CALL pace_notifyApplicantInfo_forTallint(' + query.join(',') + ')', function (err, userResult) {
+                    console.log("error", err);
+                    // console.log(userResult)
+                    if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].mobile) {
+
+                        if (userResult[0][0].isd && userResult[0][0].mobile) {
+                            if (userResult[0][0].isd == "+977") {
+                                request({
+                                    url: 'http://beta.thesmscentral.com/api/v3/sms?',
+                                    qs: {
+                                        token: 'TIGh7m1bBxtBf90T393QJyvoLUEati2FfXF',
+                                        to: userResult[0][0].mobile,
+                                        message: message,
+                                        sender: 'Techingen'
+                                    },
+                                    method: 'GET'
+
+                                }, function (error, response, body) {
+                                    if (error) {
+                                        console.log(error, "SMS");
+                                    }
+                                    else {
+                                        console.log("SUCCESS", "SMS response");
+                                    }
+
+                                });
+                            }
+                            else if (userResult[0][0].isd == "+91") {
+                                var req = http.request(options, function (res) {
+                                    var chunks = [];
+
+                                    res.on("data", function (chunk) {
+                                        chunks.push(chunk);
+                                    });
+
+                                    res.on("end", function () {
+                                        var body = Buffer.concat(chunks);
+                                        console.log(body.toString());
+                                    });
+                                });
+
+                                req.write(qs.stringify({
+                                    userId: 'talentmicro',
+                                    password: 'TalentMicro@123',
+                                    senderId: 'WTMATE',
+                                    sendMethod: 'simpleMsg',
+                                    msgType: 'text',
+                                    mobile: userResult[0][0].isd.replace("+", "") + userResult[0][0].mobile,
+                                    msg: message,
+                                    duplicateCheck: 'true',
+                                    format: 'json'
+                                }));
+                                req.end();
+                            }
+                            else if (userResult[0][0].isd != "") {
+                                client.messages.create(
+                                    {
+                                        body: message,
+                                        to: userResult[0][0].isd + userResult[0][0].mobile,
+                                        from: FromNumber
+                                    },
+                                    function (error, response) {
+                                        if (error) {
+                                            console.log(error, "SMS");
+                                        }
+                                        else {
+                                            console.log("SUCCESS", "SMS response");
+                                        }
+                                    }
+                                );
+                            }
+                        }
+                        respMsg.status = true;
+                        respMsg.message = 'Sms Sent Succefully';
+                        respMsg.data = null;
+                        res.status(200).json(respMsg);
+                    }
+                    else if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0].loggedInWhatmateUser) {
+
+                        notifyMessages.getMessagesNeedToNotify();
+                        respMsg.status = true;
+                        respMsg.message = "Details sent to whatmate";
+                        respMsg.data = null;
+                        res.status(200).json(respMsg);
+                    }
+                    else if (!err && userResult && userResult[0] && userResult[0][0] && userResult[0][0]._error) {
+                        respMsg.status = false;
+                        respMsg.message = userResult[0][0]._error;
+                        respMsg.data = null;
+                        res.status(200).json(respMsg);
+                    }
+                    else {
+                        respMsg.status = false;
+                        respMsg.message = 'Something went wrong';
+                        res.status(500).json(respMsg);
+                    }
+                });
+            }
+
+        }
+        catch (ex) {
+            console.log(ex);
+            var errorDate = new Date();
+            console.log(errorDate.toTimeString() + ' ......... error ...........');
+            respMsg.error = { server: 'Internal Server Error' };
+            respMsg.message = 'An error occurred ! Please try again';
+            res.status(400).json(respMsg);
+        }
+    }
+    else {
+        respMsg.error = error;
+        respMsg.message = 'Invalid Inputs';
+        res.status(400).json(respMsg);
+    }
+};
+
+
+paceUsersCtrl.paceadvancedReports = function (req, res, next) {
+    try {
+        var error_logger = {
+            details: 'dataMigration.paceadvancedReports'
+        }
+
+        var error_response = {
+            status: false,
+            message: "Some error occurred!",
+            error: null,
+            data: null
+        }
+        var response = {
+            status: false,
+            message: "Invalid Token",
+            data: null,
+            error: null
+        };
+        var validationFlag = true;
+        if (!req.query.token) {
+            error.token = 'Invalid token';
+            validationFlag *= false;
+        }
+        if (!req.query.heMasterId) {
+            error.heMasterId = 'Invalid company';
+            validationFlag *= false;
+        }
+
+        if (!validationFlag) {
+            response.error = error;
+            response.message = 'Please check the errors';
+            res.status(400).json(response);
+            console.log(response);
+        }
+        else {
+            req.st.validateToken(req.query.token, function (err, tokenResult) {
+                try {
+                    if ((!err) && tokenResult) {
+                        req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+                        var inputs = [
+                            req.st.db.escape(req.query.token),
+                            req.st.db.escape(req.query.heMasterId),
+                            req.st.db.escape(req.body.type || 2),
+                            req.st.db.escape(req.body.from),
+                            req.st.db.escape(req.body.to),
+                            req.st.db.escape(JSON.stringify(req.body.reportType || [])),
+                            req.st.db.escape(JSON.stringify(req.body.client || [])),
+                            req.st.db.escape(JSON.stringify(req.body.requirement || [])),
+                            req.st.db.escape(JSON.stringify(req.body.recruiterType || [])),
+                            req.st.db.escape(req.body.startPage || 1),
+                            req.st.db.escape(req.body.limit || 500),
+                            req.st.db.escape(req.body.isExport || 0),
+                            req.st.db.escape(req.body.customRange || 0),
+                            req.st.db.escape(JSON.stringify(req.body.branchList || []))
+                        ];
+
+                        var procQuery = 'CALL pace_get_AdvanceReports( ' + inputs.join(',') + ')';
+                        console.log(procQuery);
+                        req.db.query(procQuery, function (err, result) {
+                            try {
+                                console.log(err);
+                                if (!err && result) {
+                                    response.status = true;
+                                    response.message = "Data loaded successfully";
+                                    response.error = null;
+                                    response.data = {
+                                        reportData: result[0] && result[0][0] ? result[0] : [],
+                                        count: result[1] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                                    }
+
+                                    if (req.query.isWeb == 0) {
+                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        zlib.gzip(buf, function (_, result) {
+                                            try {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            }
+                                            catch (ex) {
+                                                console.log(ex);
+                                                error_logger.error = ex;
+                                                logger(req, error_logger);
+                                                res.status(500).json(error_response);
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        res.status(200).json(response);
+                                    }
+                                }
+                                else if (!err) {
+                                    response.status = true;
+                                    response.message = "no results found";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(200).json(response);
+                                }
+                                else {
+                                    response.status = false;
+                                    response.message = "Error while getting data";
+                                    response.error = null;
+                                    response.data = null;
+                                    res.status(500).json(response);
+                                }
+                            }
+                            catch (ex) {
+                                console.log(ex);
+                                error_logger.error = ex;
+                                logger(req, error_logger);
+                                res.status(500).json(error_response);
+                            }
+                        });
+                    }
+                    else {
+                        res.status(401).json(response);
+                    }
+                }
+                catch (ex) {
+                    console.log(ex);
+                    error_logger.error = ex;
+                    logger(req, error_logger);
+                    res.status(500).json(error_response);
+                }
+            });
+        }
+    }
+
+    catch (ex) {
+        console.log(ex);
+        error_logger.error = ex;
+        logger(req, error_logger);
+        res.status(500).json(error_response);
+    }
+};
+
+
+paceUsersCtrl.validateCvParserExtensionUser = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    // if (!req.body.tallintDuplicateCheckURL) {
+    //     error.tallintDuplicateCheckURL = 'Invalid duplicate check url';
+    //     validationFlag *= false;
+    // }
+
+    // if (!req.body.tallintURL) {
+    //     error.tallintURL = 'Invalid Resume save url';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+
+        var inputs = [
+            req.st.db.escape(req.body.tallintDuplicateCheckURL),  // duplicateCheckApiUrl
+            req.st.db.escape(req.body.tallintURL)  // saveResumeApiUrl
+        ];
+
+        var procQuery = 'CALL pace_get_cvParserExtensionUserValidation( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            if (!err && result) {
+
+                if (result[0][0] && result[0][0].valid && result[0][0].valid > 0) {
+                    response.status = true;
+                    response.message = "Success";
+                } else {
+                    response.status = false;
+                    response.message = "Invalid User";
+                }
+
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while getting tips";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
+
+paceUsersCtrl.evaluationCopyForTallint = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid client",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.query.client) {
+        error.client = 'Invalid Client';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+
+        var inputs = [
+            req.st.db.escape(req.query.client)
+        ];
+
+        var procQuery = 'CALL pace_get_EvaluationCopy( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            if (!err && result) {
+
+                if (result[0][0] && result[0][0].valid && result[0][0].valid > 0) {
+                    response.status = true;
+                    response.message = "Success";
+                }
+                else {
+                    response.status = false;
+                    response.message = "Invalid Client";
+                }
+
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Something went wrong";
+                response.error = null;
+                response.data = err && err.toString() ? err.toString() : null;
+                res.status(500).json(response);
+            }
+        });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
+
+paceUsersCtrl.resumeParser = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid Resume",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+
+
+        var formData = {
+            attachment: fs.createReadStream(req.files.attachment.path),
+        };
+        request.post({
+            url: 'https://dms.tallint.com/parsing/version10/parsing?IsEmployment=false',   // old one 182.74.145.171 
+            formData: formData,
+            'content-type': 'multipart/form-data; boundary=something'
+        }, function (err, httpResponse, body) {
+            console.log(err)
+            try {
+                if (!err && body) {
+                    res.json(JSON.parse(body));
+                } else {
+                    res.status(500).send(err.toString());
+                }
+            } catch (ex) {
+                console.log(ex);
+            }
+        });
+
+
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
+
+paceUsersCtrl.htmltoPdf = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid Resume",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!req.body.htmlData) {
+        error.htmlData = 'Invalid htmlData';
+        validationFlag *= false;
+    }
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+
+        var format = req.body.format || 'A4';
+        var width = req.body.width || '8in';
+        var height = req.body.height || '10.5in';
+        var border = req.body.border || '30';
+        var timeout = req.body.timeout || 30000;
+        var zoomFactor = req.body.zoomFactor || "0.5";
+        var footer = req.body.footer
+
+        var options = {
+            format: format,
+            width: width,
+            height: height,
+            border: border,
+            timeout: timeout,
+            zoomFactor: zoomFactor,
+            footer: footer
+        };
+
+        console.log(options);
+        htmlpdf.create(req.body.htmlData, options).toBuffer(function (err, buffer) {
+            try {
+                if (!err) {
+                    response.status = true;
+                    response.message = "Converted to Pdf successfully";
+                    response.data = {
+                        pdfBaseData: buffer && buffer.toString('base64') ? buffer.toString('base64') : ""
+                    }
+                    res.status(200).json(response);
+                } else {
+                    response.status = true;
+                    response.message = "Failed";
+                    response.data = null;
+                    response.error = err;
+                    res.status(200).json(response);
+                }
+            } catch (ex) {
+                console.log("html to pdf", ex);
+                response.status = false;
+                response.error = ex;
+                res.status(200).json(response);
+            }
+        });
+
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+};
+
+
+var htmlstyle = '<html><style> body {font-family: Calibri;font-size: 10px;text-align: justify;} </style><body>';
+var endBody = '</body>';
+paceUsersCtrl.docToPdf = function (req, res, next) {
+
+    var document = req.body.document || "";
+    var key = req.body.key;
+    var data = req.body.data;
+
+
+    var response = {
+        status: false,
+        message: "Invalid Resume",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    var path = require('path');
+    var mammoth = require("mammoth");
+
+
+    var file_name = Date.now();
+    fs.writeFile(path.resolve(__dirname, file_name + ".docx"), document, 'base64', function (err) {
+        console.log(err);
+        // var content = fs.readFileSync(path.resolve(__dirname, "offerDoc.docx"));
+
+        mammoth.convertToHtml({ path: path.resolve(__dirname, file_name + ".docx") })
+            .then(function (result) {
+                // var html = result.value; // The generated HTML
+                var html = htmlstyle + result.value + endBody; // The generated HTML
+                var messages = result.messages; // Any messages, such as warnings during conversion
+
+                for (var keyIndex = 0; keyIndex < key.length; keyIndex++) {
+                    html = replaceAll(html, '[' + key[keyIndex] + ']', data[keyIndex])
+                }
+
+                var format = req.body.format || 'A4';
+                var width = req.body.width || '8in';
+                var height = req.body.height || '10.5in';
+                var border = req.body.border || '30';
+                var timeout = req.body.timeout || 30000;
+                var zoomFactor = req.body.zoomFactor || "0.5";
+                var footer = req.body.footer
+
+                var options = {
+                    format: format,
+                    width: width,
+                    height: height,
+                    border: border,
+                    timeout: timeout,
+                    zoomFactor: zoomFactor,
+                    footer: footer
+                };
+
+                htmlpdf.create(html, options).toBuffer(function (err, buffer) {
+                    try {
+                        if (!err) {
+                            response.status = true;
+                            response.message = "Converted to Pdf successfully";
+                            response.data = {
+                                pdfBaseData: buffer && buffer.toString('base64') ? buffer.toString('base64') : ""
+                            }
+                            res.status(200).json(response);
+                        } else {
+                            response.status = true;
+                            response.message = "Failed";
+                            response.data = null;
+                            response.error = err;
+                            res.status(200).json(response);
+                        }
+                    } catch (ex) {
+                        console.log("html to pdf", ex);
+                        response.status = false;
+                        response.error = ex;
+                        res.status(200).json(response);
+                    }
+                });
+            })
+            .done()
+
+        fs.unlinkSync(path.resolve(__dirname, file_name + ".docx"));
+
+    });
+}
+
+
+var spawn = require("child_process").spawn;
+var path = require('path');
+// var mammoth = require("mammoth");
+
+
+var docx2Pdf = function (file_name, callback) {
+    console.log(path.resolve(__dirname, 'docx2Pdf.py'));
+    var process_docx2Pdf = spawn('python', [path.resolve(__dirname, 'docx2Pdf.py'), file_name]); // pass org file to convertor
+
+    process_docx2Pdf.stdout.on('data', function (pdfres) {
+        process_docx2Pdf.kill();
+        setTimeout(function () {
+            callback(pdfres);
+        }, 1000);
+    })
+}
+
+paceUsersCtrl.docToPdfpy = function (req, res, next) {
+
+    var response = {
+        status: false,
+        message: "Invalid Resume",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    var document = req.body.document || "";
+    var key = req.body.key;
+    var data = req.body.data;
+
+
+
+    var file_name = Date.now();
+
+    // let writeStream = fs.createWriteStream(path.resolve(__dirname, file_name + ".docx"));  // create a file stream to write
+    console.log('write file');
+    fs.writeFileSync(path.resolve(__dirname, file_name + ".docx"), document, 'base64');
+
+    var asdf = fs.readFileSync(path.resolve(__dirname, file_name + ".docx"));
+    console.log("asdf", asdf);
+
+
+    // writeStream.on('finish', () => {
+    console.log('Jello')
+    setTimeout(function () {
+        try {
+            console.log("file written")
+            docx2Pdf('1580882157552.docx', function (pdfres) {
+                console.log("pdfres", pdfres);
+                res.send(pdfres);
+            })
+        } catch (ex) {
+            console.log("error while writing", ex)
+        }
+    }, 5000);
+    // });
+}
+
+paceUsersCtrl.talentmicroClientLicense = function (req, res, next) {
+
+    console.log("talentmicro Client License");
+
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        console.log(req.body);
+
+        var inputs = [
+            req.st.db.escape(JSON.stringify(req.body || {}))
+        ];
+
+        var procQuery = 'CALL pace_get_TalentMicroClients( ' + inputs.join(',') + ')';
+        console.log(procQuery);
+        req.db.query(procQuery, function (err, result) {
+            if (!err && result) {
+
+                if (result[0][0] && result[0][0].valid && result[0][0].valid > 0) {
+                    response.status = true;
+                    response.message = result[0][0].message;
+                } else {
+                    response.status = false;
+                    response.message = result[0][0].message;
+                }
+
+                response.error = null;
+                response.data = null;
+                res.status(200).json(response);
+            }
+            else {
+                response.status = false;
+                response.message = "Error while getting tips";
+                response.error = null;
+                response.data = null;
+                res.status(500).json(response);
+            }
+        });
+    }
+};
 
 module.exports = paceUsersCtrl;

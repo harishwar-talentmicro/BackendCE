@@ -1,4 +1,5 @@
 var hristrl = {};
+var error = {};
 
 hristrl.masterData = function (req, res, next) {
     var response = {
@@ -152,7 +153,10 @@ hristrl.saveEmployeeData = function (req, res, next) {
                     req.st.db.escape(req.body.gender || 0),
                     req.st.db.escape(req.body.dob || null),
                     req.st.db.escape(req.body.maritalStatus || 0),
-                    req.st.db.escape(JSON.stringify(req.body.extraInformation || []))
+                    req.st.db.escape(JSON.stringify(req.body.extraInformation || [])),
+                    req.st.db.escape(req.body.address || ""),
+                    req.st.db.escape(req.body.latitude || 0),
+                    req.st.db.escape(req.body.longitude || 0)
                 ];
 
                 var procQuery = 'CALL pace_hris_saveEmployeeData( ' + inputs.join(',') + ')';

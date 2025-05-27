@@ -319,7 +319,13 @@ jobCtrl.saveJobDefaults = function (req, res, next) {
                         req.st.db.escape(req.body.defaultScreeningMailTemplateId || 0),
                         req.st.db.escape(req.body.defaultSubmissionMailTemplateId || 0),
                         req.st.db.escape(req.body.defaultInterviewMailTemplateId || 0),
-                        req.st.db.escape(req.body.defaultJobseekerMailTemplateId || 0)
+                        req.st.db.escape(req.body.defaultJobseekerMailTemplateId || 0),
+                        req.st.db.escape(req.body.defaultFacesheetId || 0),
+                        req.st.db.escape(req.body.overwriteResumeOnlyDoc || 0),
+                        req.st.db.escape(JSON.stringify(req.body.birthdayFile || {})),
+                        req.st.db.escape(req.body.birthdayMailBody || ""),
+                        req.st.db.escape(req.body.enablePaceUserBirthday || 0),
+                        req.st.db.escape(req.body.birthdaySubject || "")
                     ];
 
                     var procQuery = 'CALL WM_save_1010Defaults1( ' + inputs.join(',') + ')';
@@ -907,10 +913,10 @@ jobCtrl.getcontactlist = function (req, res, next) {
                         response.message = "Requirement  contactlist loaded sucessfully  ";
                         response.error = null;
                         response.data =
-                            {
-                                contactList: results[0]
+                        {
+                            contactList: results[0]
 
-                            };
+                        };
                         if (isWeb == 0) {
                             res.status(200).json(response);
                         }
@@ -1134,7 +1140,8 @@ jobCtrl.saveEducation = function (req, res, next) {
                             req.st.db.escape(req.body.educationAlternateName),
                             req.st.db.escape(req.body.specialization),
                             req.st.db.escape(req.body.specializationAlternateName),
-                            req.st.db.escape(req.body.educationType)
+                            req.st.db.escape(req.body.educationType),
+                            req.st.db.escape(req.query.heMasterId)
                         ];
                         var procQuery = 'CALL wm_save_educationDetails( ' + inputs.join(',') + ')';
                         console.log(procQuery);
@@ -1146,11 +1153,11 @@ jobCtrl.saveEducation = function (req, res, next) {
                                 response.message = results[0][0].message;
                                 response.error = null;
 
-                                for (var j = 0; j < results[1].length; j++) {
-                                    results[1][j].educationId = results[1][j].educationId;
-                                    results[1][j].educationTitle = results[1][j].EducationTitle;
-                                    results[1][j].specialization = results[1][j].specialization ? JSON.parse(results[1][j].specialization) : [];
-                                }
+                                // for (var j = 0; j < results[1].length; j++) {
+                                //     results[1][j].educationId = results[1][j].educationId;
+                                //     results[1][j].educationTitle = results[1][j].EducationTitle;
+                                //     results[1][j].specialization = results[1][j].specialization ? JSON.parse(results[1][j].specialization) : [];
+                                // }
                                 response.data = {
                                     educationList: results[1] ? results[1] : []
                                 };
@@ -1245,14 +1252,14 @@ jobCtrl.getdefaults = function (req, res, next) {
                         response.message = "Requirement default data is";
                         response.error = null;
                         response.data =
-                            {
-                                purpose: results[0][0] && results[0][0].purpose ? results[0][0].purpose : 0,
-                                jobType: results[0][0] && results[0][0].jobtype ? results[0][0].jobtype : 0,
-                                currency: results[0][0] && results[0][0].currency ? results[0][0].currency : 0,
-                                scale: results[0][0] && results[0][0].scale ? results[0][0].scale : 0,
-                                duration: results[0][0] && results[0][0].duration ? results[0][0].duration : 0,
-                                List: results[0][0] && results[0][0].List && JSON.parse(results[0][0].List) ? JSON.parse(results[0][0].List) : []
-                            };
+                        {
+                            purpose: results[0][0] && results[0][0].purpose ? results[0][0].purpose : 0,
+                            jobType: results[0][0] && results[0][0].jobtype ? results[0][0].jobtype : 0,
+                            currency: results[0][0] && results[0][0].currency ? results[0][0].currency : 0,
+                            scale: results[0][0] && results[0][0].scale ? results[0][0].scale : 0,
+                            duration: results[0][0] && results[0][0].duration ? results[0][0].duration : 0,
+                            List: results[0][0] && results[0][0].List && JSON.parse(results[0][0].List) ? JSON.parse(results[0][0].List) : []
+                        };
                         if (isWeb == 0) {
                             var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                             zlib.gzip(buf, function (_, result) {
@@ -1755,7 +1762,8 @@ jobCtrl.saveRequirement = function (req, res, next) {
                                             jdTemplateList: (results && results[3] && results[3][0]) ? results[3] : [],
                                             requirementJobTitle: (results && results[4] && results[4][0]) ? results[4] : [],
                                             requirementDetails: (results && results[6] && results[6][0]) ? results[6][0] : {},
-                                            requirementMailData: results && results[5] && results[5][0] ? results[5] : []
+                                            requirementMailData: results && results[5] && results[5][0] ? results[5] : [],
+                                            unreadNotifyCount : results && results[7] && results[7][0] && results[7][0].unreadNotifyCount ? results[7][0].unreadNotifyCount : 0
                                         }
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -2506,7 +2514,8 @@ jobCtrl.getRequirementDetailsWithMaster = function (req, res, next) {
 
                             jdTemplateList: result[17][0] ? result[17] : [],
                             followUpNotes: (result[18] && result[18][0]) ? result[18] : [],
-                            requirementCompleteDetails: (result[19] && result[19][0]) ? result[19][0] : {}
+                            requirementCompleteDetails: (result[19] && result[19][0]) ? result[19][0] : {},
+                            unreadNotifyCount : result[20] && result[20][0] && result[20][0].unreadNotifyCount ? result[20][0].unreadNotifyCount : 0
 
                         };
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3094,66 +3103,161 @@ jobCtrl.getrequirementListMobile = function (req, res, next) {
     else {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
-                req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
 
-                var inputs = [
-                    req.st.db.escape(req.query.token),
-                    req.st.db.escape(req.query.heMasterId),
-                    req.st.db.escape(req.body.keywords || "")
-                ];
+                if (req.query.isTallint == 1) {
+                    var validationFlag = true;
 
-                var procQuery = 'CALL wm_get_mobileRequirementListAtSearchpage( ' + inputs.join(',') + ')';
-                console.log(procQuery);
-                req.db.query(procQuery, function (err, result) {
-                    console.log(err);
-                    if (!err && result && result[0] && result[0][0]) {
-                        response.status = true;
-                        response.message = "Requirement list loaded successfully";
-                        response.error = null;
-
-                        for (var i = 0; i < result[0].length; i++) {
-                            result[0][i].currency = (result[0] && result[0][i] && JSON.parse(result[0][i].currency).currencyId) ? JSON.parse(result[0][i].currency) : {};
-                            result[0][i].scale = (result[0] && result[0][i] && JSON.parse(result[0][i].scale).scaleId) ? JSON.parse(result[0][i].scale) : {};
-                            result[0][i].duration = (result[0] && result[0][i] && JSON.parse(result[0][i].duration).durationId) ? JSON.parse(result[0][i].duration) : {};
-                            result[0][i].jobType = (result[0] && result[0][i] && JSON.parse(result[0][i].jobType).jobTypeId) ? JSON.parse(result[0][i].jobType) : {};
-                            result[0][i].primarySkills = (result[0] && result[0][i]) ? JSON.parse(result[0][i].primarySkills) : [];
-                            result[0][i].industry = (result[0] && result[0][i]) ? JSON.parse(result[0][i].industry) : [];
-                            result[0][i].educationSpecialization = (result[0] && result[0][i]) ? JSON.parse(result[0][i].educationSpecialization) : [];
-                            result[0][i].locationlist = (result[0] && result[0][i]) ? JSON.parse(result[0][i].locationlist) : [];
-                        }
-
-                        response.data = {
-                            requirementList: result[0] ? result[0] : []
-                        }
-                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        // zlib.gzip(buf, function (_, result) {
-                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                        //     res.status(200).json(response);
-                        // });
-                        res.status(200).json(response);
+                    if (!req.query.HCUserId) {
+                        error.HCUserId = 'Invalid HCUserId';
+                        validationFlag *= false;
                     }
-                    else if (!err) {
-                        response.status = true;
-                        response.message = "No results found";
-                        response.error = null;
-                        response.data = {
-                            requirementList: []
-                        };
-                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                        // zlib.gzip(buf, function (_, result) {
-                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
-                        //     res.status(200).json(response);
-                        // });
-                        res.status(200).json(response);
+
+                    if (!validationFlag) {
+                        response.error = error;
+                        response.message = 'Please check the errors';
+                        res.status(400).json(response);
+                        console.log(response);
                     }
                     else {
-                        response.status = false;
-                        response.message = "Error while getting requirement List";
-                        response.error = null;
-                        response.data = null;
-                        res.status(500).json(response);
+                        // pass api type to below function
+                        req.query.type = 6;   // stage detail
+                        console.log("Tallint here")
+                        fetchAPiUrl(req, function (err, urlData) {
+                            console.log(err);
+                            if (!err && urlData && urlData.apiPath) {
+                                // use this after getting url from tallint
+                                var url = urlData.apiPath + 'status=' + (req.body.status || 0) + '&startpage=' + req.body.startPage + '&limit=' + req.body.limit;
+                                console.log(url);
+                                request({
+                                    url: url,
+                                    method: urlData.method,
+                                    json: true   // <--Very important!!!
+                                    // body: req.body
+                                }, function (err, resp, result) {   // result contains tallint response data
+                                    console.log("error", err);
+                                    try {
+                                        if (!err && result && result.data) {
+                                             response.status = true;
+                                            response.message = "Data loaded successfully";
+
+                                            var requirementView = [];
+                                            if (result.data && result.data.requirementList && result.data.requirementList.length) {
+                                                var reqList = result.data.requirementList;
+                                                for (var i = 0; i < reqList.length; i++) {
+
+                                                    if (reqList[i].title && reqList[i].title != "" && reqList[i].title != "null" && reqList[i].title != null && reqList[i].title != " ") {
+                                                        var obj = {};
+                                                        obj.requirementId = reqList[i].ReqId;
+                                                        obj.transId = reqList[i].transId ? reqList[i].transId : 0;
+                                                        obj.heDepartmentId = reqList[i].hedepartmentId ? reqList[i].hedepartmentId : 0;
+                                                        obj.positions = reqList[i].positions ? reqList[i].positions : 0;
+                                                        obj.positionsFilled = reqList[i].positionsFilled ? reqList[i].positionsFilled : 0;
+                                                        obj.clientName = reqList[i].heDepartmentTitle ? reqList[i].heDepartmentTitle : "";
+                                                        obj.jobCode = reqList[i].jobCode ? reqList[i].jobCode : "";
+                                                        obj.jobTitleId = reqList[i].jobtitleId ? reqList[i].jobtitleId : 0;
+                                                        obj.title = reqList[i].title ? reqList[i].title : "";
+                                                        obj.jobtypeid = reqList[i].jobtypeid ? reqList[i].jobtypeid : 0;
+                                                        obj.jobType = reqList[i].jobType ? reqList[i].jobType : "";
+                                                        obj.jobDescription = reqList[i].jobDescription ? reqList[i].jobDescription : "";
+                                                        obj.keywords = reqList[i].keywords ? reqList[i].keywords : "";
+                                                        obj.creatorName = reqList[i].creatorName ? reqList[i].creatorName : "";
+                                                        obj.createdDate = reqList[i].createdDate ? moment(reqList[i].createdDate).format("YYYY-MM-DD HH:mm:ss") : null;
+                                                    }
+                                                }
+                                            }
+
+                                            response.data = {
+                                                transactionHistory: result.data,
+                                                count: result.data.count ? result.data.count : 0
+                                            };
+                                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                            zlib.gzip(buf, function (_, result) {
+                                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                                res.status(200).json(response);
+                                            });
+                                        }
+                                    } catch (ex) {
+                                        console.log(ex);
+                                        response.error = ex;
+                                        res.status(200).json(response);
+                                    }
+                                });
+                            }
+                            else {
+                                response.status = false;
+                                response.message = "APi URL not found";
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                        });
                     }
-                });
+                }
+                else {
+                    req.query.isWeb = req.query.isWeb ? req.query.isWeb : 0;
+
+                    var inputs = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(req.query.heMasterId),
+                        req.st.db.escape(req.body.keywords || ""),
+                        req.st.db.escape(req.body.startPage || 0),
+                        req.st.db.escape(req.body.limit || 0)
+                    ];
+
+                    var procQuery = 'CALL wm_get_mobileRequirementListAtSearchpage( ' + inputs.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        console.log(err);
+                        if (!err && result && result[0] && result[0][0]) {
+                            response.status = true;
+                            response.message = "Requirement list loaded successfully";
+                            response.error = null;
+
+                            for (var i = 0; i < result[0].length; i++) {
+                                result[0][i].currency = (result[0] && result[0][i] && JSON.parse(result[0][i].currency).currencyId) ? JSON.parse(result[0][i].currency) : {};
+                                result[0][i].scale = (result[0] && result[0][i] && JSON.parse(result[0][i].scale).scaleId) ? JSON.parse(result[0][i].scale) : {};
+                                result[0][i].duration = (result[0] && result[0][i] && JSON.parse(result[0][i].duration).durationId) ? JSON.parse(result[0][i].duration) : {};
+                                result[0][i].jobType = (result[0] && result[0][i] && JSON.parse(result[0][i].jobType).jobTypeId) ? JSON.parse(result[0][i].jobType) : {};
+                                result[0][i].primarySkills = (result[0] && result[0][i]) ? JSON.parse(result[0][i].primarySkills) : [];
+                                result[0][i].industry = (result[0] && result[0][i]) ? JSON.parse(result[0][i].industry) : [];
+                                result[0][i].educationSpecialization = (result[0] && result[0][i]) ? JSON.parse(result[0][i].educationSpecialization) : [];
+                                result[0][i].locationlist = (result[0] && result[0][i]) ? JSON.parse(result[0][i].locationlist) : [];
+                            }
+
+                            response.data = {
+                                requirementList: result[0] ? result[0] : [],
+                                count : result[0] && result[1][0] && result[1][0].count ? result[1][0].count : 0
+                            }
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            //     res.status(200).json(response);
+                            // });
+                            res.status(200).json(response);
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No results found";
+                            response.error = null;
+                            response.data = {
+                                requirementList: [],
+                                count:0
+                            };
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                            //     res.status(200).json(response);
+                            // });
+                            res.status(200).json(response);
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Error while getting requirement List";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                }
             }
             else {
                 res.status(401).json(response);

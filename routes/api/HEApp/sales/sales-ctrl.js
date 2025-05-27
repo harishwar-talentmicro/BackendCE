@@ -6470,6 +6470,13 @@ salesCtrl.salesEnqueryIntegration = function (req, res, next) {
                 items = [];
             }
 
+            if (items.length) {
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i] && !items[i].quantity) {
+                        items[i]['quantity'] = 1;
+                    }
+                }
+            }
             var taskDetails;
 
             var procParams = [
@@ -6477,7 +6484,7 @@ salesCtrl.salesEnqueryIntegration = function (req, res, next) {
                 req.st.db.escape(req.body.parentId || 0),
                 req.st.db.escape(req.body.categoryId || 0),
                 req.st.db.escape(req.body.requirement || ""),
-                req.st.db.escape(req.body.senderNotes || ""),
+                req.st.db.escape(req.body.senderNotes || req.body.message || ""),
                 req.st.db.escape(req.body.stage || 0),
                 req.st.db.escape(req.body.status || 0),
                 req.st.db.escape(req.body.reason || ""),
@@ -6526,7 +6533,7 @@ salesCtrl.salesEnqueryIntegration = function (req, res, next) {
                 req.st.db.escape(req.body.groupId)
             ];
 
-            var procQuery = 'CALL he_save_salesRequest_WithTask_New( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
+            var procQuery = 'CALL he_save_salesRequest_WithTask_New_hirecraftIntegration( ' + procParams.join(',') + ');CALL wm_update_formKeywords(' + keywordsParams.join(',') + ');';
             console.log(procQuery);
             req.db.query(procQuery, function (err, results) {
                 console.log(err);

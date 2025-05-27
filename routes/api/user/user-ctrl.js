@@ -44,11 +44,11 @@ var options = {
 };
 
 try {
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcryptjs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcrypt');
 }
 
 var st = null;
@@ -1165,6 +1165,7 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                                 data = data.replace("[name]", otpResult[0][0].name);
                                 data = data.replace("[OTP]", code);
 
+                                EZEIDEmail = otpResult[0][0].companyEmailId && otpResult[0][0].companyEmailId != "" ? otpResult[0][0].companyEmailId : EZEIDEmail;
                                 var mailOptions = {
                                     from: EZEIDEmail,
                                     to: otpResult[0][0].email,
@@ -1172,14 +1173,18 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                                     html: data // html body
                                 };
 
-                                var sendgrid = require('sendgrid')('ezeid', 'Ezeid2015');
-                                var email = new sendgrid.Email();
-                                email.from = mailOptions.from;
-                                email.to = mailOptions.to;
-                                email.subject = mailOptions.subject;
-                                email.html = mailOptions.html;
+                                const nodemailer = require('nodemailer');
+                                let transport = nodemailer.createTransport({
+                                    host: 'mail.icanrefer.net',
+                                    port: 587,
+                                    auth: {
+                                        user: 'noreply@icanrefer.net',
+                                        pass: 'icanrefer$321'
+                                    }
+                                });
 
-                                sendgrid.send(email, function (err, result) {
+                                transport.sendMail(mailOptions, function (err, result) {
+                                    console.log(err);
                                 });
                             }
                         });
@@ -1208,28 +1213,6 @@ UserCtrl.sendPasswordResetOTP = function (req, res, next) {
                             });
                         }
                         else if (otpResult[0][0].isd == "+91") {
-                            request({
-                                url: 'https://aikonsms.co.in/control/smsapi.php',
-                                qs: {
-                                    user_name: 'janardana@hirecraft.com',
-                                    password: 'Ezeid2015',
-                                    sender_id: 'WtMate',
-                                    service: 'TRANS',
-                                    mobile_no: otpResult[0][0].mobile,
-                                    message: message,
-                                    method: 'send_sms'
-                                },
-                                method: 'GET'
-
-                            }, function (error, response, body) {
-                                if (error) {
-                                    console.log(error, "SMS");
-                                }
-                                else {
-                                    console.log("SUCCESS", "SMS response");
-                                }
-                            });
-
                             var req = http.request(options, function (res) {
                                 var chunks = [];
 

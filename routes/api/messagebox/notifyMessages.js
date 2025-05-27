@@ -3,18 +3,18 @@
  */
 
 
- var st = null;
+var st = null;
 //  var dbConfig=require('../../../ezeone-config.json');
 //  var DBSecretKey=dbConfig.DB.secretKey;
- // thread
-const threads  = require('threads');
-const config  = threads.config;
-const spawn   = threads.spawn;
+// thread
+const threads = require('threads');
+const config = threads.config;
+const spawn = threads.spawn;
 
 // Set base paths to thread scripts
 config.set({
-    basepath : {
-        node : '../routes'
+    basepath: {
+        node: '../routes'
     }
 });
 
@@ -22,50 +22,68 @@ config.set({
 var DbHelper = require('./../../../helpers/DatabaseHandler'),
     db = DbHelper.getDBContext();
 
-var whatmateconfig=require('../../../ezeone-config.json');
-var DBSecretKey=whatmateconfig.DB.secretKey;
+var whatmateconfig = require('../../../ezeone-config.json');
+var DBSecretKey = whatmateconfig.DB.secretKey;
 
-function Messages(){
+function Messages() {
 }
 
-Messages.prototype.getMessagesNeedToNotify = function() {
+Messages.prototype.getMessagesNeedToNotify = function () {
 
 
     var procQuery = 'CALL he_get_messageList("' + DBSecretKey + '")';
 
     console.log(procQuery);
 
-    db.query(procQuery,function(err,messageList){
-        if(!err && messageList && messageList[0]){
-            var numberOfThreads = Math.ceil(messageList[0].length /100);
-            console.log("numberOfThreads",numberOfThreads);
-            for (var i = 0; i < numberOfThreads ; i++) {
+    db.query(procQuery, function (err, messageList) {
+        if (!err && messageList && messageList[0]) {
+            var numberOfThreads = Math.ceil(messageList[0].length / 10);
+            console.log("numberOfThreads", numberOfThreads);
+            for (var i = 0; i < numberOfThreads; i++) {
 
+                try {
+                    
                     try{
-                        const thread = spawn('worker.js');
-                        thread
-                            .send({messageList:messageList[0],increment:i,limitValues:100})
-                            .on('message', function(response) {
-                                console.log("thread_response",response);
-                                thread.kill();
-
-                            })
-                            .on('error', function(error) {
-                                console.log('Worker errored:', error);
-                            })
-                            .on('exit', function() {
-                                console.log('Worker has been terminated.');
-                            });
-
+                    const thread = spawn('worker.js');
                     }
-                    catch (err){
-                        console.log(err);
+                    catch(ex){
+                        console.log('spawn',ex);
                     }
+                    thread
+                        .send({ messageList: messageList[0], increment: i, limitValues: 100 });
+                    thread
+                        .on('message', function (response) {
+                            console.log("thread_response", response);
+                            thread.kill();
+
+                        })
+                        .on('error', function (error) {
+                            console.log('Worker errored:', error);
+                            thread.kill();
+                        })
+                        .on('exit', function () {
+                            console.log('Worker has been terminated.');
+                            thread.kill();
+                        })
+                        .on('disconnect', function () {
+                            thread.kill();
+                            console.log('Worker has been terminated.');
+                        })
+                        .on('close', function () {
+                            thread.kill();
+                            console.log('Worker has been terminated.');
+                        });
+
+
+                }
+                catch (err) {
+                    console.log(err);
+                }
 
             }
 
         }
-        else if(err) {
+        else if (err) {
             console.log(err);
         }
 

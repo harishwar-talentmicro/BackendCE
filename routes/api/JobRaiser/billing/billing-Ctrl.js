@@ -1366,7 +1366,7 @@ billingCtrl.invoiceApplyTax = function (req, res, next) {
     }
 };
 
-
+var path = require('path');
 billingCtrl.invoiceBillGenerate = function (req, res, next) {
     try {
         var error_logger = {
@@ -1440,7 +1440,8 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                                     response.error = null;
                                     var subTotalAmount = 0;
                                     var totalAmount = 0;
-                                    fs.readFile('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/paceinvoice.html', 'utf-8', function (err, data) {
+
+                                    fs.readFile(path.resolve(__dirname, "paceinvoice.html"), 'utf-8', function (err, data) {
                                         try {
                                             console.log('error from reading', err);
                                             var taxTemplate = JSON.parse(result[0][0].taxTemplate);
@@ -1572,10 +1573,10 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
 
                                                     console.log("buffer content", attachmentObjectsList[0].content);
 
-                                                    fs.writeFile("/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/invoice" + timestamp + ".pdf", buffer, function (err) {
+                                                    fs.writeFile(path.resolve(__dirname, "invoice" + timestamp + ".pdf"), buffer, function (err) {
                                                         if (!err) {
                                                             console.log("file written");
-                                                            var readStream = fs.createReadStream('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/invoice' + timestamp + '.pdf');
+                                                            var readStream = fs.createReadStream(path.resolve(__dirname, "invoice" + timestamp + ".pdf"));
 
                                                             uploadDocumentToCloud(aUrl, readStream, function (err) {
                                                                 try {
@@ -1623,7 +1624,7 @@ billingCtrl.invoiceBillGenerate = function (req, res, next) {
                                                                         });
                                                                         console.log("err", err);
                                                                         console.log('FnSaveServiceAttachment: attachment Uploaded successfully', aUrl);
-                                                                        fs.unlink('/home/ezeonetalent/ezeone1/api/routes/api/JobRaiser/billing/invoice' + timestamp + '.pdf', function (err) {
+                                                                        fs.unlink(path.resolve(__dirname, "invoice" + timestamp + ".pdf"), function (err) {
                                                                             try {
                                                                                 if (!err) {
                                                                                     console.log('File Deleted');
@@ -2266,7 +2267,7 @@ billingCtrl.getPaceFollowUpNotes = function (req, res, next) {
                         else if (req.query.type == 2)
                             clientorReqorResumeId = req.query.requirementId || 0;
                         else if (req.query.type == 3)
-                            clientorReqorResumeId = req.query.requirementId || 0;
+                            clientorReqorResumeId = req.query.applicantId || 0;
 
                         var inputs = [
                             req.st.db.escape(req.query.token),
@@ -2283,9 +2284,9 @@ billingCtrl.getPaceFollowUpNotes = function (req, res, next) {
 
                                 if (!err && result && result[0] && result[0][0]) {
 
-                                    for (var i = 0; i < result[0].length; i++) {
-                                        result[0][i].followUpNotes = (result[0] && result[0][i]) ? result[0][i].followUpNotes : [];
-                                    }
+                                    // for (var i = 0; i < result[0].length; i++) {
+                                    //     result[0][i].followUpNotes = (result[0] && result[0][i]) ? result[0][i].followUpNotes : [];
+                                    // }
 
                                     response.status = true;
                                     response.message = "followUp data loaded sucessfully";

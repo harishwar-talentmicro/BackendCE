@@ -61,5 +61,16 @@ router.post('/savePaceAdminConfiguration',paceAdmin.paceSaveHeMasterConfiguratio
 router.get('/peepalReport',paceAdmin.PeepalReport);
 router.post('/loginoutReport',paceUsersCtrl.loginoutReport);
 
+router.get('/notifyApplicantDataForTallint',paceUsersCtrl.notifyApplicantDataForTallint);
+
+router.post('/advancereports',paceUsersCtrl.paceadvancedReports);
+
+router.post('/validateCvParserExtUsers',paceUsersCtrl.validateCvParserExtensionUser);
+router.get('/evaluationCopy',paceUsersCtrl.evaluationCopyForTallint);
+router.post('/resumeParser',paceUsersCtrl.resumeParser);
+router.post('/htmltoPdf',paceUsersCtrl.htmltoPdf);
+router.post('/docToPdf',paceUsersCtrl.docToPdf);
+router.post('/docToPdfpy',paceUsersCtrl.docToPdfpy);
+router.post('/tm_license',paceUsersCtrl.talentmicroClientLicense);
 
 module.exports = router;

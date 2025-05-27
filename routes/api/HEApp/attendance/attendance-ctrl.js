@@ -113,8 +113,9 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                             req.st.db.escape(req.body.isCompOffAvailed),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)
-                  
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.minDate),
+                            req.st.db.escape(req.body.maxDate)           
                         ];
                         // changes
                         var attendenceFormId=1002;
@@ -132,7 +133,15 @@ attendanceCtrl.saveAttendance = function(req,res,next){
                         console.log(procQuery);
                         req.db.query(procQuery,function(err,results){
                             console.log(results);
-                            if(!err && results && results[0] ){
+                            
+                            if (!err && results && results[0] && results[0][0] && results[0][0]._error) {
+                                response.status = false;
+                                response.message = results[0][0]._error;
+                                response.error = null;
+                                response.data = null;
+                                res.status(200).json(response);
+                            }
+                            else if(!err && results && results[0] ){
                                 senderGroupId = results[0][0].senderId;
                                 // notificationTemplaterRes = notificationTemplater.parse('compose_message',{
                                 //     senderName : results[0][0].message
@@ -363,7 +372,9 @@ attendanceCtrl.attendanceReport=function(req,res,next){
                      req.st.db.escape(DBSecretKey),
                      req.st.db.escape(req.query.start || 1),
                      req.st.db.escape(req.query.limit || 9999),
-                     req.st.db.escape(req.query.exportAll || 0)
+                     req.st.db.escape(req.query.exportAll || 0),
+                     req.st.db.escape(JSON.stringify(req.body.rmGroupId || [])),
+                     req.st.db.escape(JSON.stringify(req.body.workLocationId || [])) 
                      
                 ];
                 /**

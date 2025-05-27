@@ -28,8 +28,8 @@ var appConfig = require('../../../../ezeone-config.json');
 var DBSecretKey = appConfig.DB.secretKey;
 
 var st = null;
-var htmlConvert = require('html-convert');
-
+// var htmlConvert = require('html-convert');
+var htmlConvert;
 var gcloud = require('gcloud');
 //var fs = require('fs');
 
@@ -101,7 +101,7 @@ var i = 0;
 var name = title = type = title1 = title2 = '';
 
 
-var convert = htmlConvert();
+// var convert = htmlConvert();
 var image;
 
 

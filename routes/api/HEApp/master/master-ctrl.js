@@ -6,20 +6,20 @@ var masterCtrl = {};
 
 var zlib = require('zlib');
 var AES_256_encryption = require('../../../encryption/encryption.js');
-var encryption = new  AES_256_encryption();
+var encryption = new AES_256_encryption();
 var appConfig = require('../../../../ezeone-config.json');
-var DBSecretKey=appConfig.DB.secretKey;
+var DBSecretKey = appConfig.DB.secretKey;
 
-masterCtrl.searchUsers = function(req,res,next){
+masterCtrl.searchUsers = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             req.query.syncDate = req.query.syncDate ? req.query.syncDate : null;
             req.query.isweb = req.query.isweb ? req.query.isweb : 0;
@@ -36,13 +36,13 @@ masterCtrl.searchUsers = function(req,res,next){
              */
             var procQuery = 'CALL HE_search_users( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,userResult){
-                if(!err && userResult && userResult[0] && userResult[0][0]){
+            req.db.query(procQuery, function (err, userResult) {
+                if (!err && userResult && userResult[0] && userResult[0][0]) {
                     response.status = true;
                     response.message = "User list loaded successfully";
                     response.error = null;
                     var output = [];
-                    for(var j = 0; j < userResult[0].length; j++) {
+                    for (var j = 0; j < userResult[0].length; j++) {
                         var res1 = {};
                         res1.HEUserId = userResult[0][j].HEUserId;
                         res1.name = userResult[0][j].name;
@@ -53,12 +53,12 @@ masterCtrl.searchUsers = function(req,res,next){
                         output.push(res1);
                     }
                     response.data = {
-                        userList : output
+                        userList: output
                     };
-                    if(req.query.isweb == 0){
+                    if (req.query.isweb == 0) {
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
@@ -67,14 +67,14 @@ masterCtrl.searchUsers = function(req,res,next){
                     }
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "No users found";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting user list";
                     response.error = null;
@@ -83,22 +83,22 @@ masterCtrl.searchUsers = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.expenseMasterData = function(req,res,next){
+masterCtrl.expenseMasterData = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -110,55 +110,54 @@ masterCtrl.expenseMasterData = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_expenseMasterData( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,expenseMaster){
-                if(!err && expenseMaster && expenseMaster[0] && expenseMaster[1]){
+            req.db.query(procQuery, function (err, expenseMaster) {
+                if (!err && expenseMaster && expenseMaster[0] && expenseMaster[1]) {
 
                     response.status = true;
                     response.message = "Expense master loaded successfully";
                     response.error = null;
-                    if(!err && expenseMaster[2][0]){
+                    if (!err && expenseMaster[2][0]) {
                         response.data = {
-                            currencyList : expenseMaster[0],
-                            expenseList : expenseMaster[1],
-                            defaultUserCurrency : {
-                                currencyId : expenseMaster[2][0].currencyId ? expenseMaster[2][0].currencyId : 0,
-                                currencySymbol : expenseMaster[2][0].currencySymbol ? expenseMaster[2][0].currencySymbol : "",
-                                conversionRate : expenseMaster[2][0].conversionRate ? expenseMaster[2][0].conversionRate : 0
+                            currencyList: expenseMaster[0],
+                            expenseList: expenseMaster[1],
+                            defaultUserCurrency: {
+                                currencyId: expenseMaster[2][0].currencyId ? expenseMaster[2][0].currencyId : 0,
+                                currencySymbol: expenseMaster[2][0].currencySymbol ? expenseMaster[2][0].currencySymbol : "",
+                                conversionRate: expenseMaster[2][0].conversionRate ? expenseMaster[2][0].conversionRate : 0
                             },
-                            enableExpConveyance : expenseMaster[3][0].enableExpConveyance,
-                            enableRefNumber : expenseMaster[3][0].enableRefNumber
+                            enableExpConveyance: expenseMaster[3][0].enableExpConveyance,
+                            enableRefNumber: expenseMaster[3][0].enableRefNumber
                         }
                     }
-                    else
-                    {
+                    else {
                         response.data = {
-                            currencyList : expenseMaster[0],
-                            expenseList : expenseMaster[1],
-                            defaultUserCurrency : {
-                                currencyId :  0,
-                                currencySymbol : "",
-                                conversionRate : 0
+                            currencyList: expenseMaster[0],
+                            expenseList: expenseMaster[1],
+                            defaultUserCurrency: {
+                                currencyId: 0,
+                                currencySymbol: "",
+                                conversionRate: 0
                             },
-                            enableExpConveyance : 0,
-                            enableExpVault : 0
+                            enableExpConveyance: 0,
+                            enableExpVault: 0
                         }
                     }
 
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "No data found";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting master data";
                     response.error = null;
@@ -167,22 +166,22 @@ masterCtrl.expenseMasterData = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.getStationary = function(req,res,next){
+masterCtrl.getStationary = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -194,29 +193,29 @@ masterCtrl.getStationary = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_stationary( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,stationaryResult){
-                if(!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]){
+            req.db.query(procQuery, function (err, stationaryResult) {
+                if (!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]) {
                     response.status = true;
                     response.message = "Stationeries loaded successfully";
                     response.error = null;
                     response.data = {
-                        stationaryList : stationaryResult[0]
+                        stationaryList: stationaryResult[0]
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Stationeries loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting stationeries";
                     response.error = null;
@@ -225,22 +224,22 @@ masterCtrl.getStationary = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.currencyData = function(req,res,next){
+masterCtrl.currencyData = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -252,47 +251,47 @@ masterCtrl.currencyData = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_currencyData( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,currencyMaster){
-                if(!err && currencyMaster && currencyMaster[0] && currencyMaster[0][0]){
+            req.db.query(procQuery, function (err, currencyMaster) {
+                if (!err && currencyMaster && currencyMaster[0] && currencyMaster[0][0]) {
                     response.status = true;
                     response.message = "Currency master loaded successfully";
                     response.error = null;
-                    if(!err && currencyMaster[1][0]){
+                    if (!err && currencyMaster[1][0]) {
                         response.data = {
-                            currencyList : currencyMaster[0],
-                            defaultUserCurrency : {
-                                currencyId : currencyMaster[1][0].currencyId ? currencyMaster[1][0].currencyId : 0,
-                                currencySymbol : currencyMaster[1][0].currencySymbol ? currencyMaster[1][0].currencySymbol : "",
-                                conversionRate : currencyMaster[1][0].conversionRate ? currencyMaster[1][0].conversionRate : 0
+                            currencyList: currencyMaster[0],
+                            defaultUserCurrency: {
+                                currencyId: currencyMaster[1][0].currencyId ? currencyMaster[1][0].currencyId : 0,
+                                currencySymbol: currencyMaster[1][0].currencySymbol ? currencyMaster[1][0].currencySymbol : "",
+                                conversionRate: currencyMaster[1][0].conversionRate ? currencyMaster[1][0].conversionRate : 0
                             }
                         };
                     }
                     else {
                         response.data = {
-                            currencyList : currencyMaster[0],
-                            defaultUserCurrency : {
-                                currencyId :  0,
-                                currencySymbol : "",
-                                conversionRate : 0
+                            currencyList: currencyMaster[0],
+                            defaultUserCurrency: {
+                                currencyId: 0,
+                                currencySymbol: "",
+                                conversionRate: 0
                             }
                         };
                     }
 
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "No data found";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting currency";
                     response.error = null;
@@ -301,22 +300,22 @@ masterCtrl.currencyData = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.getPantryItems = function(req,res,next){
+masterCtrl.getPantryItems = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -328,29 +327,29 @@ masterCtrl.getPantryItems = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_pantryItems( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,stationaryResult){
-                if(!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]){
+            req.db.query(procQuery, function (err, stationaryResult) {
+                if (!err && stationaryResult && stationaryResult[0] && stationaryResult[0][0]) {
                     response.status = true;
                     response.message = "Pantry item loaded successfully";
                     response.error = null;
                     response.data = {
-                        pantryList : stationaryResult[0]
+                        pantryList: stationaryResult[0]
                     }
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Pantry item loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting pantry item";
                     response.error = null;
@@ -359,22 +358,22 @@ masterCtrl.getPantryItems = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.getAssetsItems = function(req,res,next){
+masterCtrl.getAssetsItems = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -386,29 +385,29 @@ masterCtrl.getAssetsItems = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_assetItems( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,assetResult){
-                if(!err && assetResult && assetResult[0] && assetResult[0][0]){
+            req.db.query(procQuery, function (err, assetResult) {
+                if (!err && assetResult && assetResult[0] && assetResult[0][0]) {
                     response.status = true;
                     response.message = "Asset item loaded successfully";
                     response.error = null;
                     response.data = {
-                        assetList : assetResult[0]
+                        assetList: assetResult[0]
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Asset item loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting asset item";
                     response.error = null;
@@ -417,22 +416,22 @@ masterCtrl.getAssetsItems = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.getHRDocItems = function(req,res,next){
+masterCtrl.getHRDocItems = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -444,29 +443,29 @@ masterCtrl.getHRDocItems = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_HRDocs( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,HRDocsResult){
-                if(!err && HRDocsResult && HRDocsResult[0] && HRDocsResult[0][0]){
+            req.db.query(procQuery, function (err, HRDocsResult) {
+                if (!err && HRDocsResult && HRDocsResult[0] && HRDocsResult[0][0]) {
                     response.status = true;
                     response.message = "HR doc types loaded successfully";
                     response.error = null;
                     response.data = {
-                        HRDocList : HRDocsResult[0]
+                        HRDocList: HRDocsResult[0]
                     }
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "HR doc types loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting HR doc types";
                     response.error = null;
@@ -475,22 +474,22 @@ masterCtrl.getHRDocItems = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.expenseList = function(req,res,next){
+masterCtrl.expenseList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.token),
@@ -502,29 +501,29 @@ masterCtrl.expenseList = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_expenseList( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,expenseList){
-                if(!err && expenseList && expenseList[0] && expenseList[0][0]){
+            req.db.query(procQuery, function (err, expenseList) {
+                if (!err && expenseList && expenseList[0] && expenseList[0][0]) {
                     response.status = true;
                     response.message = "Expense list loaded successfully";
                     response.error = null;
                     response.data = {
-                        expenseList : expenseList[0]
+                        expenseList: expenseList[0]
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "No data found";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting expense list";
                     response.error = null;
@@ -533,18 +532,18 @@ masterCtrl.expenseList = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.getFormTypeList = function(req,res,next){
+masterCtrl.getFormTypeList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     if (!req.query.groupId) {
@@ -559,8 +558,8 @@ masterCtrl.getFormTypeList = function(req,res,next){
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
 
                 var procParams = [
@@ -573,29 +572,29 @@ masterCtrl.getFormTypeList = function(req,res,next){
                  */
                 var procQuery = 'CALL HE_get_filter_formList( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,formTypeResult){
-                    if(!err && formTypeResult && formTypeResult[0] && formTypeResult[0][0]){
+                req.db.query(procQuery, function (err, formTypeResult) {
+                    if (!err && formTypeResult && formTypeResult[0] && formTypeResult[0][0]) {
                         response.status = true;
                         response.message = "Form type list loaded successfully";
                         response.error = null;
                         response.data = {
-                            formTypeList : formTypeResult[0]
+                            formTypeList: formTypeResult[0]
                         }
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
 
                     }
-                    else if(!err){
+                    else if (!err) {
                         response.status = true;
                         response.message = "Form type list loaded successfully";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting form type list";
                         response.error = null;
@@ -604,7 +603,7 @@ masterCtrl.getFormTypeList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
@@ -613,16 +612,16 @@ masterCtrl.getFormTypeList = function(req,res,next){
 
 };
 
-masterCtrl.getWorkGroup = function(req,res,next){
+masterCtrl.getWorkGroup = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
 
-    req.st.validateToken(req.query.token,function(err,tokenResult){
-        if((!err) && tokenResult){
+    req.st.validateToken(req.query.token, function (err, tokenResult) {
+        if ((!err) && tokenResult) {
 
             var procParams = [
                 req.st.db.escape(req.query.groupId)
@@ -633,29 +632,29 @@ masterCtrl.getWorkGroup = function(req,res,next){
              */
             var procQuery = 'CALL HE_get_app_workGroups( ' + procParams.join(',') + ')';
             console.log(procQuery);
-            req.db.query(procQuery,function(err,workGroupResult){
-                if(!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]){
+            req.db.query(procQuery, function (err, workGroupResult) {
+                if (!err && workGroupResult && workGroupResult[0] && workGroupResult[0][0]) {
                     response.status = true;
                     response.message = "Work group loaded successfully";
                     response.error = null;
                     response.data = {
-                        workGroupList : workGroupResult[0]
+                        workGroupList: workGroupResult[0]
                     };
                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                     zlib.gzip(buf, function (_, result) {
-                        response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                        response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                         res.status(200).json(response);
                     });
 
                 }
-                else if(!err){
+                else if (!err) {
                     response.status = true;
                     response.message = "Work group loaded successfully";
                     response.error = null;
                     response.data = null;
                     res.status(200).json(response);
                 }
-                else{
+                else {
                     response.status = false;
                     response.message = "Error while getting work group";
                     response.error = null;
@@ -664,36 +663,36 @@ masterCtrl.getWorkGroup = function(req,res,next){
                 }
             });
         }
-        else{
+        else {
             res.status(401).json(response);
         }
     });
 };
 
-masterCtrl.getWhatMateCompaniesList = function(req,res,next){
+masterCtrl.getWhatMateCompaniesList = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     var error = {};
 
-    if(!req.query.token){
+    if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
 
-    if(!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -705,30 +704,30 @@ masterCtrl.getWhatMateCompaniesList = function(req,res,next){
                  */
                 var procQuery = 'CALL get_whatmate_companies( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,result){
-                    if(!err && result && result[0]){
+                req.db.query(procQuery, function (err, result) {
+                    if (!err && result && result[0]) {
                         response.status = true;
                         response.message = "Companies list loaded successfully";
                         response.error = null;
                         response.data = {
-                            companyList : result[0]
+                            companyList: result[0]
                         };
                         // res.status(200).json(response);
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else if(!err ){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No Companies found";
                         response.error = null;
                         response.data = null;
                         res.status(200).json(response);
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting companies list";
                         response.error = null;
@@ -737,41 +736,41 @@ masterCtrl.getWhatMateCompaniesList = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
-masterCtrl.getCompanyConfig = function(req,res,next){
+masterCtrl.getCompanyConfig = function (req, res, next) {
     var response = {
-        status : false,
-        message : "Invalid token",
-        data : null,
-        error : null
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
     };
     var validationFlag = true;
     var error = {};
 
-    if(!req.query.token){
+    if (!req.query.token) {
         error.token = 'Invalid token';
         validationFlag *= false;
     }
-    if(!req.query.HEMasterId){
+    if (!req.query.HEMasterId) {
         error.HEMasterId = 'Invalid HEMasterId';
         validationFlag *= false;
     }
 
-    if(!validationFlag){
+    if (!validationFlag) {
         response.error = error;
         response.message = 'Please check the errors';
         res.status(400).json(response);
         console.log(response);
     }
     else {
-        req.st.validateToken(req.query.token,function(err,tokenResult){
-            if((!err) && tokenResult){
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
 
                 var procParams = [
                     req.st.db.escape(req.query.token),
@@ -783,38 +782,39 @@ masterCtrl.getCompanyConfig = function(req,res,next){
                  */
                 var procQuery = 'CALL he_get_companyConfig( ' + procParams.join(',') + ')';
                 console.log(procQuery);
-                req.db.query(procQuery,function(err,companyConfig){
-                    if(!err && companyConfig && companyConfig[0]){
+                req.db.query(procQuery, function (err, companyConfig) {
+                    if (!err && companyConfig && companyConfig[0]) {
                         response.status = true;
                         response.message = "Company config loaded successfully";
                         response.error = null;
                         response.data = {
-                            workingHours : companyConfig[0],
-                            holidayList : companyConfig[1]
+                            workingHours: companyConfig[0],
+                            holidayList: companyConfig[1],
+                            companyConfig: companyConfig[2] && companyConfig[2][0] ? companyConfig[2][0] : null
                         };
                         // res.status(200).json(response);
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else if(!err ){
+                    else if (!err) {
                         response.status = true;
                         response.message = "No config found";
                         response.error = null;
                         response.data = {
-                            workingHours : [],
-                            holidayList : []
+                            workingHours: [],
+                            holidayList: []
                         };
-                         buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                        buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                         zlib.gzip(buf, function (_, result) {
-                            response.data = encryption.encrypt(result,tokenResult[0].secretKey).toString('base64');
+                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                             res.status(200).json(response);
                         });
                     }
-                    else{
+                    else {
                         response.status = false;
                         response.message = "Error while getting comapany config";
                         response.error = null;
@@ -823,12 +823,181 @@ masterCtrl.getCompanyConfig = function(req,res,next){
                     }
                 });
             }
-            else{
+            else {
                 res.status(401).json(response);
             }
         });
     }
 };
 
+
+
+masterCtrl.whatmateTransactionList = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+  
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(JSON.stringify(req.body || {})),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_get_loadWhatmateTransactionList( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result) {
+                            response.status = true;
+                            response.message = "Data loaded successfully";
+                            response.error = null;
+
+                            for (var i = 0; i < result[0].length; i++) {
+                                result[0][i].formData = result[0][i].formDataJSON ? JSON.parse(result[0][i].formDataJSON) : null;
+                                delete(result[0][i].formDataJSON);
+                            }
+
+                            response.data = {
+                                messageList: result[0] && result[0][0] ? result[0] : [],
+                                count: result[1] && result[1][0] ? result[1][0].count : 0,
+                                formList: result[2] && result[2][0] ? result[2] : []
+                            };
+                            var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.error = null;
+                            response.data = {
+                                list: [],
+                                count: 0
+                            };
+                            buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            zlib.gzip(buf, function (_, result) {
+                                response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Something went wrong";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
+
+
+masterCtrl.whatmateBulkTransUpdate = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    var error = {};
+
+    if (!req.query.token) {
+        error.token = 'Invalid token';
+        validationFlag *= false;
+    }
+
+  
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        req.st.validateToken(req.query.token, function (err, tokenResult) {
+            if ((!err) && tokenResult) {
+                var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+
+                    var procParams = [
+                        req.st.db.escape(req.query.token),
+                        req.st.db.escape(JSON.stringify(req.body || {})),
+                        req.st.db.escape(DBSecretKey)
+                    ];
+
+                    var procQuery = 'CALL wm_save_whatmateBulkTransactionUpdate( ' + procParams.join(',') + ')';
+                    console.log(procQuery);
+                    req.db.query(procQuery, function (err, result) {
+                        if (!err && result) {
+                            response.status = true;
+                            response.message = "Data saved successfully";
+                            response.error = null;
+                            response.data = null;
+                            // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            // });
+                        }
+                        else if (!err) {
+                            response.status = true;
+                            response.message = "No data found";
+                            response.error = null;
+                            response.data = null;
+                            // buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                            // zlib.gzip(buf, function (_, result) {
+                            //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                res.status(200).json(response);
+                            // });
+                        }
+                        else {
+                            response.status = false;
+                            response.message = "Something went wrong";
+                            response.error = null;
+                            response.data = null;
+                            res.status(500).json(response);
+                        }
+                    });
+                });
+            }
+            else {
+                res.status(401).json(response);
+            }
+        });
+    }
+};
 
 module.exports = masterCtrl;

@@ -1,7 +1,7 @@
 {
   "BASE_URL" : "https://sandbox.citruspay.com/",
   "VANITY_URL_PART" : "0qo29x6rgs",
-  "SECRET_KEY" : "	ff6c266f5598bcdf659f47e8876140231b9ed47c",
+  "SECRET_KEY" : "ff6c266f5598bcdf659f47e8876140231b9ed47c",
   "CURRENCY" : "INR",
   "RETURN_URL" : "",
   "NOTIFY_URL" : "",

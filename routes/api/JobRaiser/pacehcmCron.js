@@ -190,10 +190,24 @@ function reports (){
 }
 
 
-// cron.schedule('*/2 * * * *', function () {
-//     console.log("Pace report cron Running!!");
-//     usersList();
-// });
+cron.schedule('00 07 * * *', function () {
+    console.log('running a task every minute');
+    var datetime = new Date();
+    console.log(datetime);
+    var procQuery = 'CALL he_schedule_tasks()';
+    console.log(procQuery);
+
+    db.query(procQuery, function (err, results) {
+        console.log(results);
+        if (!err) {
+            console.log(err);
+        }
+        else {
+            console.log("success");
+        }
+    });
+
+});
 
 
 module.exports = reports;

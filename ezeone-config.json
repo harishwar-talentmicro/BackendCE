@@ -16,8 +16,7 @@
     "EZEONE_CRASH_REPORT_DIR" : "ezeone_crash_report",
     "GROUP_ICON_URL" : "http://icons.iconarchive.com/icons/blackvariant/button-ui-system-folders-alt/512/Group-icon.png",
     "EZEONE_MAILING_LIST" : [
-      "sujit.mishra3147@gmail.com",
-      "sujit@talentmicro.com"
+      "sujit.mishra3147@gmail.com"
     ],
     "EZEONE_MESSAGE_ACCEPT_STATUS":1,
     "EZEONE_MESSAGE_REJECT_STATUS":2,
@@ -62,11 +61,11 @@
   },
   "VERSION_LIST" : {
     "IOS" : [[],[23,24]],
-    "ANDROID" : [42],
-    "WhatMateIOS" : [[],[27]],
-    "WhatMateANDROID" : [42],
+    "ANDROID" : [45],
+    "WhatMateIOS" : [[],[27,28]],
+    "WhatMateANDROID" : [45],
     "dialerIOS" : [[],[1,2]],
-    "dialerANDROID" : [3],
+    "dialerANDROID" : [8],
     "WEB" : [1]
   },
   "NOTIFICATION" : {
@@ -369,7 +368,12 @@
   "RESERVED_EZEONE_LIST" : ["API","MEDIA","WWW","STATIC","SUPPORT","HELP","BETA","MAIL","MESSANGER","CHAT","NOTIFICATION","CDN",
       "SERVER[0-9]+","NS[0-9]+","MS[0-9]"],
   "DB": {
-      "secretKey" : "t@LeNtMiCr0Wh@tM@te"
+      "secretKey" : "t@LeNtMiCr0Wh@tM@te",
+      "accountSid" : "AC3765f2ec587b6b5b893566f1393a00f4",
+      "authToken" : "b36eba6376b5939cebe146f06d33ec57",
+      "FromNumber" : "+18647547021",
+      "twilioApiKey" : "SK1e1fac39290cebabde43283468428f07",
+      "twilioApiSecret" : "Hdp0VqbQTKGRNwBh2p6NPQhFuCRoSZMK"
   },
   "OPEN_URL" : {
     "GET" : [

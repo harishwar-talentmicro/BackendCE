@@ -21,5 +21,7 @@ router.get('/workGroups',masterCtrl.getWorkGroup);
 router.get('/companies',masterCtrl.getWhatMateCompaniesList);
 
 router.get('/company/config',masterCtrl.getCompanyConfig);
+router.post('/whatmateTransactionList',masterCtrl.whatmateTransactionList);
+router.post('/whatmateBulkTransUpdate',masterCtrl.whatmateBulkTransUpdate);
 
 module.exports = router;

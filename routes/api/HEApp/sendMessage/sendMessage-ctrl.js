@@ -1881,9 +1881,9 @@ sendMessageCtrl.GetAnnouncementDetail = function (req, res, next) {
                         //
                         response.data = {
                             userDetails: (Result[0] && Result[0][0] && Result[0][0].formDataJSON) ? (JSON.parse(Result[0][0].formDataJSON)) : [],
-                            isNormal: Result[1][0].isNormal,
-                            isTaxSaving: Result[1][0].isTaxSaving,
-                            isSMSEnabled: Result[1][0].isSMSEnabled
+                            isNormal: Result[1] && Result[1][0] && Result[1][0].isNormal ? Result[1][0].isNormal : 0,
+                            isTaxSaving: Result[1] && Result[1][0] && Result[1][0].isTaxSaving ?Result[1][0].isTaxSaving : 0,
+                            isSMSEnabled: Result[1] && Result[1][0] && Result[1][0].isSMSEnabled ? Result[1][0].isSMSEnabled : 0
 
                         };
 

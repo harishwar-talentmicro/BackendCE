@@ -17,11 +17,11 @@ var gcloud = require('gcloud');
 var bcrypt = null;
 
 try{
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcryptjs');
 }
 catch(ex){
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcrypt');
 }
 
 var gcs = gcloud.storage({

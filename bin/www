@@ -7,12 +7,14 @@
 var app = require('../app');
 var debug = require('debug')('ezeid_node:server');
 var http = require('http');
-// var logger = require('../logger.js')
-// var log = logger.logger;
+var logger = require('../logger.js')
+var log = logger.logger;
 
 var https = require('https');
 var fs = require('fs');
+// var webSocketServer = require('websocket').server;
 
+var uuid = require('uuid');
 /*var options = {
   pfx: fs.readFileSync('finalcert.pfx'),
   passphrase:'hire'
@@ -47,18 +49,183 @@ if (cluster.isMaster) {
   var worker = cluster.fork().process;
   console.log('worker %s started.', worker.pid);
 
-  cluster.on('exit', function(worker) {
+  cluster.on('exit', function (worker) {
     console.log('worker %s died. restart...', worker.process.pid);
     cluster.fork();
   });
 
 } else {
 
-  var server = http.createServer(app).listen(app.get('port'), function(){
+  var server = http.createServer(app).listen(app.get('port'), function () {
     console.log('EZEID Server is started successfully, and listening on port ' + app.get('port'));
   })
-      .on('error', onError)
-      .on('listening', onListening);
+    .on('error', onError)
+    .on('listening', onListening);
+
+  //websocket for web-rtc
+  var users = {};
+
+
+  // var wsServer = new webSocketServer({
+  //   httpServer: server
+  // });
+
+  // this is executed each time the websocket
+  // server receives an request
+  // wsServer.on('request', function (request) {
+
+  //   // allow all incoming connections
+  //   var connection = request.accept(null, request.origin);
+
+  //   // here we read the incoming messages and try to parse them to JSON
+  //   connection.on('message', function (message) {
+
+  //     console.log("User connected");
+
+  //     //when server gets a message from a connected user
+  //     connection.on('message', function (message) {
+  //       console.log(message);
+
+  //       var data;
+  //       //accepting only JSON messages 
+  //       try {
+  //         if (typeof (message.utf8Data) == 'string')
+  //           data = JSON.parse(message.utf8Data);
+  //         else {
+  //           data = {};
+  //         }
+  //       } catch (e) {
+  //         console.log(e);
+  //         data = {};
+  //       }
+  //       console.log(JSON.parse(message.utf8Data));
+  //       console.log(data);
+  //       //switching type of the user message 
+  //       switch (data.type) {
+  //         //when a user tries to login 
+  //         case "login":
+  //           console.log("User logged", data.name);
+
+  //           //if anyone is logged in with this username then refuse 
+  //           if (users[data.name]) {
+  //             sendTo(connection, {
+  //               type: "login",
+  //               success: false
+  //             });
+  //           } else {
+  //             //save user connection on the server 
+  //             users[data.name] = connection;
+  //             connection.name = data.name;
+
+  //             sendTo(connection, {
+  //               type: "login",
+  //               success: true
+  //             });
+  //           }
+
+  //           break;
+
+  //         case "offer":
+  //           //for ex. UserA wants to call UserB 
+  //           console.log("Sending offer to: ", data.name);
+
+  //           //if UserB exists then send him offer details 
+  //           var conn = users[data.name];
+
+  //           if (conn != null) {
+  //             //setting that UserA connected with UserB 
+  //             connection.otherName = data.name;
+
+  //             sendTo(conn, {
+  //               type: "offer",
+  //               offer: data.offer,
+  //               name: connection.name
+  //             });
+  //           }
+
+  //           break;
+
+  //         case "answer":
+  //           console.log("Sending answer to: ", data.name);
+  //           //for ex. UserB answers UserA 
+  //           var conn = users[data.name];
+
+  //           if (conn != null) {
+  //             connection.otherName = data.name;
+  //             sendTo(conn, {
+  //               type: "answer",
+  //               answer: data.answer
+  //             });
+  //           }
+
+  //           break;
+
+  //         case "candidate":
+  //           console.log("Sending candidate to:", data.name);
+  //           var conn = users[data.name];
+
+  //           if (conn != null) {
+  //             sendTo(conn, {
+  //               type: "candidate",
+  //               candidate: data.candidate
+  //             });
+  //           }
+
+  //           break;
+
+  //         case "leave":
+  //           console.log("Disconnecting from", data.name);
+  //           var conn = users[data.name];
+  //           conn.otherName = null;
+
+  //           //notify the other user so he can disconnect his peer connection 
+  //           if (conn != null) {
+  //             sendTo(conn, {
+  //               type: "leave"
+  //             });
+  //           }
+
+  //           break;
+
+  //         default:
+  //           sendTo(connection, {
+  //             type: "error",
+  //             message: "Command not found: " + data.type
+  //           });
+
+  //           break;
+  //       }
+  //     });
+
+  //     //when user exits, for example closes a browser window 
+  //     //this may help if we are still in "offer","answer" or "candidate" state 
+  //     connection.on("close", function () {
+
+  //       if (connection.name) {
+  //         delete users[connection.name];
+
+  //         if (connection.otherName) {
+  //           console.log("Disconnecting from ", connection.otherName);
+  //           var conn = users[connection.otherName];
+  //           conn.otherName = null;
+
+  //           if (conn != null) {
+  //             sendTo(conn, {
+  //               type: "leave"
+  //             });
+  //           }
+  //         }
+  //       }
+  //     });
+
+  //     connection.send("Hello world");
+
+  //   });
+
+  //   function sendTo(connection, message) {
+  //     connection.send(JSON.stringify(message));
+  //   }
+  // });
 }
 
 process.on('uncaughtException', function (err) {
@@ -115,8 +282,8 @@ function onError(error) {
   }
 
   var bind = typeof port === 'string'
-      ? 'Pipe ' + port
-      : 'Port ' + port
+    ? 'Pipe ' + port
+    : 'Port ' + port
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -140,7 +307,10 @@ function onError(error) {
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
-      ? 'pipe ' + addr
-      : 'port ' + addr.port;
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+
+

@@ -62,11 +62,11 @@ var randomstring = require("randomstring");
 
 
 try {
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcryptjs');
 }
 catch (ex) {
     console.log('Bcrypt not found, falling back to bcrypt-nodejs');
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcrypt');
 }
 
 /**
@@ -1053,39 +1053,42 @@ walkInCvCtrl.sendOtp = function (req, res, next) {
                             method: 'GET'
 
                         }, function (error, response, body) {
+                            console.log(error, "SMS");
+
                             if (error) {
                                 console.log(error, "SMS");
-                                var req = http.request(options, function (res) {
-                                    var chunks = [];
-        
-                                    res.on("data", function (chunk) {
-                                        chunks.push(chunk);
-                                        console.log('smsGateway.center ');
-                                    });
-        
-                                    res.on("end", function () {
-                                        var body = Buffer.concat(chunks);
-                                        console.log(body.toString());
-                                    });
-                                });
-        
-                                req.write(qs.stringify({
-                                    userId: 'talentmicro',
-                                    password: 'TalentMicro@123',
-                                    senderId: 'WTMATE',
-                                    sendMethod: 'simpleMsg',
-                                    msgType: 'text',
-                                    mobile: isdMobile.replace("+", "") + mobileNo,
-                                    msg: message,
-                                    duplicateCheck: 'true',
-                                    format: 'json'
-                                }));
-                                req.end();
                             }
                             else {
                                 console.log("SUCCESS Aikon sms service", "SMS response");
                             }
                         });
+                        var req = http.request(options, function (res) {
+                            var chunks = [];
+
+                            res.on("data", function (chunk) {
+                                chunks.push(chunk);
+                                console.log('smsGateway.center ');
+                            });
+
+                            res.on("end", function () {
+                                var body = Buffer.concat(chunks);
+                                console.log(body.toString());
+                            });
+                        });
+
+                        req.write(qs.stringify({
+                            userId: 'talentmicro',
+                            password: 'TalentMicro@123',
+                            senderId: 'WTMATE',
+                            sendMethod: 'simpleMsg',
+                            msgType: 'text',
+                            mobile: isdMobile.replace("+", "") + mobileNo,
+                            msg: message,
+                            duplicateCheck: 'true',
+                            format: 'json'
+                        }));
+                        req.end();
+
 
                     }
                     else if (isdMobile != "") {
@@ -4395,5 +4398,87 @@ walkInCvCtrl.getoptions = function (req, res, next) {
 
 };
 
+walkInCvCtrl.sendWalkInData = function (req, res, next) {
+    var response = {
+        status: false,
+        message: "Invalid token",
+        data: null,
+        error: null
+    };
+    var validationFlag = true;
+    // if (!req.query.token) {
+    //     error.token = 'Invalid token';
+    //     validationFlag *= false;
+    // }
+    if (!req.query.heMasterId) {
+        error.heMasterId = 'Invalid heMasterId';
+        validationFlag *= false;
+    }
+
+
+    if (!validationFlag) {
+        response.error = error;
+        response.message = 'Please check the errors';
+        res.status(400).json(response);
+        console.log(response);
+    }
+    else {
+        // req.st.validateToken(req.query.token, function (err, tokenResult) {
+        //     if ((!err) && tokenResult) {
+
+                var inputs = [
+                    req.st.db.escape(req.query.heMasterId)
+                ];
+
+                var procQuery = 'CALL wm_integration-walkIn( ' + inputs.join(',') + ')';
+                console.log(procQuery);
+                req.db.query(procQuery, function (err, result) {
+                    console.log(err);
+                    
+                    if (!err && result && result[0] && result[1]) {
+                        // result[1][isInterviewStatus]=result[0].isInterviewStatus ;
+
+                        response.status = true;
+                        response.message = "Data loaded successfully";
+                        response.error = null;
+                        response.data = {
+                            isInterviewStatus:result[0][0].isInterviewStatus,
+                            isSkillAddition:result[0][0].isSkillAddition,
+                            isAssesmentAddition:result[0][0].isAssesmentAddition,
+                            isSkill:(result[0][0].isSkill) ? result[0][0].isSkill:0,
+                            isAssesment:(result[0][0].isAssessment) ? result[0][0].isAssessment:0,
+                            optionList:result[1],
+                            
+                        };
+                        res.status(200).json(response);
+                    }
+
+
+                    else if (!err) {
+                        response.status = true;
+                        response.message = "No results found";
+                        response.error = null;
+                        response.data = {
+                            optionList:[]
+                        };
+                        res.status(200).json(response);
+
+                    }
+                    else {
+                        response.status = false;
+                        response.message = "Error while getting user data";
+                        response.error = null;
+                        response.data = null;
+                        res.status(500).json(response);
+                    }
+                });
+        //     }
+        //     else {
+        //         res.status(401).json(response);
+        //     }
+        // });
+    }
+
+};
 
 module.exports = walkInCvCtrl;

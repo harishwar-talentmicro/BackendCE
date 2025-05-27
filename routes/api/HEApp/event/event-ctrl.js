@@ -68,6 +68,8 @@ eventCtrl.getWhatMateBanners = function (req, res, next) {
                     res2.tileStyle = homePageData[1][j].tileStyle;
                     res2.type = homePageData[1][j].type;
                     res2.groupId = homePageData[1][j].groupId;
+                    res2.HCUserId = homePageData[1][j].HCUserId ? homePageData[1][j].HCUserId : 0;
+                    res2.isTallint = homePageData[1][j].isTallint ? homePageData[1][j].isTallint : 0;
                     res2.banner = homePageData[1][j].banner ? (req.CONFIG.CONSTANT.GS_URL +
                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[1][j].banner) : "";
                     WMoutput.push(res2);
@@ -83,6 +85,8 @@ eventCtrl.getWhatMateBanners = function (req, res, next) {
                     res3.tileStyle = homePageData[2][k].tileStyle;
                     res3.type = homePageData[2][k].type;
                     res3.groupId = homePageData[2][k].groupId;
+                    res3.HCUserId = homePageData[2][k].HCUserId ? homePageData[2][k].HCUserId: 0;
+                    res3.isTallint = homePageData[2][k].isTallint ? homePageData[2][k].isTallint: 0;
                     res3.banner = homePageData[2][k].banner ? (req.CONFIG.CONSTANT.GS_URL +
                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[2][k].banner) : "";
                     WMoutput.push(res3);
@@ -97,6 +101,8 @@ eventCtrl.getWhatMateBanners = function (req, res, next) {
                     res4.tileStyle = homePageData[3][l].tileStyle;
                     res4.type = homePageData[3][l].type;
                     res4.groupId = homePageData[3][l].groupId;
+                    res4.HCUserId = homePageData[3][l].HCUserId ? homePageData[3][l].HCUserId: 0;
+                    res4.isTallint = homePageData[3][l].isTallint ? homePageData[3][l].isTallint:0;
                     res4.banner = homePageData[3][l].banner ? (req.CONFIG.CONSTANT.GS_URL +
                         req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + homePageData[3][l].banner) : "";
                     WMoutput.push(res4);

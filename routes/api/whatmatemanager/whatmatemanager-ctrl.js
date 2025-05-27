@@ -534,7 +534,9 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             HRPayrollDocs : result[1][0] && result[1][0].HRPayrollDocs ? result[1][0].HRPayrollDocs : 0,
                             sales : result[1][0] && result[1][0].sales ? result[1][0].sales : 0,
                             formList : output,
-                            accessableFormList : result[2][0].formList ? JSON.parse(result[2][0].formList) : null
+                            accessableFormList : result[2][0].formList ? JSON.parse(result[2][0].formList) : null,
+                            rmGroupList : result[4] && result[4][0] ? result[4] : [],
+                            workLocationList : result[5] && result[5][0] ? result[5] : []
                         };
                         res.status(200).json(response);
                     }
@@ -552,7 +554,9 @@ managerCtrl.getFormTransactionData = function(req,res,next){
                             HRPayrollDocs : result[1][0].HRPayrollDocs,
                             sales : result[1][0].sales,
                             formList : [],
-                           accessableFormList : result[2] && result[2][0] && result[2][0].formList ? JSON.parse(result[2][0].formList) : null
+                           accessableFormList : result[2] && result[2][0] && result[2][0].formList ? JSON.parse(result[2][0].formList) : null,
+                           rmGroupList : [],
+                           workLocationList: []
                         };
                         res.status(200).json(response);
                     }

@@ -118,9 +118,20 @@ router.post('/moveOrCopyTaggedTransactions',applicantCtrl.moveOrCopyTaggedTransa
 router.post('/sendSmsToCandidates',sendgridCtrl.sendSMSToCandidates);
 
 router.post('/resume-preparation', resumeMaskingCtrl.resume_maskinghttps)
+// router.post('/resume_maskingNew', resumeMaskingCtrl.resume_maskingNew);
 
 router.get('/paceMailThreads',applicantCtrl.paceMailThreads);
 router.post('/savePaceMailThreadsData',applicantCtrl.savepaceMailThreads);
 router.post('/saveCloseRequirements',applicantCtrl.saveCloseRequirements);
+
+router.get('/cvSearchMasterData',applicantCtrl.getcvSearchMasterData);
+router.post('/SaveCVSearchResult',applicantCtrl.SaveCVSearchResult);
+router.get('/getFeebackAssessmentList',applicantCtrl.getFeebackAssessmentList);
+router.get('/getFeebackAssessmentDetails',applicantCtrl.getFeebackAssessment);
+router.post('/hiringManagerFeedbackSubmit',applicantCtrl.hiringManagerFeedbackSubmit);
+router.get('/AssessmentFeedBackPageStatusList',applicantCtrl.AssessmentFeedBackPageStatusList);
+router.post('/savePaceVendors',applicantCtrl.savePaceVendors);
+router.get('/getPaceVendorDetails',applicantCtrl.getPaceVendorDetails);
+router.get('/paceNotify',applicantCtrl.paceNotifications);
 
 module.exports = router;

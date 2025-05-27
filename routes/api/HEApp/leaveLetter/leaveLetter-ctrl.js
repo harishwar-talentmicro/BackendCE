@@ -56,6 +56,7 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                         validationFlag *= false;
                     }
                 
+                    req.body.leaveDays = req.body.leaveDays && req.body.leaveDays!=0 ? req.body.leaveDays : 1;
                     if (!req.body.leaveDays) {
                         error.leaveDays = 'Invalid leaveDays';
                         validationFlag *= false;
@@ -126,7 +127,9 @@ leaveLetterCtrl.saveLeaveLetter = function(req,res,next){
                             req.st.db.escape(JSON.stringify(attachmentList)),
                             req.st.db.escape(DBSecretKey),
                             req.st.db.escape(req.body.timestamp),
-                            req.st.db.escape(req.body.createdTimeStamp)                   
+                            req.st.db.escape(req.body.createdTimeStamp),
+                            req.st.db.escape(req.body.minDate),
+                            req.st.db.escape(req.body.maxDate)                      
                         ];
 
                         var leaveFormId=1004;

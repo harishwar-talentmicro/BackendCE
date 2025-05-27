@@ -86,7 +86,12 @@ onboardingctrl.onBoardingDynamicForm = function (req, res, next) {
                                 radioName  : results[6] ? results[6]:[],
                                 sampleSegment :output,
                                 gender : results[9] ? results[9]:[],
-                                document : results[10] ? results[10]:[]
+                                document : results[10] ? results[10]:[],
+                                salutation : results[11] ? results[11]:[],
+                                maritialStatus : results[12] ? results[12]:[],
+                                nationality : results[13] ? results[13]:[],
+                                religion : results[14] ? results[14]:[],
+                                bloodGroup : results[15] ? results[15]:[]
                             }
                             
                         }
@@ -182,7 +187,13 @@ onboardingctrl.onBoardingDynamicMaster = function (req, res, next) {
                                 selectTypeList : results[8] ? results[8]:[],
                                 controlTypeList : results[9] ? results[9]:[],
                                 gender : results[12] ? results[12]:[],
-                                document : results[13] ? results[13]:[]
+                                document : results[13] ? results[13]:[],
+                                salutation : results[14] ? results[14]:[],
+                                maritialStatus : results[15] ? results[15]:[],
+                                nationality : results[16] ? results[16]:[],
+                                religion : results[17] ? results[17]:[],
+                                bloodGroup : results[18] ? results[18]:[],
+                                courseType : results[19] ? results[19]:[]
                             },
                             dropdownName:results[11] ? results[11]:[],
                         }
@@ -313,9 +324,9 @@ onboardingctrl.saveOnBoarding = function (req, res, next) {
         req.st.validateToken(req.query.token, function (err, tokenResult) {
             if ((!err) && tokenResult) {
 
-                    var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
-                    zlib.unzip(decryptBuf, function (_, resultDecrypt) {
-                        req.body = JSON.parse(resultDecrypt.toString('utf-8'));
+                    // var decryptBuf = encryption.decrypt1((req.body.data), tokenResult[0].secretKey);
+                    // zlib.unzip(decryptBuf, function (_, resultDecrypt) {
+                    //     req.body = JSON.parse(resultDecrypt.toString('utf-8'));
                         var userDetails = req.body.userDetails;
                         if (typeof (userDetails) == "string") {
                             userDetails = JSON.parse(userDetails);
@@ -437,12 +448,12 @@ onboardingctrl.saveOnBoarding = function (req, res, next) {
                                     };
                                     // res.status(200).json(response);
                                     if (req.query.isWeb == 0) {
-                                        var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
-                                        zlib.gzip(buf, function (_, result) {
-                                            response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
+                                        // var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
+                                        // zlib.gzip(buf, function (_, result) {
+                                        //     response.data = encryption.encrypt(result, tokenResult[0].secretKey).toString('base64');
                                             res.status(200).json(response);
 
-                                        });
+                                        // });
                                     }
                                     else {
                                         res.status(200).json(response);
@@ -523,7 +534,7 @@ onboardingctrl.saveOnBoarding = function (req, res, next) {
                                 }
                             });
                         }
-                    });
+                    // });
             
             }
             else {

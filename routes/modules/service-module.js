@@ -155,6 +155,42 @@ var uploadDocumentToCloud = function (uniqueName, readStream, callback) {
     });
 };
 
+
+var uploadDocumentToCloud_project_management = function(uniqueName,readStream,callback){
+    var remoteWriteStream = bucket.file('project_management/'+uniqueName).createWriteStream();
+    readStream.pipe(remoteWriteStream);
+
+    remoteWriteStream.on('finish', function(){
+        console.log('done');
+        if(callback){
+            if(typeof(callback)== 'function'){
+                callback(null);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+
+    remoteWriteStream.on('error', function(err){
+        if(callback){
+            if(typeof(callback)== 'function'){
+                console.log(err);
+                callback(err);
+            }
+            else{
+                console.log('callback is required for uploadDocumentToCloud');
+            }
+        }
+        else{
+            console.log('callback is required for uploadDocumentToCloud');
+        }
+    });
+};
+
 /**
  * @todo FnGetServiceProviders
  * Method : GET
@@ -923,7 +959,7 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
                 console.log('filetype', filetype);
 
                 if (filetype && filetype != "") {
-                    if (filetype != 'doc') { //&& filetype != 'pdf'
+                    if (filetype != 'doc' && filetype != 'pdf') {
                         aUrl = uniqueId + '.' + filetype;
                         aFilename = req.files.attachment.originalname;
                         console.log("aFilenameaFilename", aFilename);
@@ -1023,7 +1059,102 @@ Service.prototype.saveServiceAttachmentPace = function (req, res, next) {
 };
 
 
-Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
+// project management attachments temp
+Service.prototype.saveServiceAttachmentProjectManagement = function(req,res,next) {
+
+    var aUrl='',aFilename='';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+
+    try{
+        if(req.files) {
+            if(req.files.attachment) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+                var mimeType = req.files.attachment.mimetype;
+                if(mimeType && filetype==''){
+                    if(mimeType.indexOf('png') > 0|| mimeType.indexOf('jpg') > 0 ){
+                        filetype = "png";
+                    }
+                    else if(mimeType.indexOf('jpeg') > 0 ){
+                        filetype = "jpeg";
+                    }
+                    else if(mimeType.indexOf('jpg') > 0 ){
+                        filetype = "jpg"
+                    }
+                    else if(mimeType.indexOf('doc') > 0 ){
+                        filetype = "docx"
+                    }
+                    else if(mimeType.indexOf('docx') > 0 ){
+                        filetype = "docx"
+                    }
+                    else if(mimeType.indexOf('rtf') > 0 ){
+                        filetype = "rtf"
+                    }
+                    else if(mimeType.indexOf('pdf') > 0 ){
+                        filetype = "pdf"
+                    }
+                    else if(mimeType.indexOf('application/msword') > -1 ){
+                        filetype = "docx"
+                    }
+                }
+                aUrl = uniqueId + '.' + filetype;
+                aFilename = req.files.attachment.originalname;
+                console.log("aFilenameaFilename",aFilename);
+                console.log("aFilenameaFilename",req.files.attachment);
+                
+                console.log("req.files.attachment.path",req.files.attachment.path);
+
+                var readStream = fs.createReadStream(req.files.attachment.path);
+
+                uploadDocumentToCloud_project_management(aUrl, readStream, function (err) {
+                    if (!err) {
+                        responseMessage.status = true;
+                        responseMessage.message = 'attachment Uploaded successfully';
+                        responseMessage.data = {
+                            a_url : aUrl,
+                            a_fn :aFilename
+                        };
+                        console.log("responseMessage",responseMessage);
+
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                    }
+                    else {
+                        responseMessage.error = err;
+                        responseMessage.message = 'attachment not upload';
+                        res.status(200).json(responseMessage);
+                        console.log('FnSaveServiceAttachment:attachment not upload');
+                    }
+                });
+            }
+        }
+        else{
+            responseMessage.message = 'file is required';
+            res.status(200).json(responseMessage);
+            console.log('file is required');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error'
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceAttachment:error ' + ex);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
+
+
+Service.prototype.saveServiceAttachmentDocOld = function (req, res, next) {
 
     var aUrl = '', aFilename = '';
 
@@ -1071,7 +1202,7 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                 }
 
                 console.log('doc api log', filetype);
-                if (filetype != "doc") {
+                if (filetype != "doc" && filetype != 'pdf') {
                     aUrl = uniqueId + '.' + filetype;
                     aFilename = req.files.attachment.originalname;
                     console.log("aFilenameaFilename", aFilename);
@@ -1108,13 +1239,11 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                     });
                 }
                 else {
-                    // if (filetype == 'doc') {
+                    if (filetype == 'doc' || filetype == 'pdf') {
                         var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
-                        var file_name_docx = file_name + 'x';
-                    // } else {
-                    //     var file_name = 'pace' + Date.now() + '.' + filetype; // '.doc'
-                    //     var file_name_docx = file_name;
-                    // }
+                        var file_name_html = file_name.split('.')[0] + '.html';
+                        var file_name_docx = file_name.split('.')[0] + '.docx';
+                    }
 
                     aUrl = uniqueId + '.docx';
                     console.log('doc to docx', aUrl);
@@ -1123,13 +1252,21 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                     // write some data with a base64 encoding
                     var rs = fs.createReadStream(req.files.attachment.path);
                     rs.pipe(writeStream);
-                    console.log('start to convert doc to docx');
+                    console.log('start to convert');
                     // the finish event is emitted when all data has been flushed from the stream
                     writeStream.on('finish', () => {
                         try {
                             console.log('wrote all data to file');
-                            console.log(path.resolve(__dirname, 'doc2docx.py'));
-                            var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]); // pass org file to convertor
+
+                            if (filetype == 'doc') {
+                                console.log(path.resolve(__dirname, 'doc2docx.py'));
+                                var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]); // pass org file to convertor                                
+                            }
+                            else {
+                                console.log(path.resolve(__dirname, 'pdf2docx.py'));
+                                var process = spawn('python', [path.resolve(__dirname, 'pdf2docx.py'), file_name, file_name_html]); // pass org file to convertor
+                            }
+
                             // process.stdout.on('data',function(data){
                             //     console.log(data.toString());
                             // })
@@ -1139,7 +1276,10 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
                                     console.log('Hello data', data.toString());
                                 process.kill();
                                 setTimeout(function () {
+                                    console.log('insde set time out');
+
                                     var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
+
 
                                     uploadDocumentToCloud(aUrl, readStream, function (err) {
                                         try {
@@ -1199,6 +1339,311 @@ Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
     }
 };
 
+
+var pdftohtml = function (file_name, callback) {
+    console.log(path.resolve(__dirname, 'pdf2html.py'));
+    var process_pdftohtml = spawn('python', [path.resolve(__dirname, 'pdf2html.py'), file_name]); // pass org file to convertor
+
+    process_pdftohtml.stdout.on('data', function (datahtml) {
+        process_pdftohtml.kill();
+        setTimeout(function () {
+            callback(datahtml);
+        }, 1000);
+    })
+}
+
+var htmltodocx = function (file_name_html, callback) {
+    console.log('Html to docx function ',path.resolve(__dirname, 'html2docx.py'));
+    var process_htmltodocx = spawn('python', [path.resolve(__dirname, 'html2docx.py'), file_name_html]); // pass org file to convertor
+    process_htmltodocx.stdout.on('data', function (datahtml) {
+        process_htmltodocx.kill();
+        setTimeout(function () {
+            callback(datahtml);
+        }, 1000);
+    })
+}
+
+
+Service.prototype.saveServiceAttachmentDoc = function (req, res, next) {
+
+    var aUrl = '', aFilename = '';
+
+    var responseMessage = {
+        status: false,
+        error: {},
+        message: '',
+        data: null
+    };
+    console.log('doc to docx', req.files);
+
+    try {
+        if (req.files) {
+            if (req.files.attachment) {
+                var uniqueId = uuid.v4();
+                var filetype = (req.files.attachment.extension) ? req.files.attachment.extension : '';
+                var mimeType = req.files.attachment.mimetype;
+                console.log('doc filetype', filetype);
+
+                if (mimeType) {
+                    if (mimeType.indexOf('png') > 0 || mimeType.indexOf('jpg') > 0) {
+                        filetype = "png";
+                    }
+                    else if (mimeType.indexOf('jpeg') > 0) {
+                        filetype = "jpeg";
+                    }
+                    else if (mimeType.indexOf('jpg') > 0) {
+                        filetype = "jpg"
+                    }
+                    else if (mimeType.indexOf('doc') > 0) {
+                        filetype = "doc"
+                    }
+                    else if (mimeType.indexOf('docx') > 0) {
+                        filetype = "docx"
+                    }
+                    else if (mimeType.indexOf('rtf') > 0) {
+                        filetype = "rtf"
+                    }
+                    else if (mimeType.indexOf('pdf') > 0) {
+                        filetype = "pdf"
+                    }
+                    else if (mimeType.indexOf('application/msword') > -1) {
+                        filetype = "doc"
+                    }
+                }
+
+                console.log('doc api log', filetype);
+                if (filetype != "doc" && filetype != 'pdf') {
+                    aUrl = uniqueId + '.' + filetype;
+                    aFilename = req.files.attachment.originalname;
+                    console.log("aFilenameaFilename", aFilename);
+                    console.log("aFilenameaFilename", req.files.attachment);
+
+                    console.log("req.files.attachment.path", req.files.attachment.path);
+
+                    var readStream = fs.createReadStream(req.files.attachment.path);
+
+                    uploadDocumentToCloud(aUrl, readStream, function (err) {
+                        try {
+                            if (!err) {
+                                responseMessage.status = true;
+                                responseMessage.message = 'attachment Uploaded successfully';
+                                responseMessage.data = {
+                                    a_url: aUrl,
+                                    a_fn: aFilename
+                                };
+                                console.log("responseMessage", responseMessage);
+
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                            }
+                            else {
+                                responseMessage.message = 'attachment not upload';
+                                res.status(200).json(responseMessage);
+                                console.log('FnSaveServiceAttachment:attachment not upload');
+                            }
+                        } catch (ex) {
+                            console.log(ex);
+                            responseMessage.message = 'Failed to upload';
+                            res.status(500).json(responseMessage);
+                        }
+                    });
+                }
+                else {
+                    var file_name = 'pace' + Date.now() + '.' + filetype;
+                    var file_name_html = file_name.split('.')[0] + '.html';
+                    var file_name_docx = file_name.split('.')[0] + '.docx';
+                    console.log('file_name', file_name)
+                    console.log('file_name_html', file_name_html)
+                    console.log('file_name_docx', file_name_docx)
+
+                    aUrl = uniqueId + '.docx';
+                    console.log('doc to docx', aUrl);
+                    let writeStream = fs.createWriteStream(path.resolve(__dirname, file_name));  // create a file stream to write
+
+                    // write some data with a base64 encoding
+                    var rs = fs.createReadStream(req.files.attachment.path);
+                    rs.pipe(writeStream);
+                    console.log('start to convert');
+
+                    // the finish event is emitted when all data has been flushed from the stream
+                    writeStream.on('finish', () => {
+                        try {
+                            console.log('wrote all data to file');
+
+                            if (filetype == 'doc') {
+                                console.log(path.resolve(__dirname, 'doc2docx.py'));
+                                var process = spawn('python', [path.resolve(__dirname, 'doc2docx.py'), file_name]); // pass org file to convertor                                
+                                console.log('start conversion doc to docx');
+                                process.stdout.on('data', function (data) {
+                                    console.log("Inside");
+                                    if (data)
+                                        console.log('Hello data', data.toString());
+                                    process.kill();
+                                    setTimeout(function () {
+                                        console.log('insde set time out');
+
+                                        var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
+
+
+                                        uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                            try {
+                                                if (!err) {
+                                                    responseMessage.status = true;
+                                                    responseMessage.message = 'attachment Uploaded successfully';
+                                                    responseMessage.data = {
+                                                        a_url: aUrl,
+                                                        a_fn: aFilename,
+                                                        message: 'docx'
+                                                    };
+                                                    console.log("responseMessage", responseMessage);
+
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                                }
+                                                else {
+                                                    responseMessage.message = 'attachment not upload';
+                                                    res.status(200).json(responseMessage);
+                                                    console.log('FnSaveServiceAttachment:attachment not upload');
+                                                }
+                                            } catch (ex) {
+                                                console.log(ex);
+                                                responseMessage.message = 'Failed to upload';
+                                                res.status(500).json(responseMessage);
+                                            }
+                                        });
+                                    }, 1000);
+
+                                })
+
+                            }
+                            else {
+
+                                pdftohtml(file_name, function (htmldata) {
+                                    console.log('callback pdftohtml', htmldata.toString());
+                                    if (htmldata.toString().indexOf('') > -1) {
+                                        console.log('success html stage')
+                                        htmltodocx(file_name_html, function (docxdata) {
+                                            console.log('call back of htmltodocx', docxdata.toString());
+                                            if (docxdata.toString().indexOf('') > -1) {
+                                                console.log('success to docx:::')
+                                                var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
+
+                                                uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                                    try {
+                                                        if (!err) {
+                                                            responseMessage.status = true;
+                                                            responseMessage.message = 'attachment Uploaded successfully';
+                                                            responseMessage.data = {
+                                                                a_url: aUrl,
+                                                                a_fn: aFilename,
+                                                                message: 'docx'
+                                                            };
+                                                            console.log("responseMessage", responseMessage);
+
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                                        }
+                                                        else {
+                                                            responseMessage.message = 'attachment not upload';
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnSaveServiceAttachment:attachment not upload');
+                                                        }
+                                                    } catch (ex) {
+                                                        console.log(ex);
+                                                        responseMessage.message = 'Failed to upload';
+                                                        res.status(500).json(responseMessage);
+                                                    }
+                                                });
+                                            }
+                                        })
+                                    }
+                                })
+
+                                /*
+                                console.log(path.resolve(__dirname, 'pdf2html.py'));
+                                console.log(path.resolve(__dirname, 'html2docx.py'));
+                                var process_pdftohtml = spawn('python', [path.resolve(__dirname, 'pdf2html.py'), file_name]); // pass org file to convertor
+                                var process_htmltodocx = spawn('python', [path.resolve(__dirname, 'html2docx.py'), file_name_html]); // pass org file to convertor
+
+                                process_pdftohtml.stdout.on('data', function (datahtml) {
+                                    console.log("Inside pdf to html process");
+                                    if (datahtml)
+                                        console.log('Hello datahtml', datahtml.toString());
+                                    process_pdftohtml.kill();
+                                    setTimeout(function () {
+                                        console.log('inside set time out html');
+                                        process_htmltodocx.stdout.on('data', function (datadocx) {
+                                            console.log("Inside html to docx process");
+                                            if (datadocx)
+                                                console.log('Hello datahtml', datadocx.toString());
+                                            process_htmltodocx.kill();
+                                            setTimeout(function () {
+                                                console.log('insde set time out docx');
+
+                                                var readStream = fs.createReadStream(path.resolve(__dirname, file_name_docx));
+
+                                                uploadDocumentToCloud(aUrl, readStream, function (err) {
+                                                    try {
+                                                        if (!err) {
+                                                            responseMessage.status = true;
+                                                            responseMessage.message = 'attachment Uploaded successfully';
+                                                            responseMessage.data = {
+                                                                a_url: aUrl,
+                                                                a_fn: aFilename,
+                                                                message: 'docx'
+                                                            };
+                                                            console.log("responseMessage", responseMessage);
+
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnSaveServiceAttachment: attachment Uploaded successfully');
+                                                        }
+                                                        else {
+                                                            responseMessage.message = 'attachment not upload';
+                                                            res.status(200).json(responseMessage);
+                                                            console.log('FnSaveServiceAttachment:attachment not upload');
+                                                        }
+                                                    } catch (ex) {
+                                                        console.log(ex);
+                                                        responseMessage.message = 'Failed to upload';
+                                                        res.status(500).json(responseMessage);
+                                                    }
+                                                });
+                                            }, 2000);
+                                        })
+                                    }, 2000);
+                                })
+                                */
+
+                            }
+
+                        } catch (ex) {
+                            console.log(ex);
+                            responseMessage.message = 'Failed to upload';
+                            res.status(500).json(responseMessage);
+                        }
+                    });
+                }
+            }
+        }
+        else {
+            responseMessage.message = 'file is required';
+            res.status(200).json(responseMessage);
+            console.log('file is required');
+        }
+    }
+    catch (ex) {
+        responseMessage.error = {
+            server: 'Internal Server error',
+            message: ex.toString()
+        };
+        responseMessage.message = 'An error occurred !';
+        console.log('FnSaveServiceAttachment:error ' + ex);
+        console.log(ex);
+        var errorDate = new Date();
+        console.log(errorDate.toTimeString() + ' ....................');
+        res.status(400).json(responseMessage);
+    }
+};
 
 /**
  * @todo FnSaveServiceVideo

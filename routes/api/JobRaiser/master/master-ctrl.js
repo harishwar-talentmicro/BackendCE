@@ -127,7 +127,7 @@ masterCtrl.getReqMasterData = function (req, res, next) {
                                             result.data.scale = result.data.scale && result.data.scale != null ? result.data.scale : [{ scaleId: 1, scale: "Hundreds" }, { scaleId: 2, scale: "Lakhs" }];
                                             result.data.industry = result.data.industry && result.data.industry != null ? result.data.industry : [{ industryId: 43, title: "Software IT", industryTitle: "Software IT" }, { industryId: 44, title: "Business Development", industryTitle: "Business Development" }];
                                             result.data.teamMembers = [{ memberId: 1, displayName: "Hirecraft HC" }, { memberId: 1, displayName: "Hirecraft HC" }, { memberId: 43589, displayName: "Aauyush sharma" }, { memberId: 43589, displayName: "Aauyush sharma" }];
-                                            
+
                                             // result.data.department = result.data.department && result.data.department.length!=0 ? result.data.department : [{ departmentId: 1, department: "Sales" }, { departmentId: 2, department: "Customer Support" }];
 
                                             // result.data.subDepartments = result.data.subDepartments && result.data.subDepartments.length!=0 ? result.data.subDepartments : [{ subDepartmentId: 1, subDepartment: "Sales Division A" }, { subDepartmentId: 2, subDepartment: "Customer Support Division A" }];
@@ -508,7 +508,8 @@ masterCtrl.saveClients = function (req, res, next) {
                                     roles: results[5] ? results[5] : [],
                                     group: results[6] ? results[6] : [],
                                     newClient: results[7] ? results[7][0].newClient : {},
-                                    followUpNotes: results[8] && results[8][0] ? results[8] : []
+                                    followUpNotes: results[8] && results[8][0] ? results[8] : [],
+                                    unreadNotifyCount : results[8] && results[8][0] && results[8][0].unreadNotifyCount ? results[8][0].unreadNotifyCount : 0 
                                 };
 
                                 var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -1085,7 +1086,7 @@ masterCtrl.savetemplate = function (req, res, next) {
                         req.body.updateFlag = (req.body.updateFlag) ? req.body.updateFlag : 0;
                         req.body.SMSMessage = (req.body.SMSMessage) ? req.body.SMSMessage : '';
                         req.body.whatmateMessage = (req.body.whatmateMessage) ? req.body.whatmateMessage : '';
-                        var templateId =  req.body.template && (req.body.template.templateId)  ? (req.body.template.templateId)  : req.body.templateId || 0;
+                        var templateId = req.body.template && (req.body.template.templateId) ? (req.body.template.templateId) : req.body.templateId || 0;
                         var whatmateMessage = req.body.whatmateMessage || '';
                         var smsMsg = req.body.smsMsg || '';
                         var smsFlag = req.body.smsFlag || 0;
@@ -1763,7 +1764,9 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                     req.st.db.escape(req.body.joiningDate || null),
                                     req.st.db.escape(req.body.jobType || 0),
                                     req.st.db.escape(req.body.creatorName || ""),
-                                    req.st.db.escape(req.body.createdDate || null)
+                                    req.st.db.escape(req.body.createdDate || null),
+                                    req.st.db.escape(JSON.stringify(req.body.jobTitleId || [])),
+                                    req.st.db.escape(JSON.stringify(req.body.branchList || []))
                                 ];
 
                                 var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
@@ -1771,7 +1774,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 req.db.query(procQuery, function (err, results) {
                                     console.log(err);
 
-                                    if (!err && results && (results[0] || results[1])) {
+                                    if (!err && results) {
                                         response.status = true;
                                         response.message = " Requirement View loaded sucessfully";
                                         response.error = null;
@@ -1790,7 +1793,8 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                         response.data = {
                                             requirementView: results[0] ? results[0] : [],
                                             requirementCount: (results[2] && results[2][0] && results[2][0].requirementCount) ? results[2][0].requirementCount : 0,
-                                            stageList: results[3] && results[3][0] ? results[3] : []
+                                            stageList: results[3] && results[3][0] ? results[3] : [],
+                                            unreadNotifyCount: (results[4] && results[4][0] && results[4][0].unreadNotifyCount) ? results[4][0].unreadNotifyCount : 0
                                         };
                                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                         zlib.gzip(buf, function (_, result) {
@@ -1862,7 +1866,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                     req.query.status = req.query.status ? req.query.status : 0;
 
                                     // use this after getting url from tallint
-                                    var url = urlData.apiPath + 'status=' + req.query.status + '&startpage=' + req.query.startPage + '&limit=' + req.query.limit;
+                                    var url = urlData.apiPath + 'status=' + req.query.status + '&startpage=' + req.query.startPage + '&limit=' + req.query.limit + '&HCUserId=' + req.query.HCUserId + '&keyword=' + req.query.search;
                                     console.log(url);
                                     request({
                                         url: url,
@@ -1880,12 +1884,12 @@ masterCtrl.getRequirementView = function (req, res, next) {
 
                                                         if (reqList[i].title && reqList[i].title != "" && reqList[i].title != "null" && reqList[i].title != null && reqList[i].title != " ") {
                                                             var obj = {};
-                                                            obj.parentId = reqList[i].ReqId;
+                                                            obj.parentId = reqList[i].parentId;
                                                             obj.transId = reqList[i].transId ? reqList[i].transId : 0;
                                                             obj.heDepartmentId = reqList[i].hedepartmentId ? reqList[i].hedepartmentId : 0;
                                                             obj.positions = reqList[i].positions ? reqList[i].positions : 0;
                                                             obj.positionsFilled = reqList[i].positionsFilled ? reqList[i].positionsFilled : 0;
-                                                            obj.departmentTitle = reqList[i].heDepartmentTitle ? reqList[i].heDepartmentTitle : "";
+                                                            obj.departmentTitle = reqList[i].departmentTitle ? reqList[i].departmentTitle : reqList[i].heDepartmentTitle ? reqList[i].heDepartmentTitle : "";
                                                             obj.jobCode = reqList[i].jobCode ? reqList[i].jobCode : "";
                                                             obj.jobtitleId = reqList[i].jobtitleId ? reqList[i].jobtitleId : 0;
                                                             obj.title = reqList[i].title ? reqList[i].title : "";
@@ -1896,56 +1900,71 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                                             obj.creatorName = reqList[i].creatorName ? reqList[i].creatorName : "";
                                                             obj.createdDate = reqList[i].createdDate ? moment(reqList[i].createdDate).format("YYYY-MM-DD HH:mm:ss") : null;
 
-                                                            var stageDetail = [];
-                                                            stageDetail.push({
-                                                                stageId: reqList[i].screeningStageId ? reqList[i].screeningStageId : 0,
-                                                                title: reqList[i].screeningStage ? reqList[i].screeningStage : "",
-                                                                applicant: reqList[i].screeningCount ? reqList[i].screeningCount : 0,
-                                                                colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
-                                                            }, {
-                                                                    stageId: reqList[i].shortlistStageId ? reqList[i].shortlistStageId : 0,
-                                                                    title: reqList[i].shortlistStage ? reqList[i].shortlistStage : "",
-                                                                    applicant: reqList[i].shortlistCount ? reqList[i].shortlistCount : 0,
-                                                                    colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
-                                                                }, {
-                                                                    stageId: reqList[i].interviewStageId ? reqList[i].interviewStageId : 0,
-                                                                    title: reqList[i].interviewStage ? reqList[i].interviewStage : "",
-                                                                    applicant: reqList[i].interviewCount ? reqList[i].interviewCount : 0,
-                                                                    colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
-                                                                }, {
-                                                                    stageId: reqList[i].joinedStageId ? reqList[i].joinedStageId : 0,
-                                                                    title: reqList[i].joinedStage ? reqList[i].joinedStage : "",
-                                                                    applicant: reqList[i].joinedCount ? reqList[i].joinedCount : 0,
-                                                                    colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
-                                                                }, {
-                                                                    stageId: reqList[i].offerStageId ? reqList[i].offerStageId : 0,
-                                                                    title: reqList[i].offerStage ? reqList[i].offerStage : "",
-                                                                    applicant: reqList[i].offerCount ? reqList[i].offerCount : 0,
-                                                                    colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
-                                                                })
-                                                            obj.stageDetail = stageDetail;
+                                                            // var stageDetail = [];
+                                                            // stageDetail.push({
+                                                            //     stageId: reqList[i].screeningStageId ? reqList[i].screeningStageId : 0,
+                                                            //     title: reqList[i].screeningStage ? reqList[i].screeningStage : "",
+                                                            //     applicant: reqList[i].screeningCount ? reqList[i].screeningCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].cvScreeningStageId ? reqList[i].cvScreeningStageId : 0,
+                                                            //     title: reqList[i].cvScreeningStage ? reqList[i].cvScreeningStage : "",
+                                                            //     applicant: reqList[i].cvScreeningCount ? reqList[i].cvScreeningCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].EAFFormStageId ? reqList[i].EAFFormStageId : 0,
+                                                            //     title: reqList[i].EAFFormStage ? reqList[i].EAFFormStage : "",
+                                                            //     applicant: reqList[i].EAFFormCount ? reqList[i].EAFFormCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].interviewStageId ? reqList[i].interviewStageId : 0,
+                                                            //     title: reqList[i].interviewStage ? reqList[i].interviewStage : "",
+                                                            //     applicant: reqList[i].interviewCount ? reqList[i].interviewCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].OfferCTCPreparationStageId ? reqList[i].OfferCTCPreparationStageId : 0,
+                                                            //     title: reqList[i].OfferCTCPreparationstage ? reqList[i].OfferCTCPreparationstage : "",
+                                                            //     applicant: reqList[i].OfferCTCCount ? reqList[i].OfferCTCCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].MedicalTestStageId ? reqList[i].MedicalTestStageId : 0,
+                                                            //     title: reqList[i].MedicalTeststage ? reqList[i].MedicalTeststage : "",
+                                                            //     applicant: reqList[i].MedicalTestCount ? reqList[i].MedicalTestCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].offerStageId ? reqList[i].offerStageId : 0,
+                                                            //     title: reqList[i].offerStage ? reqList[i].offerStage : "",
+                                                            //     applicant: reqList[i].offerCount ? reqList[i].offerCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // }, {
+                                                            //     stageId: reqList[i].OnBoardingStageId ? reqList[i].OnBoardingStageId : 0,
+                                                            //     title: reqList[i].OnBoardingStage ? reqList[i].OnBoardingStage : "",
+                                                            //     applicant: reqList[i].OnBoardingCount ? reqList[i].OnBoardingCount : 0,
+                                                            //     colorCode: reqList[i].colorCode ? reqList[i].colorCode : "#C71585"
+                                                            // })
+                                                            obj.stageDetail = reqList[i].stageDetail ? reqList[i].stageDetail : [];
 
-                                                            let stageList = [];
+                                                            // let stageList = [];
 
-                                                            if (reqList[i].master_stages && reqList[i].master_stages != "" && typeof (reqList[i].master_stages) == "string") {
-                                                                reqList[i].master_stages = JSON.parse(reqList[i].master_stages);
-                                                            }
-                                                            else if (reqList[i].master_stages && reqList[i].master_stages != "") {
-                                                                reqList[i].master_stages = reqList[i].master_stages;
-                                                            }
-                                                            else {
-                                                                reqList[i].master_stages = [];
-                                                            }
+                                                            // if (reqList[i].master_stages && reqList[i].master_stages != "" && typeof (reqList[i].master_stages) == "string") {
+                                                            //     reqList[i].master_stages = JSON.parse(reqList[i].master_stages);
+                                                            // }
+                                                            // else if (reqList[i].master_stages && reqList[i].master_stages != "") {
+                                                            //     reqList[i].master_stages = reqList[i].master_stages;
+                                                            // }
+                                                            // else {
+                                                            //     reqList[i].master_stages = [];
+                                                            // }
 
-                                                            for (var k = 0; k < reqList[i].master_stages.length; k++) {
-                                                                var stageObj = {};
-                                                                stageObj.stageId = reqList[i].master_stages[k].stage_id ? reqList[i].master_stages[k].stage_id : 0;
-                                                                stageObj.colorCode = "#C71585";
-                                                                stageObj.stageTitle = reqList[i].master_stages[k].stage_title ? reqList[i].master_stages[k].stage_title : "No-title";
-                                                                stageObj.stageTypeId = reqList[i].master_stages[k].stage_type ? reqList[i].master_stages[k].stage_type : 1;
-                                                                stageList.push(stageObj);
-                                                            }
-                                                            obj.stageList = stageList;
+                                                            // for (var k = 0; k < reqList[i].master_stages.length; k++) {
+                                                            //     var stageObj = {};
+                                                            //     stageObj.stageId = reqList[i].master_stages[k].stage_id ? reqList[i].master_stages[k].stage_id : 0;
+                                                            //     stageObj.colorCode = "#C71585";
+                                                            //     stageObj.stageTitle = reqList[i].master_stages[k].stage_title ? reqList[i].master_stages[k].stage_title : "No-title";
+                                                            //     stageObj.stageTypeId = reqList[i].master_stages[k].stage_type ? reqList[i].master_stages[k].stage_type : 1;
+                                                            //     stageList.push(stageObj);
+                                                            // }
+                                                            obj.stageList = reqList[i].master_stages;
 
                                                             requirementView.push(obj);
                                                         }
@@ -1956,29 +1975,29 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                                 }
 
                                                 var stageList = [];
-                                                if (result.data && result.data.stageList && result.data.stageList.length) {
-                                                    var stageListTemp = result.data.stageList;
-                                                    for (var i = 0; i < stageListTemp.length; i++) {
+                                                // if (result.data && result.data.stageList && result.data.stageList.length) {
+                                                //     var stageListTemp = result.data.stageList;
+                                                //     for (var i = 0; i < stageListTemp.length; i++) {
 
-                                                        var statusList = [];
-                                                        var statusListTemp = stageListTemp[i].statusList ? stageListTemp[i].statusList : [];
-                                                        for (var j = 0; j < statusListTemp.length; j++) {
-                                                            if (statusListTemp[j].statusId) {
-                                                                statusList.push({
-                                                                    statusId: statusListTemp[j].statusId ? statusListTemp[j].statusId : 0,
-                                                                    statusName: statusListTemp[j].statusName ? statusListTemp[j].statusName : ""
-                                                                })
-                                                            }
-                                                        }
+                                                //         var statusList = [];
+                                                //         var statusListTemp = stageListTemp[i].statusList ? stageListTemp[i].statusList : [];
+                                                //         for (var j = 0; j < statusListTemp.length; j++) {
+                                                //             if (statusListTemp[j].statusId) {
+                                                //                 statusList.push({
+                                                //                     statusId: statusListTemp[j].statusId ? statusListTemp[j].statusId : 0,
+                                                //                     statusName: statusListTemp[j].statusName ? statusListTemp[j].statusName : ""
+                                                //                 })
+                                                //             }
+                                                //         }
 
-                                                        stageList.push({
-                                                            stageId: stageListTemp[i].stageLevel ? stageListTemp[i].stageLevel : 0,
-                                                            stageTitle: stageListTemp[i].stageTitle ? stageListTemp[i].stageTitle : "",
-                                                            stageTypeId: stageListTemp[i].stageTypeId ? stageListTemp[i].stageTypeId : stageListTemp[i].stageLevel,
-                                                            statusList: statusList
-                                                        });
-                                                    }
-                                                }
+                                                //         stageList.push({
+                                                //             stageId: stageListTemp[i].stageLevel ? stageListTemp[i].stageLevel : 0,
+                                                //             stageTitle: stageListTemp[i].stageTitle ? stageListTemp[i].stageTitle : "",
+                                                //             stageTypeId: stageListTemp[i].stageTypeId ? stageListTemp[i].stageTypeId : stageListTemp[i].stageLevel,
+                                                //             statusList: statusList
+                                                //         });
+                                                //     }
+                                                // }
 
                                                 var reqCount = 0;
                                                 if (result.data && result.data.count) {
@@ -2063,7 +2082,6 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 }
                             })
                         }
-
                     }
                     else {
                         var validationFlag = true;
@@ -2101,7 +2119,9 @@ masterCtrl.getRequirementView = function (req, res, next) {
                                 req.st.db.escape(req.body.joiningDate || null),
                                 req.st.db.escape(req.body.jobType || 0),
                                 req.st.db.escape(req.body.creatorName || ""),
-                                req.st.db.escape(req.body.createdDate || null)
+                                req.st.db.escape(req.body.createdDate || null),
+                                req.st.db.escape(JSON.stringify(req.body.jobTitleId || [])),
+                                req.st.db.escape(JSON.stringify(req.body.branchList || []))
                             ];
 
                             var procQuery = 'CALL wm_get_requirementView( ' + inputs.join(',') + ')';
@@ -2109,7 +2129,7 @@ masterCtrl.getRequirementView = function (req, res, next) {
                             req.db.query(procQuery, function (err, results) {
                                 console.log(err);
 
-                                if (!err && results && (results[0] || results[1])) {
+                                if (!err && results) {
                                     response.status = true;
                                     response.message = " Requirement View loaded sucessfully";
                                     response.error = null;
@@ -2235,7 +2255,9 @@ masterCtrl.getClientView = function (req, res, next) {
                                 req.st.db.escape(req.body.followUpNotes || ""),
                                 req.st.db.escape(req.body.createdUserName || ""),
                                 req.st.db.escape(req.body.createdDate || null),
-                                req.st.db.escape(JSON.stringify(req.body.clientStatusId || []))
+                                req.st.db.escape(JSON.stringify(req.body.clientStatusId || [])),
+                                req.st.db.escape(JSON.stringify(req.body.clientList || [])),
+                                req.st.db.escape(JSON.stringify(req.body.clientLocationList || []))
                             ];
 
                             var procQuery = 'CALL wm_get_clientView( ' + inputs.join(',') + ')';
@@ -2256,7 +2278,8 @@ masterCtrl.getClientView = function (req, res, next) {
                                     }
                                     response.data = {
                                         clientView: results[0] ? results[0] : [],
-                                        clientCount: results[1] && results[1][0] && results[1][0].clientCount ? results[1][0].clientCount : 0
+                                        clientCount: results[1] && results[1][0] && results[1][0].clientCount ? results[1][0].clientCount : 0,
+                                        unreadNotifyCount : results[2] && results[2][0] && results[2][0].unreadNotifyCount ? results[2][0].unreadNotifyCount : 0
                                     };
                                     var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
                                     zlib.gzip(buf, function (_, result) {
@@ -2671,7 +2694,8 @@ masterCtrl.getClientLocationContacts = function (req, res, next) {
                             contracts: contracts,//(result[2] && result[2][0]) ? JSON.parse(result[2][0].contracts) : []
                             contactList: result[3][0].contactList,
                             followUpNotes: result[4] && result[4][0] ? result[4] : [],
-                            mailHistory: result[5] && result[5][0] ? result[5] : []
+                            mailHistory: result[5] && result[5][0] ? result[5] : [],
+                            unreadNotifyCount : result[6] && result[6][0] && result[6][0].unreadNotifyCount ? result[6][0].unreadNotifyCount : 0
                         };
 
                         var buf = new Buffer(JSON.stringify(response.data), 'utf-8');
@@ -3057,7 +3081,9 @@ masterCtrl.saveUserManager = function (req, res, next) {
                             req.st.db.escape(encryptPwd),
                             req.st.db.escape(req.body.mailer),
                             req.st.db.escape(JSON.stringify(branch)),
-                            req.st.db.escape(req.body.EZEOneId)
+                            req.st.db.escape(req.body.EZEOneId),
+                            req.st.db.escape(JSON.stringify(req.body.longSignFile || '')),
+                            req.st.db.escape(req.body.DOB || null)
                         ];
                         var procQuery = 'CALL save_Pace_User( ' + inputs.join(',') + ')';
                         console.log(procQuery);
@@ -3084,6 +3110,7 @@ masterCtrl.saveUserManager = function (req, res, next) {
                                 results[1][0].branch = (results[1][0].branch && JSON.parse(results[1][0].branch).branchId) ? JSON.parse(results[1][0].branch) : {};
 
                                 results[1][0].grade = (results[1][0].grade && JSON.parse(results[1][0].grade).gradeId) ? JSON.parse(results[1][0].grade) : {};
+                                results[1][0].longSignFile = results[1][0].longSignFile && results[1][0].longSignFile != '' ? JSON.parse(results[1][0].longSignFile) : {};
 
                                 response.data = {
                                     userDetail: results[1][0] ? results[1][0] : {}

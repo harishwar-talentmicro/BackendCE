@@ -81,6 +81,12 @@ try:
     header_text = text_paragraph.add_run()
     header_text.add_text(sys.argv[5])
 
+    if sys.argv[13] != '':
+        facesheet_paragraph = first_paragraph.insert_paragraph_before()
+        facesheet_paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        header_text = facesheet_paragraph.add_run()
+        header_text.add_text(sys.argv[13])
+
     footer = section.footer
     last_paragraph = footer.paragraphs[0]
     footer_paragraph = last_paragraph.insert_paragraph_before()

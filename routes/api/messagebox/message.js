@@ -331,21 +331,21 @@ router.post('/', function (req, res, next) {
 
                                                     res.status(200).json(responseMessage);
                                                     /**notification send to user to whome message is sending*/
-                                                    if (results[1] && results[1].length > 0) {
+                                                    // if (results[1] && results[1].length > 0) {
 
-                                                        if (results[0][0].groupType == 0) {
-                                                            senderGroupId = results[0][0].groupId;
-                                                            var notificationTemplaterRes = notificationTemplater.parse('compose_message_group', {
-                                                                senderName: results[0][0].senderName,
-                                                                groupName: results[1][0].groupName
-                                                            });
-                                                        }
-                                                        else {
-                                                            senderGroupId = results[0][0].senderId;
-                                                            notificationTemplaterRes = notificationTemplater.parse('compose_message', {
-                                                                senderName: results[0][0].senderName + " " + results[0][0].message
-                                                            });
-                                                        }
+                                                    //     if (results[0][0].groupType == 0) {
+                                                    //         senderGroupId = results[0][0].groupId;
+                                                    //         var notificationTemplaterRes = notificationTemplater.parse('compose_message_group', {
+                                                    //             senderName: results[0][0].senderName,
+                                                    //             groupName: results[1][0].groupName
+                                                    //         });
+                                                    //     }
+                                                    //     else {
+                                                    //         senderGroupId = results[0][0].senderId;
+                                                    //         notificationTemplaterRes = notificationTemplater.parse('compose_message', {
+                                                    //             senderName: results[0][0].senderName + " " + results[0][0].message
+                                                    //         });
+                                                    //     }
 
                                                         /**
                                                          * Condtion should be like this in restricted reply case
@@ -360,12 +360,13 @@ router.post('/', function (req, res, next) {
                                                          *
                                                          */
 
-                                                        for (var i = 0; i < results[1].length; i++ ) {
+                                                     //   for (var i = 0; i < results[1].length; i++ ) {
                                                             /**
                                                              * if relation not exist then send all sender details to receiver
                                                              * */
                                                             // notifyMessages.getMessagesNeedToNotify();
                                                             if(autoJoinResults[0][0].groupuserid == 0){
+                                                                console.log("klnv==========================================")
                                                                 notifyMessages.getMessagesNeedToNotify();
                                                                 // if(notificationTemplaterRes.parsedTpl){
                                                                 //     notification.publish(
@@ -437,6 +438,7 @@ router.post('/', function (req, res, next) {
                                                                 // }
                                                             }
                                                             else{
+                                                                console.log("klnv=================vnlesdnvn=========================")
                                                                 notifyMessages.getMessagesNeedToNotify();
                                                                 // if(notificationTemplaterRes.parsedTpl){
                                                                 //     notification.publish(
@@ -507,8 +509,8 @@ router.post('/', function (req, res, next) {
                                                                 // }
                                                             }
 
-                                                        }
-                                                    }
+                                                       // }
+                                                    // }
 
                                                 }
                                                 /**
@@ -1179,99 +1181,99 @@ router.get('/loadAllMessages', function (req, res, next) {
                                         
                                         if (results && results[0] && results[0].length > 0) {
 
-                                            for (var mainIndex=0; mainIndex<results[0].length; mainIndex++){
-                                                results[0][mainIndex].groupMessageList= (results[0] && results[0][mainIndex]) ? JSON.parse(results[0][mainIndex].groupMessageList) :[];
+                                        //     for (var mainIndex=0; mainIndex<results[0].length; mainIndex++){
+                                        //         results[0][mainIndex].groupMessageList= (results[0] && results[0][mainIndex]) ? JSON.parse(results[0][mainIndex].groupMessageList) :[];
                                             
-                                            var messageObj;
-                                            for (var messageCounter = 0; messageCounter < results[0][mainIndex].groupMessageList.length; messageCounter++) {
-                                                switch (results[0][mainIndex].groupMessageList[messageCounter].messageType) {
-                                                    case 0:
-                                                        message = results[0][mainIndex].groupMessageList[messageCounter].message;
-                                                        break;
+                                        //     var messageObj;
+                                        //     for (var messageCounter = 0; messageCounter < results[0][mainIndex].groupMessageList.length; messageCounter++) {
+                                        //         switch (results[0][mainIndex].groupMessageList[messageCounter].messageType) {
+                                        //             case 0:
+                                        //                 message = results[0][mainIndex].groupMessageList[messageCounter].message;
+                                        //                 break;
 
-                                                    case 2:
-                                                        message = results[0][mainIndex].groupMessageList[messageCounter].message;
-                                                        messageObj = JSON.parse(message);
-                                                        messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
-                                                        messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
-                                                        results[0][mainIndex].groupMessageList[messageCounter].message = messageObj;
-                                                        break;
-                                                    case 3:
-                                                        message = results[0][mainIndex].groupMessageList[messageCounter].message;
-                                                        console.log("-----------------------------------------------------------");
-                                                        // console.log(message);
-                                                        console.log("-----------------------------------------------------------");
-                                                        messageObj = JSON.parse(message);
+                                        //             case 2:
+                                        //                 message = results[0][mainIndex].groupMessageList[messageCounter].message;
+                                        //                 messageObj = JSON.parse(message);
+                                        //                 messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                        //                     req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                        //                 messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                        //                     req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                        //                 results[0][mainIndex].groupMessageList[messageCounter].message = messageObj;
+                                        //                 break;
+                                        //             case 3:
+                                        //                 message = results[0][mainIndex].groupMessageList[messageCounter].message;
+                                        //                 console.log("-----------------------------------------------------------");
+                                        //                 // console.log(message);
+                                        //                 console.log("-----------------------------------------------------------");
+                                        //                 messageObj = JSON.parse(message);
 
-                                                        messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
-                                                        messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
-                                                            req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
-                                                        results[0][mainIndex].groupMessageList[messageCounter].message = messageObj;
-                                                        break;
+                                        //                 messageObj.attachmentLink = (messageObj.attachmentLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                        //                     req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.attachmentLink)) : '';
+                                        //                 messageObj.thumbnailLink = (messageObj.thumbnailLink) ? (req.CONFIG.CONSTANT.GS_URL +
+                                        //                     req.CONFIG.CONSTANT.STORAGE_BUCKET + '/' + req.st.getOnlyAttachmentName(messageObj.thumbnailLink)) : '';
+                                        //                 results[0][mainIndex].groupMessageList[messageCounter].message = messageObj;
+                                        //                 break;
 
-                                                    default:
-                                                        break;
-                                                }
+                                        //             default:
+                                        //                 break;
+                                        //         }
 
-                                            }
-                                        }
+                                        //     }
+                                        // }
                                             //console.log(results[0],"results[0]");
                                             responseMessage.status = true;
                                             responseMessage.error = null;
                                             responseMessage.message = 'Messages of group loaded successfully';
                                             // responseMessage.totalCount = (results[1] && results[1][0] && results[1][0].count) ? results[1][0].count : 0;
                                             // var output = [];
-                                            for (var i = 0; i < results[0].length; i++) {
-                                                if (typeof(results[0][i].groupMessageList)=="string"){
-                                                    results[0][i].groupMessageList= (results[0] && results[0][i]) ? JSON.parse(results[0][i].groupMessageList) :[];
+                                            // for (var i = 0; i < results[0].length; i++) {
+                                            //     if (typeof(results[0][i].groupMessageList)=="string"){
+                                            //         results[0][i].groupMessageList= (results[0] && results[0][i]) ? JSON.parse(results[0][i].groupMessageList) :[];
 
-                                                }
-                                                for (var k=0; k<results[0][i].groupMessageList.length ; k++){
-                                                    results[0][i].groupMessageList[k].formData = results[0][i].groupMessageList[k].formData ? JSON.parse(results[0][i].groupMessageList[k].formData):null
-                                                }
+                                            //     }
+                                            //     for (var k=0; k<results[0][i].groupMessageList.length ; k++){
+                                            //         results[0][i].groupMessageList[k].formData = results[0][i].groupMessageList[k].formData ? JSON.parse(results[0][i].groupMessageList[k].formData):null
+                                            //     }
                                                 
-                                                // output.push({
-                                                //     messageId: results[0][i].messageId,
-                                                //     message: results[0][i].message,
-                                                //     messageLink: results[0][i].messageLink,
-                                                //     createdDate: results[0][i].createdDate,
-                                                //     messageType: results[0][i].messageType,
-                                                //     messageStatus: results[0][i].messageStatus,
-                                                //     priority: results[0][i].priority,
-                                                //     senderName: results[0][i].senderName,
-                                                //     // senderId: results[0][i].senderId,
-                                                //     receiverId: results[0][i].receiverId,
-                                                //     expiryDate: results[0][i].expiryDate,
-                                                //     transId: results[0][i].transId ? results[0][i].transId : 0,
-                                                //     formId: results[0][i].formId ? results[0][i].formId : 0,
-                                                //     readStatus: results[0][i].readStatus ? results[0][i].readStatus : 0,
-                                                //     readSyncStatus: results[0][i].readSyncStatus ? results[0][i].readSyncStatus : 0,
-                                                //     readDateTime: results[0][i].readDateTime ? results[0][i].readDateTime : null,
-                                                //     currentStatus: results[0][i].currentStatus ? results[0][i].currentStatus : 0,
-                                                //     currentTransId: results[0][i].currentTransId ? results[0][i].currentTransId : 0,
-                                                //     parentId: results[0][i].parentId ? results[0][i].parentId : 0,
-                                                //     accessUserType: results[0][i].accessUserType ? results[0][i].accessUserType : 0,
-                                                //     heUserId: results[0][i].heUserId ? results[0][i].heUserId : 0,
-                                                //     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null ,
+                                            //     // output.push({
+                                            //     //     messageId: results[0][i].messageId,
+                                            //     //     message: results[0][i].message,
+                                            //     //     messageLink: results[0][i].messageLink,
+                                            //     //     createdDate: results[0][i].createdDate,
+                                            //     //     messageType: results[0][i].messageType,
+                                            //     //     messageStatus: results[0][i].messageStatus,
+                                            //     //     priority: results[0][i].priority,
+                                            //     //     senderName: results[0][i].senderName,
+                                            //     //     // senderId: results[0][i].senderId,
+                                            //     //     receiverId: results[0][i].receiverId,
+                                            //     //     expiryDate: results[0][i].expiryDate,
+                                            //     //     transId: results[0][i].transId ? results[0][i].transId : 0,
+                                            //     //     formId: results[0][i].formId ? results[0][i].formId : 0,
+                                            //     //     readStatus: results[0][i].readStatus ? results[0][i].readStatus : 0,
+                                            //     //     readSyncStatus: results[0][i].readSyncStatus ? results[0][i].readSyncStatus : 0,
+                                            //     //     readDateTime: results[0][i].readDateTime ? results[0][i].readDateTime : null,
+                                            //     //     currentStatus: results[0][i].currentStatus ? results[0][i].currentStatus : 0,
+                                            //     //     currentTransId: results[0][i].currentTransId ? results[0][i].currentTransId : 0,
+                                            //     //     parentId: results[0][i].parentId ? results[0][i].parentId : 0,
+                                            //     //     accessUserType: results[0][i].accessUserType ? results[0][i].accessUserType : 0,
+                                            //     //     heUserId: results[0][i].heUserId ? results[0][i].heUserId : 0,
+                                            //     //     formData: results[0][i].formDataJSON ? JSON.parse(results[0][i].formDataJSON) : null ,
 
-                                                //     likeCount: results[0][i].likeCount ? results[0][i].likeCount : 0,
-                                                //     commentCount: results[0][i].commentCount ? results[0][i].commentCount : 0,
-                                                //     shareCount: results[0][i].shareCount ? results[0][i].shareCount : 0,
-                                                //     likeStatus: results[0][i].likeStatus ? results[0][i].likeStatus : 0,
-                                                //     isTopScroll: results[0][i].isTopScroll ? results[0][i].isTopScroll : 0,
-                                                //     isChatBotHide: results[0][i].isChatBotHide ? results[0][i].isChatBotHide : 0,
-                                                //     isFormGroupHide: results[0][i].isFormGroupHide ? results[0][i].isFormGroupHide : 0,
-                                                //     enableHomePageScroll: results[0][i].enableHomePageScroll ? results[0][i].enableHomePageScroll : 0,
-                                                //     showFormsOnHomePage: results[0][i].showFormsOnHomePage ? results[0][i].showFormsOnHomePage : 0,
+                                            //     //     likeCount: results[0][i].likeCount ? results[0][i].likeCount : 0,
+                                            //     //     commentCount: results[0][i].commentCount ? results[0][i].commentCount : 0,
+                                            //     //     shareCount: results[0][i].shareCount ? results[0][i].shareCount : 0,
+                                            //     //     likeStatus: results[0][i].likeStatus ? results[0][i].likeStatus : 0,
+                                            //     //     isTopScroll: results[0][i].isTopScroll ? results[0][i].isTopScroll : 0,
+                                            //     //     isChatBotHide: results[0][i].isChatBotHide ? results[0][i].isChatBotHide : 0,
+                                            //     //     isFormGroupHide: results[0][i].isFormGroupHide ? results[0][i].isFormGroupHide : 0,
+                                            //     //     enableHomePageScroll: results[0][i].enableHomePageScroll ? results[0][i].enableHomePageScroll : 0,
+                                            //     //     showFormsOnHomePage: results[0][i].showFormsOnHomePage ? results[0][i].showFormsOnHomePage : 0,
 
-                                                //     homePageBanner: results[0][i].homePageBanner ? results[0][i].homePageBanner : '',
-                                                //     hideDashboard: results[0][i].hideDashboard ? results[0][i].hideDashboard : 0
+                                            //     //     homePageBanner: results[0][i].homePageBanner ? results[0][i].homePageBanner : '',
+                                            //     //     hideDashboard: results[0][i].hideDashboard ? results[0][i].hideDashboard : 0
                                                     
-                                                // });
-                                            }
+                                            //     // });
+                                            // }
 
 
                                             

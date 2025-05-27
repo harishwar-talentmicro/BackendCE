@@ -16,15 +16,15 @@ router.get('/expense',loginCtrl.getExpenseList);
 router.get('/expense/details',loginCtrl.getExpenseDetails);
 
 router.get('/master/status',loginCtrl.getFormStatus);
-router.get('/attendanceRequest',loginCtrl.getAttendanceRequestList);
-router.get('/leaveRegister',loginCtrl.getLeaveRegister);
+router.post('/attendanceRequest',loginCtrl.getAttendanceRequestList);
+router.post('/leaveRegister',loginCtrl.getLeaveRegister);
 router.get('/travelRequest',loginCtrl.getTravelRequest);
-router.get('/travelClaim',loginCtrl.getTravelClaim);
+router.post('/travelClaim',loginCtrl.getTravelClaim);
 
 router.get('/sales/master',loginCtrl.getSalesMaster);
 router.get('/salesTracker',loginCtrl.getSalesList);
 
-router.get('/attendance/register',loginCtrl.getAttendanceRegister);
+router.post('/attendance/register',loginCtrl.getAttendanceRegister);
 router.get('/attendance/register/details',loginCtrl.getAttendanceRegisterDetails);
 
 router.get('/stationaryList',loginCtrl.getStationaryList);
