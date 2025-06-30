@@ -581,8 +581,18 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
             console.log(" Parsed data:", response.data);
             user_details = response.data.parsed_data;
             result = response.data;
+
+            await fsp.unlink(filePath);
         } catch (error) {
             console.error("Parser API call failed:", error?.response?.data || error.message);
+            try {
+                if (fs.existsSync(filePath)) {
+                    await fsp.unlink(filePath);
+                    console.log(`Temp file ${filename} removed after error.`);
+                }
+            } catch (cleanupErr) {
+                console.error("Failed to delete temp file:", cleanupErr.message);
+            }
             res.status(500).json({ error: 'Parser API failed' });
         }
 
@@ -805,13 +815,15 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
                 catch (err) {
                     console.log('resume file error', err)
                 }
-                try {
-                    details.file_name = user_details?.cvFileName;
-                    details.resume_extension = user_details?.cvFileName.split('.').pop();
+                if (user_details?.cvFileName) {
+                    try {
+                        details.file_name = user_details?.cvFileName;
+                        details.resume_extension = user_details?.cvFileName?.split('.').pop();
 
-                }
-                catch (err) {
-                    console.log('resume file error', err)
+                    }
+                    catch (err) {
+                        console.log('resume file error', err)
+                    }
                 }
                 try {
                     details.last_modified_date = user_details?.last_modified_date;
@@ -1230,7 +1242,7 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
         }
 
     }
-console.log(details);
+    console.log(details);
 
     let config = {
         method: 'post',
