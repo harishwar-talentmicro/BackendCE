@@ -536,7 +536,6 @@ naukriImporter.checkApplicantExistsFromNaukriPortal = function (req, res) {
 
 
 naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
-
     var details = new shared_ctrl.portalimporterDetails();
     details.portal_id = 1;
     let user_details;
@@ -726,8 +725,16 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
 
                 //gender
                 try {
+                    let gender = user_details?.gender;
+                    if (gender.toLowerCase() == "female") {
 
-                    details.gender = user_details?.gender;
+                        details.gender = 'F'
+                    } else if (gender.toLowerCase() == "male") {
+
+                        details.gender = 'M'
+                    } else {
+                        details.gender = '';
+                    }
                 }
                 catch (err) {
                     console.log(err, "save naukri gender");
@@ -807,19 +814,72 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
                 catch (err) {
 
                 }
+                // try {
+                //     // details.resume_document = result?.extracted_pdf;
+                //     details.attachment = result?.extracted_pdf;
+
+                //     // const base64Data = result?.extracted_pdf;
+                //     // const fileName = `resume_${Date.now()}.pdf`;
+                //     // const filePath2 = path.join(__dirname, fileName);
+                //     // await fsp.writeFile(filePath2, Buffer.from(base64Data, 'base64'));
+                //     // console.log("PDF file written to disk:", filePath2);
+                //     // details.attachment = filePath2;
+                //     // await fsp.unlink(filePath2);
+
+                // }
+                // catch (err) {
+                //     console.log('resume file error', err)
+                // }
+
+
                 try {
                     // details.resume_document = result?.extracted_pdf;
                     details.attachment = result?.extracted_pdf;
+                    base64String = result?.extracted_pdf;
+
+                    try {
+                        const zlib = require('zlib');
+                        const util = require('util');
+                        const gzipAsync = util.promisify(zlib.gzip);
+                        const gunzipAsync = util.promisify(zlib.gunzip);
+                        // Step 1: Convert base64 to buffer
+                        const gzBuffer = Buffer.from(base64String, 'base64');
+                        // Step 2: UNZIP it (get PDF content)
+                        const pdfBuffer = await gunzipAsync(gzBuffer);
+                        const extract = pdfBuffer.toString('base64');
+                        details.attachment = extract;
+
+                        // Step 3: Write unzipped PDF to disk
+                        // const pdfPath = path.join(__dirname, `resume_unzipped_${Date.now()}.pdf`);
+                        // await fsp.writeFile(pdfPath, pdfBuffer);
+
+                        // Step 4: ZIP the PDF again
+                        // const rezippedBuffer = await gzipAsync(pdfBuffer);
+
+                        // // Step 5: Write zipped `.gz` file to disk
+                        // const zipPath = path.join(__dirname, `resume_zipped_${Date.now()}.gz`);
+                        // await fsp.writeFile(zipPath, rezippedBuffer);
+                        // console.log("Zipped file saved:", zipPath);
+
+                    } catch (error) {
+                        console.error('Error processing base64 GZIP file:', error.message);
+                    }
+                    // await fsp.writeFile(filePath2, Buffer.from(base64Data, 'base64'));
+                    // console.log("PDF file written to disk:", filePath2);
+                    // details.attachment = filePath2;
+                    // await fsp.unlink(filePath2);
 
                 }
                 catch (err) {
                     console.log('resume file error', err)
                 }
+
                 if (user_details?.cvFileName) {
                     try {
                         details.file_name = user_details?.cvFileName;
-                        details.resume_extension = user_details?.cvFileName?.split('.').pop();
-
+                        details.resume_extension = "pdf";
+                        // details.resume_extension = user_details?.cvFileName?.split('.').pop();
+                        // details.resume_mimeType= resume_MIME || "",
                     }
                     catch (err) {
                         console.log('resume file error', err)
@@ -835,19 +895,19 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
                 }
 
                 try {
-                    if (req.body?.requirements) {
+                    if (req.body.requirements) {
                         try {
-                            if (typeof req.body?.requirements == "string") {
+                            if (typeof req.body.requirements == "string") {
                                 try {
                                     req.body.requirements = JSON.parse(req.body.requirements)
                                 } catch (err) {
                                     console.log(err);
                                 }
                             }
-                            if (req.body?.requirements?.length) {
+                            if (req.body.requirements.length) {
                                 details.requirements = req.body.requirements
                             } else {
-                                details.requirements = [parseInt(req.body?.requirements)];
+                                details.requirements = [parseInt(req.body.requirements)];
                             }
                         } catch (err) {
                             console.log(err);
@@ -865,376 +925,342 @@ naukriImporter.saveApplicantsFromNaukri = async function (req, res) {
             console.log(err, 'error')
         }
     } else {
-        user_details = shared_ctrl.jsonDeepParse(req.body.user_details);
+        console.log("entered into else condition")
+        user_details = shared_ctrl.jsonDeepParse(req.body.contact_details);
 
         try {
             if (user_details) {
                 console.log(user_details)
                 //name
-                if (user_details?.name) {
+                try {
+                    details.full_name = user_details.name;
                     try {
-                        details.full_name = user_details?.name;
-                        try {
-                            details.first_name = user_details?.name.split(',')[0].split(' ')[0]
-                        } catch (error) {
-
-                        }
-                        try {
-                            details.last_name = user_details?.name.split(',')[0].split(' ').pop()
-                        } catch (error) {
-
-                        }
-                    }
-                    catch (err) {
+                        details.first_name = user_details.name.split(',')[0].split(' ')[0]
+                    } catch (error) {
 
                     }
+                    try {
+                        details.last_name = user_details.name.split(',')[0].split(' ').pop()
+                    } catch (error) {
+
+                    }
+                }
+                catch (err) {
+
                 }
 
                 //emailId
-                if (user_details?.email) {
-                    try {
-                        details.email_id = user_details?.email;
-                    }
-                    catch (err) { }
+                try {
+                    details.email_id = user_details.email;
                 }
+                catch (err) { }
 
                 //mobile_number
-                if (user_details?.mobile_number) {
-                    try {
-                        details.mobile_number = user_details?.mobile
-                    }
-                    catch (err) { }
-                }
                 try {
-                    if ((user_details?.mobile).toString().length == 12) {
-                        details.mobile_number = (user_details?.mobile).toString().slice(2, 12);
-                        details.isd = (user_details?.mobile).toString().slice(0, 2);
+                    details.mobile_number = user_details.mobile
+                }
+                catch (err) { }
+                try {
+                    if ((user_details.mobile).toString().length == 12) {
+                        details.mobile_number = (user_details.mobile).toString().slice(2, 12);
+                        details.isd = (user_details.mobile).toString().slice(0, 2);
                     }
                 }
                 catch (err) {
 
                 }
                 //address
-                if (user_details?.address) {
-                    try {
-                        details.address = user_details?.address;
-                    } catch (err) {
-                        console.log(err, "save naukri details.address");
-                    }
+                try {
+                    details.address = user_details.address;
+                } catch (err) {
+                    console.log(err, "save naukri details.address");
                 }
+
 
                 //  experience
-                if (user_details?.stotalExp) {
-                    try {
-                        details.experience = user_details?.stotalExp;
-                    }
-                    catch (err) {
-                        console.log(err, "save naukri details.experience");
-                    }
+                try {
+                    details.experience = user_details.stotalExp;
                 }
+                catch (err) {
+                    console.log(err, "save naukri details.experience");
+                }
+
                 //details.primary_skills
-                if (user_details?.mergedKeySkill) {
-                    try {
-                        details.primary_skills = user_details?.mergedKeySkill?.split(',');
-                    } catch (err) {
-                        console.log(err, "save naukri details.primary_skills");
-                    }
+                try {
+                    details.primary_skills = user_details.mergedKeySkill.split(',');
+                } catch (err) {
+                    console.log(err, "save naukri details.primary_skills");
                 }
                 //details.notice_period
-                if (user_details?.noticePeriod) {
-                    try {
-                        details.notice_period = user_details?.noticePeriod;
-                    } catch (err) {
-                        console.log(err, "save naukri details.notice_period");
-                    }
+                try {
+                    details.notice_period = user_details.noticePeriod;
+                } catch (err) {
+                    console.log(err, "save naukri details.notice_period");
                 }
                 // salary details
-                if (user_details?.ctcValue) {
+                try {
+                    details.present_salary = user_details.ctcValue;
+
                     try {
-                        details.present_salary = user_details?.ctcValue;
+                        details.present_salary_curr = user_details.ctcType;
+                    }
+                    catch (Err) {
 
-                        try {
-                            details.present_salary_curr = user_details?.ctcType;
-                        }
-                        catch (Err) {
-
-                        }
-
-                        details.present_salary_period = "Lacs Per Annum";
                     }
 
+                    details.present_salary_period = "Lacs Per Annum";
+                }
 
-                    catch (err) {
-                        console.log(err, "save naukri details.salaryDetails");
-                    }
+                catch (err) {
+                    console.log(err, "save naukri details.salaryDetails");
                 }
                 //salary
-                if (user_details?.expectedCtcValue) {
+                try {
+                    details.expected_salary = user_details.expectedCtcValue;
+
                     try {
-                        details.expected_salary = user_details?.expectedCtcValue;
+                        details.expected_salary_curr = user_details.expectedCtcType;
+                    }
+                    catch (Err) {
 
-                        try {
-                            details.expected_salary_curr = user_details?.expectedCtcType;
-                        }
-                        catch (Err) {
-
-                        }
-
-                        details.expected_salary_period = "Lacs Per Annum";
                     }
 
-                    catch (err) {
-                        console.log(err, "save naukri details.salaryDetails");
-                    }
+                    details.expected_salary_period = "Lacs Per Annum";
+                }
+
+                catch (err) {
+                    console.log(err, "save naukri details.salaryDetails");
                 }
 
                 //location
-                if (user_details?.city) {
-                    try {
-                        details.location = user_details?.city
-                    }
-                    catch (err) {
 
-                    }
+                try {
+                    details.location = user_details.city
                 }
-                //Preffered location
-                if (user_details?.preferredLocations) {
-                    try {
-                        details.preferredLocations = user_details?.prefLocation.split(',')
-                    }
-                    catch (err) {
+                catch (err) {
 
-                    }
+                }
+
+                //Preffered location
+                try {
+                    details.preferredLocations = user_details.prefLocation.split(',')
+                }
+                catch (err) {
+
                 }
 
                 //DOB
-                if (user_details?.DOB) {
-                    try {
-                        details.DOB = shared_ctrl.dateConverter(user_details?.birthDate)
-                    }
-                    catch (err) {
+                try {
+                    details.DOB = shared_ctrl.dateConverter(user_details.birthDate)
+                }
+                catch (err) {
 
-                    }
                 }
 
                 //gender
-                if (user_details?.gender) {
-                    try {
-                        let gender = user_details?.gender;
-                        if (gender.toLowerCase() == "female") {
+                try {
+                    let gender = user_details.gender;
+                    if (gender.toLowerCase() == "female") {
 
-                            details.gender = 'F'
-                        } else if (gender.toLowerCase() == "male") {
+                        details.gender = 'F'
+                    } else if (gender.toLowerCase() == "male") {
 
-                            details.gender = 'M'
-                        } else {
-                            details.gender = '';
-                        }
-                    }
-                    catch (err) {
-                        console.log(err, "save naukri gender");
+                        details.gender = 'M'
+                    } else {
+                        details.gender = '';
                     }
                 }
+                catch (err) {
+                    console.log(err, "save naukri gender");
+                }
                 // industry
-                if (user_details?.industryType) {
-                    try {
-                        details.industry = user_details?.industryType;
-                    }
-                    catch (err) {
-                        console.log(err, "save naukri industry");
-                    }
+
+                try {
+                    details.industry = user_details.industryType;
+                }
+                catch (err) {
+                    console.log(err, "save naukri industry");
                 }
 
                 // functional_areas
-                if (user_details?.farea) {
-                    try {
-                        details.functional_areas = user_details?.farea.split(',');
-                    }
-                    catch (err) {
-                        console.log(err, "save naukri functional_areas");
-                    }
+
+                try {
+                    details.functional_areas = user_details.farea.split(',');
                 }
+                catch (err) {
+                    console.log(err, "save naukri functional_areas");
+                }
+
                 //role
-                if (user_details?.role) {
-                    try {
-                        details.role = user_details?.role;
-                    }
-                    catch (err) {
-                        console.log(err, "save naukri role");
-                    }
+                try {
+                    details.role = user_details.role;
+                }
+                catch (err) {
+                    console.log(err, "save naukri role");
                 }
 
                 //other_details
-                if (user_details?.role) {
-                    try {
-                        details.job_title = user_details?.role;
-                        details.designation = user_details?.role;
-                        details.current_employer = user_details?.companyName;
+
+                try {
+                    details.job_title = user_details.role;
+                    details.designation = user_details.role;
+                    details.current_employer = user_details.companyName;
 
 
-                    }
-                    catch (err) {
-
-                    }
                 }
+                catch (err) {
+
+                }
+
                 //histrory
-                if (user_details?.workExperiences) {
-                    try {
-                        var work_histories = [];
-                        var work_history_element = user_details?.workExperiences;
-                        //index 0 consists of current organization
-                        if (work_history_element && work_history_element.length)
-                            for (var i = 0; i < work_history_element.length; i++) {
-                                var work_history = {};
-                                work_history.duration = {
-                                    from: new Date(work_history_element[i].startYearMillis),
-                                    to: work_history_element[i].endYearMillis ? new Date(work_history_element[i].endYearMillis) : 'Present'
-                                };
+                try {
+                    var work_histories = [];
+                    var work_history_element = user_details.workExperiences;
+                    //index 0 consists of current organization
+                    if (work_history_element && work_history_element.length)
+                        for (var i = 0; i < work_history_element.length; i++) {
+                            var work_history = {};
+                            work_history.duration = {
+                                from: new Date(work_history_element[i].startYearMillis),
+                                to: work_history_element[i].endYearMillis ? new Date(work_history_element[i].endYearMillis) : 'Present'
+                            };
 
-                                try {
-                                    if (!work_history_element[i].endYearMillis) {
-                                        details.job_title = work_history_element[i].designation;
-                                        details.designation = work_history_element[i].designation;
-                                        details.current_employer = work_history_element[i].organization;
-                                    }
-                                }
-                                catch (err) {
-
-                                }
-                                work_history.employer = work_history_element[i].organization;
-                                work_history.summary = work_history_element[i].jobProfile || '';
-                                work_history.designation = work_history_element[i].designation;
-                                work_histories.push(work_history);
-
-                            }
-                        details.work_history = work_histories;
-                    } catch (err) {
-                        console.log(err, "save naukri details.work_history");
-                    }
-                }
-
-
-                //skill exp
-                if (user_details?.skills) {
-
-                    try {
-                        let skill_experiences = [];
-                        let skill_experience_element = user_details?.skills;
-                        if (skill_experience_element && skill_experience_element.length) {
-                            for (var i = 0; i < skill_experience_element.length; i++) {
-                                var skill_experience = {};
-                                if (skill_experience_element[i]?.skill?.label)
-                                    skill_experience.skill_name = skill_experience_element[i].skill?.label;
-                                if (skill_experience_element[i].lastUsed) {
-                                    skill_experience.last_used = skill_experience_element[i].lastUsed;
-                                }
-                                if (skill_experience_element[i].version) {
-                                    skill_experience.version = skill_experience_element[i].version;
-                                }
-                                try {
-                                    skill_experience.experience = skill_experience_element[i].experienceTime || 0;
-                                }
-                                catch (err) {
-
-                                }
-                                skill_experiences.push(skill_experience);
-                            }
-                        }
-
-                        details.skill_experience = skill_experiences;
-                    } catch (err) {
-                        console.log(err, "save naukri  details.skill_experience");
-                    }
-                }
-                //education
-                if (user_details?.educations) {
-                    try {
-                        let education = [];
-                        let education_element = user_details?.educations;
-                        for (let i = 0; i < education_element.length; i++) {
-                            let education_object = {};
                             try {
-                                education_object.institution = education_element[i]?.['institute'].label;
-                                education_object.passing_year = education_element[i]?.['yearOfCompletion'];
-                                education_object.specialization = education_element[i]?.['spec'].label;
-                                education_object.education = education_element[i]?.['course'].label;
-                                education_object.education_group = education_element[i]?.['educationType'].label;
-                                // education_object.percentageType = education_element[i]['gradeId'] == 1 ? 2 : (education_element[i]['gradeId'] == 2 ? 3 : (education_element[i]['gradeId'] == 3 ? 1 : education_element[i]['gradeId']));
-                                // education_object.percentage = education_element[i]['marks'];
-                                education_object.educationType = education_element[i]['courseType'];
+                                if (!work_history_element[i].endYearMillis) {
+                                    details.job_title = work_history_element[i].designation;
+                                    details.designation = work_history_element[i].designation;
+                                    details.current_employer = work_history_element[i].organization;
+                                }
                             }
                             catch (err) {
 
                             }
-                            education.push(education_object)
-                            console.log(education_object);
+                            work_history.employer = work_history_element[i].organization;
+                            work_history.summary = work_history_element[i].jobProfile || '';
+                            work_history.designation = work_history_element[i].designation;
+                            work_histories.push(work_history);
+
                         }
-                        details.education = education;
-                    } catch (err) {
-                        console.log(err, "save naukri details.education");
+                    details.work_history = work_histories;
+                } catch (err) {
+                    console.log(err, "save naukri details.work_history");
+                }
+
+
+
+                //skill exp
+
+
+                try {
+                    let skill_experiences = [];
+                    let skill_experience_element = user_details.skills;
+                    if (skill_experience_element && skill_experience_element.length) {
+                        for (var i = 0; i < skill_experience_element.length; i++) {
+                            var skill_experience = {};
+                            if (skill_experience_element[i]?.skill?.label)
+                                skill_experience.skill_name = skill_experience_element[i].skill?.label;
+                            if (skill_experience_element[i].lastUsed) {
+                                skill_experience.last_used = skill_experience_element[i].lastUsed;
+                            }
+                            if (skill_experience_element[i].version) {
+                                skill_experience.version = skill_experience_element[i].version;
+                            }
+                            try {
+                                skill_experience.experience = skill_experience_element[i].experienceTime || 0;
+                            }
+                            catch (err) {
+
+                            }
+                            skill_experiences.push(skill_experience);
+                        }
                     }
+
+                    details.skill_experience = skill_experiences;
+                } catch (err) {
+                    console.log(err, "save naukri  details.skill_experience");
+                }
+
+                //education
+
+                try {
+                    let education = [];
+                    let education_element = user_details.educations;
+                    for (let i = 0; i < education_element.length; i++) {
+                        let education_object = {};
+                        try {
+                            education_object.institution = education_element[i]?.['institute'].label;
+                            education_object.passing_year = education_element[i]?.['yearOfCompletion'];
+                            education_object.specialization = education_element[i]?.['spec'].label;
+                            education_object.education = education_element[i]?.['course'].label;
+                            education_object.education_group = education_element[i]?.['educationType'].label;
+                            // education_object.percentageType = education_element[i]['gradeId'] == 1 ? 2 : (education_element[i]['gradeId'] == 2 ? 3 : (education_element[i]['gradeId'] == 3 ? 1 : education_element[i]['gradeId']));
+                            // education_object.percentage = education_element[i]['marks'];
+                            education_object.educationType = education_element[i]['courseType'];
+                        }
+                        catch (err) {
+
+                        }
+                        education.push(education_object)
+                        console.log(education_object);
+                    }
+                    details.education = education;
+                } catch (err) {
+                    console.log(err, "save naukri details.education");
                 }
                 //certifications
-
-                if (user_details?.certifications) {
-                    try {
-                        details.certifications = user_details?.certifications || [];
-                    }
-                    catch (err) {
-
-                    }
-                }
-                if (user_details?.resumeId) {
-                    try {
-                        details.u_id = user_details?.resumeId
-                    }
-                    catch (err) {
-
-                    }
-                }
-                if (user_details?.requirements) {
-                    try {
-                        if (req.body.requirements) {
-                            try {
-                                if (typeof req.body.requirements == "string") {
-                                    try {
-                                        req.body.requirements = JSON.parse(req.body.requirements)
-                                    } catch (err) {
-                                        console.log(err);
-                                    }
-                                }
-                                if (req.body.requirements.length) {
-                                    details.requirements = req.body.requirements
-                                } else {
-                                    details.requirements = [parseInt(req.body.requirements)];
-                                }
-                            } catch (err) {
-                                console.log(err);
-                            }
-                        }
-                    }
-                    catch (Err) {
-
-                    }
-                }
-                if (user_details) {
-                    try {
-                        details.naukri_response = user_details;
-                    }
-                    catch (Err) {
-
-                    }
-                }
-            }
-            if (user_details?.base64) {
                 try {
-                    details.attachment = resume_details.base64;
-                    details.file_name = resume_details.file_name;
-                    details.resume_extension = resume_details.file_name.split('.').pop();
+                    details.certifications = user_details.certifications || [];
                 }
                 catch (err) {
-                    console.log('resume file error')
+
                 }
+
+                try {
+                    details.u_id = user_details.resumeId
+                }
+                catch (err) {
+
+                }
+
+                try {
+                    if (req.body.requirements) {
+                        try {
+                            if (typeof req.body.requirements == "string") {
+                                try {
+                                    req.body.requirements = JSON.parse(req.body.requirements)
+                                } catch (err) {
+                                    console.log(err);
+                                }
+                            }
+                            if (req.body.requirements.length) {
+                                details.requirements = req.body.requirements
+                            } else {
+                                details.requirements = [parseInt(req.body.requirements)];
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                }
+                catch (Err) {
+
+                }
+
+                try {
+                    details.naukri_response = user_details;
+                }
+                catch (Err) {
+
+                }
+            }
+
+            try {
+                details.attachment = resume_details.base64;
+                details.file_name = resume_details.file_name;
+                details.resume_extension = resume_details.file_name.split('.').pop();
+            }
+            catch (err) {
+                console.log('resume file error')
             }
         } catch (err) {
 
@@ -2294,12 +2320,14 @@ naukriImporter.checkApplicantExistsFromNaukriPortalApplied = function (req, res)
 
 };
 
-naukriImporter.saveApplicantsFromNaukriApplied = function (req, res) {
+naukriImporter.saveApplicantsFromNaukriApplied = async function (req, res) {
     var response = new shared_ctrl.response();
     var details = new shared_ctrl.portalimporterDetails();
     details.portal_id = 1;
     var tallintToken = req.body.session['token'];
-    let user_details = shared_ctrl.jsonDeepParse(req.body.user_details);
+    let user_details;
+    var result;
+    let contact_details = shared_ctrl.jsonDeepParse(req.body.user_details);
     let resume_details = shared_ctrl.jsonDeepParse(req.body.attachment);
     let portal_details = shared_ctrl.jsonDeepParse(req.body.portal_details);
     let client_details = shared_ctrl.jsonDeepParse(req.body.client_details);
@@ -2309,357 +2337,712 @@ naukriImporter.saveApplicantsFromNaukriApplied = function (req, res) {
     if (selectedPortal.resumeSaveApiUrl) {
         save_url = selectedPortal.resumeSaveApiUrl;
         console.log(save_url)
-    } try {
-        if (user_details) {
-            //name
+    }
+    const htmlContent = shared_ctrl.jsonDeepParse(req.body.html_content)?.html_content;
+    if (htmlContent) {
+        const timestamp = Date.now();
+        const filename = `@page_resdex.naukri.com_${timestamp}.html`;
+        const filePath = path.resolve(__dirname, filename);
+        console.log(filename)
+        try {
+            await fsp.writeFile(filePath, htmlContent);
+
+            const form = new FormData();
+            form.append('html_file', fs.createReadStream(filePath), { filename });
+            form.append('output_base_name', 'string');
+
+            const response = await axios({
+                method: 'post',
+                url: 'https://api.parsinga.com/naukri-html-processor',
+                headers: {
+                    'Authorization': "Bearer 0530148c-6dd9-41bf-81da-0a268ecad812",
+                    ...form.getHeaders(),
+                },
+                data: form,
+                maxBodyLength: Infinity,
+                maxContentLength: Infinity,
+            });
+
+            console.log(" Parsed data:", response.data);
+            user_details = response.data.parsed_data;
+            result = response.data;
+
+            await fsp.unlink(filePath);
+        } catch (error) {
+            console.error("Parser API call failed:", error?.response?.data || error.message);
             try {
-                details.full_name = user_details?.name || "";;
-                try {
-                    details.first_name = user_details?.name.split(',')[0].split(' ')[0] || "";
-                } catch (error) {
+                if (fs.existsSync(filePath)) {
+                    await fsp.unlink(filePath);
+                    console.log(`Temp file ${filename} removed after error.`);
                 }
-                try {
-                    details.last_name = user_details?.name.split(',')[0].split(' ').pop() || "";
-                } catch (error) {
-                }
+            } catch (cleanupErr) {
+                console.error("Failed to delete temp file:", cleanupErr.message);
             }
-            catch (err) {
-            }
-            //emailId
-            try {
-                details.email_id = user_details?.email || "";
-            }
-            catch (err) { }
-            try {
-                details.alt_email_id = user_details?.email || "";
-            }
-            catch (err) { }
-            //mobile_number
-            // try {
-            //   details.mobile_number = user_details?.phoneNumber[0] || ""
-            // }
-            // catch (err) { }
-            // try {
-            //   if ((user_details?.phoneNumber[0]).toString().length == 12) {
-            //     details.mobile_number = (user_details?.phoneNumber[0]).toString().slice(2, 12);
-            //     details.isd = (user_details?.phoneNumber[0]).toString().slice(0, 2);
-            //   }
-            // }
-            // catch (err) {
-            // }
-            try {
-                details.age = user_details?.age || ""
-            } catch (error) {
-            }
-            //address
-            try {
-                details.address = user_details?.currentCity || "";
-            } catch (err) {
-                console.log(err, "save naukri details.address");
-            }
-            try {
-                details.last_modified_date = user_details?.lastActiveOnResdex || "";
-            } catch (err) {
-                console.log(err, "save naukri details.last_modified_date");
-            }
-            //  experience
-            // try {
-            //     details.experience = user_details?.experience['years'] + " years " + user_details?.experience['months'] + " months" || "";
-
-            // }
-            // catch (err) {
-            //     console.log(err, "save naukri details.experience");
-            // }
-            // try {
-            //     // let temp_experience = 0;
-            //     // console.log(user_details?.experience);
-
-            //     // const temp_element = user_details?.experience;
-
-            //     // if (temp_element?.years) {
-            //     //     temp_experience += temp_element.years;
-            //     // }
-
-            //     // if (temp_element?.months) {
-            //     //     temp_experience += parseFloat((temp_element.months / 12).toFixed(1));
-            //     // }
-
-            //     // if (temp_experience) {
-            //     //     details.experience = temp_experience;
-            //     // }
-
-            //     console.log("Converted Experience:", temp_experience);
-            // } catch (error) {
-            //     console.error("Error processing experience:", error);
-            // }
-
-            try {
-                details.profile_pic = user_details?.photo || "";
-            }
-            catch (err) {
-                console.log(err, "save naukri details.profile_pic");
-            }
-            // Portal Id
-            try {
-                details.portal_id = 1;
-            }
-            catch (err) {
-                console.log(err, "save naukri details.portal_id");
-            }
-            //Languages
-            try {
-                // let languages = [];
-                // let language_element = user_details?.languages;
-                // if (language_element && language_element.length) {
-                //   for (var i = 0; i < language_element.length; i++) {
-                //     var language = {};
-                //     if (language_element[i])
-                //       language.language_name = language_element[i];
-                //     languages.push(language);
-                //   }
-                // }
-                details.languages = user_details?.languages || [];
-            } catch (err) {
-                console.log(err, "save naukri details.languages");
-            }
-            //Secondary Skills
-            // try {
-            //   let secondary_skills = [];
-            //   let secondary_skill_element = user_details?.mayKnow;
-            //   if (secondary_skill_element && secondary_skill_element.length) {
-            //     for (var i = 0; i < secondary_skill_element.length; i++) {
-            //       var secondary_skill = {};
-            //       if (secondary_skill_element[i])
-            //         secondary_skill.skill_name = secondary_skill_element[i];
-            //       secondary_skill.last_used = "";
-            //       secondary_skill.experience = "";
-            //       secondary_skills.push(secondary_skill);
-            //     }
-            //   }
-            //   details.secondary_skills = secondary_skills;
-            // } catch (err) {
-            //   console.log(err, "save naukri details.secondary_skills");
-            // }
-            //details.notice_period
-            try {
-                details.notice_period = user_details?.noticePeriod || "";
-            } catch (err) {
-                console.log(err, "save naukri details.notice_period");
-            }
-            // salary details
-            try {
-                details.present_salary = user_details?.ctc['lacs'] + " " + user_details?.ctc['thousands'];
-                try {
-                    details.present_salary_curr = user_details?.ctc['currency'] || "";
-                }
-                catch (Err) {
-                }
-                details.present_salary_period = "Lacs Per Annum";
-            }
-            catch (err) {
-                console.log(err, "save naukri details.salaryDetails");
-            }
-            //salary
-            try {
-                details.expected_salary = user_details?.expectedCtc['lacs'] + "." + user_details?.expectedCtc['thousands'];
-                try {
-                    details.expected_salary_curr = user_details?.expectedCtc['currency'] || "";
-                }
-                catch (Err) {
-                }
-                details.expected_salary_period = "Lacs Per Annum";
-            }
-            catch (err) {
-                console.log(err, "save naukri details.salaryDetails");
-            }
-            //location
-            try {
-                details.location = user_details?.currentCity || ""
-            }
-            catch (err) {
-            }
-            //Preffered locations
-            try {
-                // let preferredLocations = [];
-                // let preferredLocation_element = user_details?.preferredLocation;
-                // if (preferredLocation_element && preferredLocation_element.length) {
-                //   for (var i = 0; i < preferredLocation_element.length; i++) {
-                //     var preferredLocation = {};
-                //     if (preferredLocation_element[i])
-                //       preferredLocation.name = preferredLocation_element[i];
-                //     preferredLocations.push(preferredLocation);
-                //   }
-                // }
-                details.preferredLocations = user_details?.preferredLocations;
-            } catch (err) {
-                console.log(err, "save apna details.preferredLocation");
-            }
-            //DOB
-            // try {
-            //   details.DOB = shared_ctrl.dateConverter(user_details?.birthDate)
-            // }
-            // catch (err) {
-            // }
-            //gender
-            // try {
-            //   let gender = user_details?.gender;
-            //   if (gender.toLowerCase() == "f") {
-
-            //     details.gender = 'F'
-            //   } else if (gender.toLowerCase() == "m") {
-
-            //     details.gender = 'M'
-            //   } else {
-            //     details.gender = '';
-            //   }
-            // }
-            // catch (err) {
-            //   console.log(err, "save naukri gender");
-            // }
-            // industry
-            try {
-                // let industries = [];
-                // let industry_element = user_details?.industries;
-                // if (industry_element && industry_element.length) {
-                //   for (var i = 0; i < industry_element.length; i++) {
-                //     var industry = {};
-                //     if (industry_element[i])
-                //       industry.name = industry_element[i];
-                //     industries.push(industry);
-                //   }
-                // }
-                details.industry = user_details?.industry;
-            } catch (err) {
-                console.log(err, "save apna details.industry");
-            }
-            // functional_areas
-            try {
-                details.functional_areas = user_details?.functionalArea || [];
-            }
-            catch (err) {
-                console.log(err, "save naukri functional_areas");
-            }
-            //role
-            try {
-                details.role = user_details?.role || "";
-            }
-            catch (err) {
-                console.log(err, "save naukri role");
-            }
-            try {
-                details.skills = user_details?.keySkills || "";
-            }
-            catch (err) {
-                console.log(err, "save naukri skills");
-            }
-            try {
-                details.summary = user_details?.summary || "";
-            }
-            catch (err) {
-                console.log(err, "save naukri summary");
-            }
-            //other_details
-            try {
-                details.job_title = user_details?.workExp[0]?.designation || "";
-                details.designation = user_details?.designation || "";
-                details.current_employer = user_details?.current_employer || "";
-            }
-            catch (err) {
-            }
-            //Work history
-            try {
-                var work_histories = [];
-                var work_history_element = user_details?.workExp;
-                //index 0 consists of current organization
-                if (work_history_element && work_history_element?.length)
-                    for (var i = 0; i < work_history_element?.length; i++) {
-                        var work_history = {};
-                        work_history.duration = {
-                            from: new Date(work_history_element[i].workingFrom),
-                            to: work_history_element[i]?.workingTo ? new Date(work_history_element[i].workingTo) : 'Present'
-                        };
-                        work_history.employer = work_history_element[i]?.company;
-                        work_history.summary = work_history_element[i]?.jobProfile || '';
-                        work_history.designation = work_history_element[i]?.designation;
-                        work_histories.push(work_history);
-                    }
-                details.work_history = work_histories;
-            } catch (err) {
-                console.log(err, "save naukri details.work_history");
-            }
-            //skill exp
-            // try {
-            //   let skill_experiences = [];
-            //   let skill_experience_element = user_details?.skills;
-            //   if (skill_experience_element && skill_experience_element?.length) {
-            //     for (var i = 0; i < skill_experience_element?.length; i++) {
-            //       var skill_experience = {};
-            //       if (skill_experience_element[i])
-            //         skill_experience.skill_name = stripHtmlTags(skill_experience_element[i]);
-            //       skill_experience.last_used = "";
-            //       skill_experience.experience = "";
-            //       skill_experiences.push(skill_experience);
-            //     }
-            //   }
-            //   details.skill_experience = skill_experiences;
-            //   details.primary_skills = skill_experiences;
-
-            // } catch (err) {
-            //   console.log(err, "save naukri details.skill_experience");
-            // }
-            //education
-            try {
-                let education = [];
-                let education_element = user_details?.education;
-                for (let i = 0; i < education_element?.length; i++) {
-                    let education_object = {};
-                    try {
-                        education_object.institution = education_element[i]?.institute;
-                        education_object.passing_year = education_element[i]?.year ? education_element[i].year : "still studying";
-                        education_object.specialization = education_element[i]?.specialization;
-                        education_object.education = education_element[i]?.courseType;
-                        education_object.education_group = education_element[i]?.institute;
-                        education_object.educationType = education_element[i]?.degreeType;
-                    }
-                    catch (err) {
-
-                    }
-                    if (education_object.institution)
-                        education.push(education_object);
-
-                }
-                details.education = education;
-            } catch (err) {
-                console.log(err, "save naukri details.education");
-            }
-
-            try {
-                details.uid = user_details?.jobSeekerUserId || ""
-            }
-            catch (err) {
-            }
-            try {
-                details.naukri_response = user_details;
-            }
-            catch (Err) {
-
-            }
+            res.status(500).json({ error: 'Parser API failed' });
         }
 
-        console.log(details);
-        // try {
-        //     details.attachment = resume_details?.base64;
-        //     details.file_name = resume_details?.file_name;
-        //     details.resume_extension = resume_details.file_name?.split('.').pop();
-        // }
-        // catch (err) {
-        //     console.log('resume file error')
-        // }
-    } catch (err) {
+        try {
+            if (user_details) {
+                console.log(user_details)
+                //name
+                try {
+                    details.full_name = user_details?.full_name;
+                    try {
+                        details.first_name = user_details?.first_name
+                    } catch (error) {
 
-        console.log(err, 'error')
+                    }
+                    try {
+                        details.last_name = user_details?.last_name
+                    } catch (error) {
+
+                    }
+                }
+                catch (err) {
+
+                }
+
+                //emailId
+                try {
+                    details.email_id = user_details?.email_id;
+                }
+                catch (err) { }
+
+                //mobile_number
+                try {
+                    details.mobile_number = user_details?.mobile_number
+                }
+                catch (err) { }
+                try {
+                    details.mobile_isd = user_details?.mobile_isd
+
+                }
+                catch (err) {
+
+                }
+                //address
+                try {
+                    details.address = user_details?.parsed_data?.personal_info?.contact?.address;
+                } catch (err) {
+                    console.log(err, "save naukri details.address");
+                }
+
+
+                //  experience
+                try {
+                    details.experience = user_details?.experience;
+                    details.age = user_details?.age;
+                }
+                catch (err) {
+                    console.log(err, "save naukri details.experience");
+                }
+
+                //primary_skills
+                try {
+                    details.primary_skills = user_details?.primary_skills;
+                    details.secondary_skills = user_details?.secondary_skills;
+                } catch (err) {
+                    console.log(err, "save naukri details.primary_skills");
+                }
+                //notice_period
+                try {
+                    details.notice_period = user_details?.notice_period;
+                } catch (err) {
+                    console.log(err, "save naukri details.notice_period");
+                }
+                // salary details
+                try {
+                    details.present_salary = user_details?.present_salary;
+
+                    try {
+                        details.present_salary_curr = user_details?.present_salary_curr;
+                    }
+                    catch (Err) {
+
+                    }
+
+                    details.present_salary_period = user_details?.present_salary_period;
+                }
+
+                catch (err) {
+                    console.log(err, "save naukri details.salaryDetails");
+                }
+                //salary
+                try {
+                    details.expected_salary = user_details?.expected_salary;
+
+                    try {
+                        details.expected_salary_curr = user_details?.expected_salary_curr;
+                    }
+                    catch (Err) {
+
+                    }
+
+                    details.expected_salary_period = user_details?.expected_salary_period;
+                }
+
+                catch (err) {
+                    console.log(err, "save naukri details.salaryDetails");
+                }
+
+                //location
+
+                try {
+                    details.location = user_details?.location
+                }
+                catch (err) {
+
+                }
+
+                //Preffered location
+                try {
+                    details.preferredLocations = user_details?.pref_locations;
+                }
+                catch (err) {
+
+                }
+
+                //DOB
+                try {
+                    details.DOB = user_details?.DOB;
+                }
+                catch (err) {
+                }
+
+                //gender
+                try {
+                    let gender = user_details?.gender;
+                    if (gender.toLowerCase() == "female") {
+
+                        details.gender = 'F'
+                    } else if (gender.toLowerCase() == "male") {
+
+                        details.gender = 'M'
+                    } else {
+                        details.gender = '';
+                    }
+                }
+                catch (err) {
+                    console.log(err, "save naukri gender");
+                }
+                // industry
+                try {
+                    details.industry = user_details?.industry;
+                }
+                catch (err) {
+                    console.log(err, "save naukri industry");
+                }
+
+                // functional_areas
+                try {
+                    details.functional_areas = user_details?.functional_areas;
+                }
+                catch (err) {
+                    console.log(err, "save naukri functional_areas");
+                }
+
+                //role
+                try {
+                    details.role = user_details?.role;
+                }
+                catch (err) {
+                    console.log(err, "save naukri role");
+                }
+
+                //other_details
+                try {
+                    details.job_title = user_details?.work_history[0]?.designation;
+                    details.designation = user_details?.work_history[0]?.designation;
+                    details.current_employer = user_details?.current_employer;
+                }
+                catch (err) {
+
+                }
+
+                //history
+                try {
+                    details.work_history = user_details?.work_history;
+                } catch (err) {
+                    console.log(err, "save naukri details.work_history");
+                }
+
+                //skill exp
+                try {
+                    details.skill_experience = user_details?.experience;
+                } catch (err) {
+                    console.log(err, "save naukri  details.skill_experience");
+                }
+
+                //education
+
+                try {
+
+                    details.education = user_details?.education;
+                    details.projects = user_details?.projects;
+                } catch (err) {
+                    console.log(err, "save naukri details.education");
+                }
+                //certifications
+                try {
+                    details.certifications = user_details?.certifications || [];
+                }
+                catch (err) {
+
+                }
+
+                try {
+                    details.u_id = result?.file_uuid;
+                    details.nationality = user_details?.nationality
+                    details.job_type = user_details?.job_type
+                    details.summary = user_details?.summary
+                    details.languages = user_details?.languages
+                }
+                catch (err) {
+
+                }
+                try {
+                    // details.resume_document = result?.extracted_pdf;
+                    details.attachment = result?.extracted_pdf;
+
+                    // const base64Data = result?.extracted_pdf;
+                    // const fileName = `resume_${Date.now()}.pdf`;
+                    // const filePath2 = path.join(__dirname, fileName);
+                    // await fsp.writeFile(filePath2, Buffer.from(base64Data, 'base64'));
+                    // console.log("PDF file written to disk:", filePath2);
+                    // details.attachment = filePath2;
+                    // await fsp.unlink(filePath2);
+
+                }
+                catch (err) {
+                    console.log('resume file error', err)
+                }
+                if (user_details?.cvFileName) {
+                    try {
+                        details.file_name = user_details?.cvFileName;
+                        details.resume_extension = user_details?.cvFileName?.split('.').pop();
+                        // details.resume_mimeType= resume_MIME || "",
+                    }
+                    catch (err) {
+                        console.log('resume file error', err)
+                    }
+                }
+                try {
+                    details.last_modified_date = user_details?.last_modified_date;
+                    details.portal_id = user_details?.portal_id;
+
+                }
+                catch (err) {
+                    console.log('resume file error')
+                }
+
+                try {
+                    if (req.body?.requirements) {
+                        try {
+                            if (typeof req.body?.requirements == "string") {
+                                try {
+                                    req.body.requirements = JSON.parse(req.body.requirements)
+                                } catch (err) {
+                                    console.log(err);
+                                }
+                            }
+                            if (req.body?.requirements?.length) {
+                                details.requirements = req.body.requirements
+                            } else {
+                                details.requirements = [parseInt(req.body?.requirements)];
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                }
+                catch (Err) {
+
+                }
+            }
+
+
+        } catch (err) {
+
+            console.log(err, 'error')
+        }
+    } else {
+        console.log("entered into else condition")
+        user_details = shared_ctrl.jsonDeepParse(req.body.contact_details);
+
+        try {
+            if (user_details) {
+                //name
+                try {
+                    details.full_name = user_details?.name || "";;
+                    try {
+                        details.first_name = user_details?.name.split(',')[0].split(' ')[0] || "";
+                    } catch (error) {
+                    }
+                    try {
+                        details.last_name = user_details?.name.split(',')[0].split(' ').pop() || "";
+                    } catch (error) {
+                    }
+                }
+                catch (err) {
+                }
+                //emailId
+                try {
+                    details.email_id = user_details?.email || "";
+                }
+                catch (err) { }
+                try {
+                    details.alt_email_id = user_details?.email || "";
+                }
+                catch (err) { }
+                //mobile_number
+                // try {
+                //   details.mobile_number = user_details?.phoneNumber[0] || ""
+                // }
+                // catch (err) { }
+                // try {
+                //   if ((user_details?.phoneNumber[0]).toString().length == 12) {
+                //     details.mobile_number = (user_details?.phoneNumber[0]).toString().slice(2, 12);
+                //     details.isd = (user_details?.phoneNumber[0]).toString().slice(0, 2);
+                //   }
+                // }
+                // catch (err) {
+                // }
+                try {
+                    details.age = user_details?.age || ""
+                } catch (error) {
+                }
+                //address
+                try {
+                    details.address = user_details?.currentCity || "";
+                } catch (err) {
+                    console.log(err, "save naukri details.address");
+                }
+                try {
+                    details.last_modified_date = user_details?.lastActiveOnResdex || "";
+                } catch (err) {
+                    console.log(err, "save naukri details.last_modified_date");
+                }
+                //  experience
+                // try {
+                //     details.experience = user_details?.experience['years'] + " years " + user_details?.experience['months'] + " months" || "";
+
+                // }
+                // catch (err) {
+                //     console.log(err, "save naukri details.experience");
+                // }
+                // try {
+                //     // let temp_experience = 0;
+                //     // console.log(user_details?.experience);
+
+                //     // const temp_element = user_details?.experience;
+
+                //     // if (temp_element?.years) {
+                //     //     temp_experience += temp_element.years;
+                //     // }
+
+                //     // if (temp_element?.months) {
+                //     //     temp_experience += parseFloat((temp_element.months / 12).toFixed(1));
+                //     // }
+
+                //     // if (temp_experience) {
+                //     //     details.experience = temp_experience;
+                //     // }
+
+                //     console.log("Converted Experience:", temp_experience);
+                // } catch (error) {
+                //     console.error("Error processing experience:", error);
+                // }
+
+                try {
+                    details.profile_pic = user_details?.photo || "";
+                }
+                catch (err) {
+                    console.log(err, "save naukri details.profile_pic");
+                }
+                // Portal Id
+                try {
+                    details.portal_id = 1;
+                }
+                catch (err) {
+                    console.log(err, "save naukri details.portal_id");
+                }
+                //Languages
+                try {
+                    // let languages = [];
+                    // let language_element = user_details?.languages;
+                    // if (language_element && language_element.length) {
+                    //   for (var i = 0; i < language_element.length; i++) {
+                    //     var language = {};
+                    //     if (language_element[i])
+                    //       language.language_name = language_element[i];
+                    //     languages.push(language);
+                    //   }
+                    // }
+                    details.languages = user_details?.languages || [];
+                } catch (err) {
+                    console.log(err, "save naukri details.languages");
+                }
+                //Secondary Skills
+                // try {
+                //   let secondary_skills = [];
+                //   let secondary_skill_element = user_details?.mayKnow;
+                //   if (secondary_skill_element && secondary_skill_element.length) {
+                //     for (var i = 0; i < secondary_skill_element.length; i++) {
+                //       var secondary_skill = {};
+                //       if (secondary_skill_element[i])
+                //         secondary_skill.skill_name = secondary_skill_element[i];
+                //       secondary_skill.last_used = "";
+                //       secondary_skill.experience = "";
+                //       secondary_skills.push(secondary_skill);
+                //     }
+                //   }
+                //   details.secondary_skills = secondary_skills;
+                // } catch (err) {
+                //   console.log(err, "save naukri details.secondary_skills");
+                // }
+                //details.notice_period
+                try {
+                    details.notice_period = user_details?.noticePeriod || "";
+                } catch (err) {
+                    console.log(err, "save naukri details.notice_period");
+                }
+                // salary details
+                try {
+                    details.present_salary = user_details?.ctc['lacs'] + " " + user_details?.ctc['thousands'];
+                    try {
+                        details.present_salary_curr = user_details?.ctc['currency'] || "";
+                    }
+                    catch (Err) {
+                    }
+                    details.present_salary_period = "Lacs Per Annum";
+                }
+                catch (err) {
+                    console.log(err, "save naukri details.salaryDetails");
+                }
+                //salary
+                try {
+                    details.expected_salary = user_details?.expectedCtc['lacs'] + "." + user_details?.expectedCtc['thousands'];
+                    try {
+                        details.expected_salary_curr = user_details?.expectedCtc['currency'] || "";
+                    }
+                    catch (Err) {
+                    }
+                    details.expected_salary_period = "Lacs Per Annum";
+                }
+                catch (err) {
+                    console.log(err, "save naukri details.salaryDetails");
+                }
+                //location
+                try {
+                    details.location = user_details?.currentCity || ""
+                }
+                catch (err) {
+                }
+                //Preffered locations
+                try {
+                    // let preferredLocations = [];
+                    // let preferredLocation_element = user_details?.preferredLocation;
+                    // if (preferredLocation_element && preferredLocation_element.length) {
+                    //   for (var i = 0; i < preferredLocation_element.length; i++) {
+                    //     var preferredLocation = {};
+                    //     if (preferredLocation_element[i])
+                    //       preferredLocation.name = preferredLocation_element[i];
+                    //     preferredLocations.push(preferredLocation);
+                    //   }
+                    // }
+                    details.preferredLocations = user_details?.preferredLocations;
+                } catch (err) {
+                    console.log(err, "save apna details.preferredLocation");
+                }
+                //DOB
+                // try {
+                //   details.DOB = shared_ctrl.dateConverter(user_details?.birthDate)
+                // }
+                // catch (err) {
+                // }
+                //gender
+                // try {
+                //   let gender = user_details?.gender;
+                //   if (gender.toLowerCase() == "f") {
+
+                //     details.gender = 'F'
+                //   } else if (gender.toLowerCase() == "m") {
+
+                //     details.gender = 'M'
+                //   } else {
+                //     details.gender = '';
+                //   }
+                // }
+                // catch (err) {
+                //   console.log(err, "save naukri gender");
+                // }
+                // industry
+                try {
+                    // let industries = [];
+                    // let industry_element = user_details?.industries;
+                    // if (industry_element && industry_element.length) {
+                    //   for (var i = 0; i < industry_element.length; i++) {
+                    //     var industry = {};
+                    //     if (industry_element[i])
+                    //       industry.name = industry_element[i];
+                    //     industries.push(industry);
+                    //   }
+                    // }
+                    details.industry = user_details?.industry;
+                } catch (err) {
+                    console.log(err, "save apna details.industry");
+                }
+                // functional_areas
+                try {
+                    details.functional_areas = user_details?.functionalArea || [];
+                }
+                catch (err) {
+                    console.log(err, "save naukri functional_areas");
+                }
+                //role
+                try {
+                    details.role = user_details?.role || "";
+                }
+                catch (err) {
+                    console.log(err, "save naukri role");
+                }
+                try {
+                    details.skills = user_details?.keySkills || "";
+                }
+                catch (err) {
+                    console.log(err, "save naukri skills");
+                }
+                try {
+                    details.summary = user_details?.summary || "";
+                }
+                catch (err) {
+                    console.log(err, "save naukri summary");
+                }
+                //other_details
+                try {
+                    details.job_title = user_details?.workExp[0]?.designation || "";
+                    details.designation = user_details?.designation || "";
+                    details.current_employer = user_details?.current_employer || "";
+                }
+                catch (err) {
+                }
+                //Work history
+                try {
+                    var work_histories = [];
+                    var work_history_element = user_details?.workExp;
+                    //index 0 consists of current organization
+                    if (work_history_element && work_history_element?.length)
+                        for (var i = 0; i < work_history_element?.length; i++) {
+                            var work_history = {};
+                            work_history.duration = {
+                                from: new Date(work_history_element[i].workingFrom),
+                                to: work_history_element[i]?.workingTo ? new Date(work_history_element[i].workingTo) : 'Present'
+                            };
+                            work_history.employer = work_history_element[i]?.company;
+                            work_history.summary = work_history_element[i]?.jobProfile || '';
+                            work_history.designation = work_history_element[i]?.designation;
+                            work_histories.push(work_history);
+                        }
+                    details.work_history = work_histories;
+                } catch (err) {
+                    console.log(err, "save naukri details.work_history");
+                }
+                //skill exp
+                // try {
+                //   let skill_experiences = [];
+                //   let skill_experience_element = user_details?.skills;
+                //   if (skill_experience_element && skill_experience_element?.length) {
+                //     for (var i = 0; i < skill_experience_element?.length; i++) {
+                //       var skill_experience = {};
+                //       if (skill_experience_element[i])
+                //         skill_experience.skill_name = stripHtmlTags(skill_experience_element[i]);
+                //       skill_experience.last_used = "";
+                //       skill_experience.experience = "";
+                //       skill_experiences.push(skill_experience);
+                //     }
+                //   }
+                //   details.skill_experience = skill_experiences;
+                //   details.primary_skills = skill_experiences;
+
+                // } catch (err) {
+                //   console.log(err, "save naukri details.skill_experience");
+                // }
+                //education
+                try {
+                    if (req.body.requirements) {
+                        try {
+                            if (typeof req.body.requirements == "string") {
+                                try {
+                                    req.body.requirements = JSON.parse(req.body.requirements)
+                                } catch (err) {
+                                    console.log(err);
+                                }
+                            }
+                            if (req.body.requirements.length) {
+                                details.requirements = req.body.requirements
+                            } else {
+                                details.requirements = [parseInt(req.body.requirements)];
+                            }
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    }
+                }
+                catch (Err) {
+
+                }
+                try {
+                    let education = [];
+                    let education_element = user_details?.education;
+                    for (let i = 0; i < education_element?.length; i++) {
+                        let education_object = {};
+                        try {
+                            education_object.institution = education_element[i]?.institute;
+                            education_object.passing_year = education_element[i]?.year ? education_element[i].year : "still studying";
+                            education_object.specialization = education_element[i]?.specialization;
+                            education_object.education = education_element[i]?.courseType;
+                            education_object.education_group = education_element[i]?.institute;
+                            education_object.educationType = education_element[i]?.degreeType;
+                        }
+                        catch (err) {
+
+                        }
+                        if (education_object.institution)
+                            education.push(education_object);
+
+                    }
+                    details.education = education;
+                } catch (err) {
+                    console.log(err, "save naukri details.education");
+                }
+
+                try {
+                    details.uid = user_details?.jobSeekerUserId || ""
+                }
+                catch (err) {
+                }
+                try {
+                    details.naukri_response = user_details;
+                }
+                catch (Err) {
+
+                }
+            }
+
+
+            try {
+                details.attachment = resume_details?.base64;
+                details.file_name = resume_details?.file_name;
+                details.resume_extension = resume_details.file_name?.split('.').pop();
+            }
+            catch (err) {
+                console.log('resume file error')
+            }
+            console.log(details);
+        } catch (err) {
+            console.log(err, 'error')
+        }
     }
-
     let config = {
         method: 'post',
         maxBodyLength: Infinity,
@@ -2709,6 +3092,7 @@ var keyMap = {
 
 
 }
+
 
 function parseV3DuplicateInfo(document, index = 0) {
     let details = new shared_ctrl.portalimporterDetails();
