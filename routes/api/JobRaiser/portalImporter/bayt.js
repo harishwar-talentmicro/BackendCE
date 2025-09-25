@@ -6,6 +6,7 @@ const axios = require('axios');
 var curr;
 BaytImporter = {};
 
+
 let ConvertedSalaryInfo = {
   AED: { conversion_rate: '0.27' },
   DZD: { conversion_rate: '0.00843519' },
@@ -231,6 +232,7 @@ BaytImporter.checkApplicantExistsFromBayt = function (req, res, next) {
     overwriteResumeOnlyDoc: portal_details.overwriteResumeOnlyDoc || 0,
     requirements: requirementList
   }
+
   let config = {
     method: 'post',
     maxBodyLength: Infinity,
@@ -266,14 +268,13 @@ BaytImporter.saveApplicantForBayt = function (req, res) {
   let save_url = req.body.save_url;
   if (selectedPortal.resumeSaveApiUrl) {
     save_url = selectedPortal.resumeSaveApiUrl;
-    console.log(save_url)
   } try {
     if (user_details) {
       //name
       try {
         details.full_name = user_details?.cvSections?.['personalInformationSection']?.name || ""
         try {
-          details.first_name = user_details?.cvSections?.['personalInformationSection']?.name?.split(" ")[0] || "";
+          details.first_name = user_details?.cvSections?.['personalInformationSection']?.name?.split(" ").slice(0, -1).join(" ") || "";
         } catch (error) {
         }
         try {
@@ -467,6 +468,7 @@ BaytImporter.saveApplicantForBayt = function (req, res) {
         details.job_title = user_details?.cvSections?.['busniessCard']?.position || "";
         details.designation = user_details?.cvSections?.['busniessCard']?.position || "";
         details.current_employer = user_details?.cvSections?.['busniessCard']?.companyName || "";
+        details.marital_status = user_details?.cvSections?.['personalInformationSection']?.maritalStatus || ""
       }
       catch (err) {
       }
@@ -573,6 +575,29 @@ BaytImporter.saveApplicantForBayt = function (req, res) {
     }
     catch (err) {
       console.log('resume file error')
+    }
+    try {
+      if (req.body?.requirements) {
+        try {
+          if (typeof req.body.requirements == "string") {
+            try {
+              req.body.requirements = JSON.parse(req.body.requirements)
+            } catch (err) {
+              console.log(err);
+            }
+          }
+          if (req.body.requirements.length) {
+            details.requirements = req.body.requirements
+          } else {
+            details.requirements = [parseInt(req.body.requirements)];
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      }
+    }
+    catch (Err) {
+
     }
   } catch (err) {
 
